@@ -21,14 +21,14 @@ class Astrology {
         const diff = (date - known) / (1000 * 60 * 60 * 24);
         const phase = (diff % lunarCycle) / lunarCycle;
 
-        if (phase < 0.0625 || phase >= 0.9375) return { icon: '🌑', name: { en: 'New Moon', es: 'Luna Nueva', it: 'Luna Nuova', zh: '新月' } };
-        if (phase < 0.1875) return { icon: '🌒', name: { en: 'Waxing Crescent', es: 'Creciente', it: 'Crescente', zh: '眉月' } };
-        if (phase < 0.3125) return { icon: '🌓', name: { en: 'First Quarter', es: 'Cuarto Creciente', it: 'Primo Quarto', zh: '上弦月' } };
-        if (phase < 0.4375) return { icon: '🌔', name: { en: 'Waxing Gibbous', es: 'Gibosa Creciente', it: 'Gibbosa Crescente', zh: '盈凸月' } };
-        if (phase < 0.5625) return { icon: '🌕', name: { en: 'Full Moon', es: 'Luna Llena', it: 'Luna Piena', zh: '满月' } };
-        if (phase < 0.6875) return { icon: '🌖', name: { en: 'Waning Gibbous', es: 'Gibosa Menguante', it: 'Gibbosa Calante', zh: '亏凸月' } };
-        if (phase < 0.8125) return { icon: '🌗', name: { en: 'Last Quarter', es: 'Cuarto Menguante', it: 'Ultimo Quarto', zh: '下弦月' } };
-        return { icon: '🌘', name: { en: 'Waning Crescent', es: 'Menguante', it: 'Calante', zh: '残月' } };
+        if (phase < 0.0625 || phase >= 0.9375) return { icon: '\u25CF', name: { en: 'New Moon', es: 'Luna Nueva', it: 'Luna Nuova', zh: '新月' } };
+        if (phase < 0.1875) return { icon: '\u263D', name: { en: 'Waxing Crescent', es: 'Creciente', it: 'Crescente', zh: '眉月' } };
+        if (phase < 0.3125) return { icon: '\u25D0', name: { en: 'First Quarter', es: 'Cuarto Creciente', it: 'Primo Quarto', zh: '上弦月' } };
+        if (phase < 0.4375) return { icon: '\u25D1', name: { en: 'Waxing Gibbous', es: 'Gibosa Creciente', it: 'Gibbosa Crescente', zh: '盈凸月' } };
+        if (phase < 0.5625) return { icon: '\u25CB', name: { en: 'Full Moon', es: 'Luna Llena', it: 'Luna Piena', zh: '满月' } };
+        if (phase < 0.6875) return { icon: '\u25D1', name: { en: 'Waning Gibbous', es: 'Gibosa Menguante', it: 'Gibbosa Calante', zh: '亏凸月' } };
+        if (phase < 0.8125) return { icon: '\u25D0', name: { en: 'Last Quarter', es: 'Cuarto Menguante', it: 'Ultimo Quarto', zh: '下弦月' } };
+        return { icon: '\u263E', name: { en: 'Waning Crescent', es: 'Menguante', it: 'Calante', zh: '残月' } };
     }
 
     static getLunarDate(gregorianDate) {
