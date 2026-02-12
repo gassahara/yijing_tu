@@ -37,6 +37,31 @@ class App {
         }
     }
 
+    static toggleBaziWizard() {
+        const wizard = document.getElementById('bazi-wizard');
+        if (wizard) {
+            wizard.classList.toggle('active');
+        }
+    }
+
+    static setNow() {
+        const dateInput = document.getElementById('readingDate');
+        const timeInput = document.getElementById('readingTime');
+        const now = new Date();
+        
+        if (dateInput) {
+            dateInput.valueAsDate = now;
+            this.updateReadingDate();
+        }
+        
+        if (timeInput) {
+            const h = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            timeInput.value = `${h}:${m}`;
+            this.updateReadingTime();
+        }
+    }
+
     static async init() {
         // Load data first
         this.hexagrams = await IChingCaster.fetchHexagramData();
@@ -70,6 +95,15 @@ class App {
         // Listen for resize events to update mobile state
         window.addEventListener('resize', () => {
             this.isMobile = window.matchMedia('(max-width: 767px)').matches;
+        });
+
+        // Close BaZi wizard on outside click
+        document.addEventListener('mousedown', (e) => {
+            const wizard = document.getElementById('bazi-wizard');
+            const content = document.querySelector('.bazi-wizard-content');
+            if (wizard && wizard.classList.contains('active') && content && !content.contains(e.target)) {
+                this.toggleBaziWizard();
+            }
         });
     }
     

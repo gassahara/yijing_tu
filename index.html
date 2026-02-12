@@ -156,22 +156,12 @@
             </div>
             <div class="header-controls">
                 <div class="control-group">
-                    <label for="readingDate" class="label-with-icon">
+                    <button class="bazi-toggle-btn" onclick="App.toggleBaziWizard()" aria-label="BaZi Configuration">
                         <span class="icon" aria-hidden="true">
-                            <svg><use href="#icon-moon"/></svg>
+                            <svg><use href="#icon-palace"/></svg>
                         </span>
-                        <span data-i18n="dateLabel">Date (Lunar)</span>
-                    </label>
-                    <input type="date" id="readingDate" onchange="App.updateReadingDate()" aria-label="Select reading date">
-                </div>
-                <div class="control-group">
-                    <label for="readingTime" class="label-with-icon">
-                        <span class="icon" aria-hidden="true">
-                            <svg><use href="#icon-clock"/></svg>
-                        </span>
-                        <span data-i18n="birthTimeLabel">Birth Time</span>
-                    </label>
-                    <input type="time" id="readingTime" onchange="App.updateReadingTime()" aria-label="Select birth time">
+                        <span data-i18n="baziSettings">BaZi Settings</span>
+                    </button>
                 </div>
                 <div class="control-group">
                     <label for="contextMinutes" class="label-with-icon">
@@ -212,6 +202,38 @@
             </div>
         </div>
     </header>
+
+    <!-- BaZi Configuration Wizard (Modal) -->
+    <div id="bazi-wizard" class="bazi-wizard-overlay" role="dialog" aria-modal="true" aria-label="BaZi Configuration">
+        <div class="bazi-wizard-content">
+            <button class="bazi-wizard-close" onclick="App.toggleBaziWizard()" aria-label="Close">&times;</button>
+            <h2 data-i18n="baziSettings">BaZi Settings</h2>
+            <div class="bazi-wizard-step">
+                <div class="bazi-control-group">
+                    <label for="readingDate" class="label-with-icon">
+                        <span class="icon" aria-hidden="true">
+                            <svg><use href="#icon-moon"/></svg>
+                        </span>
+                        <span data-i18n="dateLabel">Date (Lunar)</span>
+                    </label>
+                    <input type="date" id="readingDate" onchange="App.updateReadingDate()" aria-label="Select reading date">
+                </div>
+                <div class="bazi-control-group">
+                    <label for="readingTime" class="label-with-icon">
+                        <span class="icon" aria-hidden="true">
+                            <svg><use href="#icon-clock"/></svg>
+                        </span>
+                        <span data-i18n="birthTimeLabel">Birth Time</span>
+                    </label>
+                    <input type="time" id="readingTime" onchange="App.updateReadingTime()" aria-label="Select birth time">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="acc-btn" style="flex: 1;" onclick="App.setNow()" data-i18n="setNow">Now</button>
+                    <button class="btn-cast" style="flex: 2;" onclick="App.toggleBaziWizard()" data-i18n="saveSettings">Save & Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bagua Strip -->
     <!-- Trigram Popup -->
