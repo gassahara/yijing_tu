@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Astrology Test - Star Horary & Ayanamsa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="chinese-astrology.css?v=3.0.0">
+    <style>
+        body { 
+            font-family: Georgia, serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f0e8;
+        }
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 3px solid #8B0000;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #8B0000;
+            margin: 0 0 10px 0;
+        }
+        .header p {
+            color: #666;
+            font-style: italic;
+        }
+        .test-controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        .control-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        input, select {
+            padding: 10px;
+            border: 2px solid #d4c8b0;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #8B0000;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-calculate {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-calculate:hover {
+            background: #a00000;
+        }
+        .btn-calculate:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #results {
+            margin-top: 30px;
+        }
+        .api-status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .api-status.online {
+            background: #e8f4e8;
+            color: #2c5a2c;
+        }
+        .api-status.offline {
+            background: #ffe8e8;
+            color: #8b0000;
+        }
+        .literature-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .literature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .literature-item {
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #8B0000;
+        }
+        .literature-item h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .literature-item .chinese {
+            color: #8B0000;
+            font-size: 1.1em;
+        }
+        .literature-item .era {
+            color: #666;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌟 Chinese Astrology System</h1>
+        <p>Star Horary (Pa Gua/Ba Gua) with Ayanamsa Correction</p>
+        <p><em>San Shi (Three Styles) • Shen Sha (Symbolic Stars) • 28 Xiu (Lunar Mansions)</em></p>
+    </div>
+
+    <!-- API Status -->
+    <div id="apiStatus" class="api-status offline">
+        Checking API connection (v2.1.0-bagua)...
+    </div>
+
+    <!-- Literature Reference -->
+    <div class="literature-section">
+        <h3>📚 Ancient Literature Sources</h3>
+        <div class="literature-grid" id="literatureGrid">
+            <!-- Populated by JS -->
+        </div>
+        <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+            <h4>🆕 New Sources for Bagua & He Tu Analysis:</h4>
+            <ul style="margin: 10px 0; color: #555;">
+                <li><strong>Zhou Yi (周易)</strong> - The Book of Changes - Source of Bagua arrangements</li>
+                <li><strong>He Tu Luo Shu Yi Xiang (河圖洛書意象)</strong> - He Tu and Lo Shu imagery analysis</li>
+                <li><strong>Shuo Gua (說卦)</strong> - Discussion of the Trigrams - Trigram meanings and associations</li>
+                <li><strong>Xian Tian Tu (先天圖)</strong> - Pre-Heaven diagram - Fu Xi's arrangement</li>
+                <li><strong>Hou Tian Tu (后天圖)</strong> - Post-Heaven diagram - King Wen's arrangement</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Test Controls -->
+    <div class="test-controls">
+        <h3>🔮 Astrology Calculator</h3>
+        
+        <div class="control-group">
+            <label>Date & Time (Current Moment)</label>
+            <div class="control-row">
+                <input type="datetime-local" id="momentDate" value="">
+                <button type="button" onclick="setNow()" style="padding: 10px 20px;">Set to Now</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Location (for Ayanamsa Correction)</label>
+            <div class="control-row">
+                <input type="number" id="longitude" placeholder="Longitude (-180 to 180)" step="0.0001">
+                <input type="number" id="latitude" placeholder="Latitude (-90 to 90)" step="0.0001">
+                <button type="button" onclick="getLocation()" style="padding: 10px 20px;">📍 Get My Location</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Birth Information (Optional - for Comparison)</label>
+            <div class="control-row">
+                <input type="datetime-local" id="birthDate" placeholder="Birth Date">
+                <input type="number" id="birthLongitude" placeholder="Birth Longitude" step="0.0001">
+                <input type="number" id="birthLatitude" placeholder="Birth Latitude" step="0.0001">
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label>Include Systems</label>
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="includeQiMen" checked>
+                    <span>Qi Men Dun Jia (奇門遁甲)</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="includeLunar" checked>
+                    <span>28 Lunar Mansions (二十八宿)</span>
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" id="includeTaiSui" checked>
+                    <span>Tai Sui Analysis (太歲)</span>
+                </label>
+                <label class="checkbox-item" style="background: rgba(139,0,0,0.1); padding: 5px 10px; border-radius: 5px;">
+                    <input type="checkbox" checked disabled>
+                    <span><strong>Ba Gua (八卦) - NEW</strong></span>
+                </label>
+                <label class="checkbox-item" style="background: rgba(30,144,255,0.1); padding: 5px 10px; border-radius: 5px;">
+                    <input type="checkbox" checked disabled>
+                    <span><strong>He Tu (河图) - NEW</strong></span>
+                </label>
+            </div>
+        </div>
+
+        <button class="btn-calculate" onclick="calculateAstrology()">
+            Calculate Complete Astrology Reading
+        </button>
+    </div>
+
+    <!-- Results -->
+    <div id="results"></div>
+
+    <!-- Raw JSON Output -->
+    <div id="rawOutput" style="margin-top: 30px; display: none;">
+        <h3>📄 Raw API Response</h3>
+        <pre id="rawJson"></pre>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="chinese_metaphysics_literature.js"></script>
+    <script src="chinese-astrology-client.js?v=3.0.0"></script>
+    
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setNow();
+            displayLiterature();
+            checkAPI();
+        });
+
+        function setNow() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('momentDate').value = now.toISOString().slice(0, 16);
+        }
+
+        function getLocation() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    document.getElementById('longitude').value = position.coords.longitude.toFixed(4);
+                    document.getElementById('latitude').value = position.coords.latitude.toFixed(4);
+                    alert(`Location acquired:\nLongitude: ${position.coords.longitude.toFixed(4)}\nLatitude: ${position.coords.latitude.toFixed(4)}`);
+                },
+                error => {
+                    alert('Error getting location: ' + error.message);
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
+        function displayLiterature() {
+            const container = document.getElementById('literatureGrid');
+            const refs = CHINESE_METAPHYSICS_LITERATURE.ancientReferences.slice(0, 6);
+            
+            container.innerHTML = refs.map(ref => `
+                <div class="literature-item">
+                    <h4>${ref.title.en}</h4>
+                    <div class="chinese">${ref.title.zh}</div>
+                    <div class="era">${ref.era}</div>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #555;">
+                        ${ref.significance.substring(0, 100)}...
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        async function checkAPI() {
+            const statusDiv = document.getElementById('apiStatus');
+            try {
+                // Try a simple calculation
+                const response = await fetch(CHINESE_ASTROLOGY_API.baseUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        date: new Date().toISOString(),
+                        includeQiMen: false,
+                        includeTaiSui: false
+                    })
+                });
+                
+                if (response.ok) {
+                    statusDiv.className = 'api-status online';
+                    statusDiv.innerHTML = '✅ API Online - Ready for calculations';
+                } else {
+                    throw new Error('API returned error');
+                }
+            } catch (e) {
+                statusDiv.className = 'api-status offline';
+                statusDiv.innerHTML = '⚠️ API Offline - Using local calculations only<br><small>Deploy the supabase function to enable full features</small>';
+            }
+        }
+
+        async function calculateAstrology() {
+            const btn = document.querySelector('.btn-calculate');
+            const resultsDiv = document.getElementById('results');
+            
+            btn.disabled = true;
+            btn.textContent = 'Calculating...';
+            resultsDiv.innerHTML = '<div class="astrology-loading">Consulting the celestial authorities...</div>';
+            
+            try {
+                // Build request parameters
+                const params = {
+                    date: new Date(document.getElementById('momentDate').value).toISOString(),
+                    includeQiMen: document.getElementById('includeQiMen').checked,
+                    includeLunar: document.getElementById('includeLunar').checked,
+                    includeTaiSui: document.getElementById('includeTaiSui').checked
+                };
+                
+                // Add location if provided
+                const lon = parseFloat(document.getElementById('longitude').value);
+                const lat = parseFloat(document.getElementById('latitude').value);
+                if (!isNaN(lon) && !isNaN(lat)) {
+                    params.location = { longitude: lon, latitude: lat };
+                }
+                
+                // Add birth info if provided
+                const birthDateVal = document.getElementById('birthDate').value;
+                if (birthDateVal) {
+                    params.birthDate = new Date(birthDateVal).toISOString();
+                    
+                    const birthLon = parseFloat(document.getElementById('birthLongitude').value);
+                    const birthLat = parseFloat(document.getElementById('birthLatitude').value);
+                    if (!isNaN(birthLon) && !isNaN(birthLat)) {
+                        params.birthLocation = { longitude: birthLon, latitude: birthLat };
+                    }
+                }
+                
+                // Call API
+                const data = await CHINESE_ASTROLOGY_API.calculate(params);
+                
+                // Render results
+                ChineseAstrologyDisplay.render(data, resultsDiv);
+                
+                // Show raw JSON
+                document.getElementById('rawJson').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('rawOutput').style.display = 'block';
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="astrology-error">
+                        <p>Error: ${error.message}</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">
+                            Make sure the Supabase function is deployed:<br>
+                            <code>supabase functions deploy chinese-astrology</code>
+                        </p>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Calculate Complete Astrology Reading';
+            }
+        }
+    </script>
+</body>
+</html>

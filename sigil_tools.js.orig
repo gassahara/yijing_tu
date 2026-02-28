@@ -1,0 +1,3149 @@
+/**
+ * SigilTools - Specialized canvas drawing utilities for Daoist Fulu (Talismans)
+ */
+class SigilTools {
+    static draw(canvasId, sigilData, verbosity = 0) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.warn(`[SigilTools] Canvas ${canvasId} not found`);
+            return;
+        }
+
+        // Get actual display size
+        let rect = canvas.getBoundingClientRect();
+
+        // If the canvas is not yet in the layout (size 0), wait a bit or use a fallback
+        if (rect.width === 0 || rect.height === 0) {
+            console.warn(`[SigilTools] Canvas ${canvasId} has 0 size, retrying in 100ms...`);
+            setTimeout(() => this.draw(canvasId, sigilData, verbosity), 100);
+            return;
+        }
+
+        const dpr = window.devicePixelRatio || 1;
+
+        // Set canvas internal resolution to match display size with DPR
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Scale context for DPR
+        ctx.scale(dpr, dpr);
+
+        // Work with logical coordinates
+        const logicalW = rect.width;
+        const logicalH = rect.height;
+
+        const { fuluContent, sigilInstructions, visualGrid, layoutInstructions, backgroundColor, strokeColor, fdl } = sigilData;
+
+        if (verbosity >= 4) {
+            console.log(`[SigilTools:DEBUG] Drawing on ${logicalW}x${logicalH} canvas (DPR: ${dpr})`);
+            console.log(`[SigilTools:DEBUG] Data:`, {
+                hasFdl: !!fdl,
+                fdlSource: fdl ? fdl.source : 'N/A',
+                hasFuluContent: !!fuluContent,
+                hasSigilInstructions: !!sigilInstructions,
+                hasLayoutInstructions: !!layoutInstructions
+            });
+        } else {
+            console.log(`[SigilTools] Drawing on ${logicalW}x${logicalH} canvas (DPR: ${dpr})`, {
+                hasFdl: !!fdl,
+                hasFuluContent: !!fuluContent,
+                hasSigilInstructions: !!sigilInstructions,
+                hasLayoutInstructions: !!layoutInstructions
+            });
+        }
+
+        // Reset and clear
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+
+        // 1. Background Layer
+        const bg = backgroundColor || (fdl ? this.normalizeColor(fdl.background) : '#0a0a0a') || '#0a0a0a';
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, logicalW, logicalH);
+        if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 1: Background filled with ${bg}`);
+
+        // 2. Mystical Glow Layer
+        const stroke = strokeColor || '#d4af37';
+        const grad = ctx.createRadialGradient(logicalW / 2, logicalH / 2, 0, logicalW / 2, logicalH / 2, logicalW / 2);
+        grad.addColorStop(0, `${stroke}15`);
+        grad.addColorStop(0.5, `${stroke}08`);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, logicalW, logicalH);
+        if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 2: Glow layer applied with ${stroke}`);
+
+        // Configure default stroke
+        ctx.strokeStyle = stroke;
+        ctx.fillStyle = stroke;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = stroke;
+
+        // 3. Drawing Phase
+        // Priority: DB-sourced FDL (real historical drawings) > Generated FDL (Feng Shui, etc.) > sigilInstructions from API > placeholder
+        // AI-generated FDL is NOT used for fulu — only authenticated drawing data from the database.
+        // But we DO use generated FDL for non-fulu types like Feng Shui diagrams
+        const isGeneratedFDL = fdl && fdl.layers && fdl.layers.some(layer => 
+            layer.commands && layer.commands.some(cmd => 
+                ['fengshui', 'bagua', 'bazi', 'loshu'].includes(cmd.type)
+            )
+        );
+        
+        // Responsive Adjustment: Reserve space for image on mobile
+        let adjustedH = logicalH;
+        if (sigilData.image && logicalW <= 600) {
+            adjustedH = logicalH * 0.65; // Use top 65% for drawing, bottom 35% for image
+        }
+        
+        if (fdl && fdl.source === 'database') {
+            // Authentic database-sourced FDL (fulu talismans)
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 3: Rendering authentic DB FDL`);
+            this.drawFDL(ctx, logicalW, adjustedH, fdl, stroke);
+        } else if (fdl && fdl.source === 'procedural_generator') {
+            // Procedurally generated FDL (fulu talismans from generator)
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 3: Rendering procedural FDL`);
+            this.drawFDL(ctx, logicalW, adjustedH, fdl, stroke);
+        } else if (isGeneratedFDL) {
+            // Generated FDL for diagrams (Feng Shui, Bagua, Bazi, etc.)
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 3: Rendering generated diagram FDL`);
+            this.drawFDL(ctx, logicalW, adjustedH, fdl, stroke);
+        } else if (sigilInstructions && sigilInstructions.length > 0) {
+            // API-provided drawing instructions
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 3: Rendering vector instructions`);
+            this.drawVectorInstructions(ctx, sigilInstructions, stroke, logicalW, adjustedH, layoutInstructions);
+        } else if (fuluContent && fuluContent.talismanNameZh) {
+            // Use structured layout for talismans - uses new calligraphic engine
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 3: Rendering structured talisman layout`);
+            this.drawFuluTalisman(ctx, logicalW, adjustedH, fuluContent, stroke, bg);
+        } else if (fdl) {
+            // Fallback: render any FDL present
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 3: Rendering fallback FDL`);
+            this.drawFDL(ctx, logicalW, adjustedH, fdl, stroke);
+        } else {
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 3: No valid data, showing pending state`);
+            this.drawPendingState(ctx, logicalW, logicalH);
+        }
+
+        // 4. Energy Aura (Border)
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.3;
+        ctx.setLineDash([]);
+        ctx.strokeStyle = stroke;
+        ctx.strokeRect(8, 8, logicalW - 16, logicalH - 16);
+        ctx.globalAlpha = 1.0;
+        if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Step 5: Energy aura border drawn`);
+    }
+
+    /**
+     * Draw an image beside the FDL rendering (or below on mobile)
+     * The image is loaded and drawn at a smaller size on the right side (desktop) or bottom (mobile)
+     * Supports both single image URL and array of URLs
+     */
+    static drawImageBesideFDL(ctx, w, h, imageData, verbosity = 0) {
+        // Handle both single URL and array of URLs
+        const imageUrls = Array.isArray(imageData) ? imageData : [imageData];
+        
+        if (imageUrls.length === 0) return;
+        
+        // Responsive Layout: Stack below on narrow screens, beside on wide screens
+        const isMobile = w <= 600;
+        
+        let maxImgWidth, maxImgHeight, startX, startY;
+        
+        if (isMobile) {
+            // Mobile: Stack at bottom
+            maxImgWidth = w * 0.8;
+            maxImgHeight = h * 0.35;
+            startX = (w - maxImgWidth) / 2; // Centered
+            startY = h - maxImgHeight - 20;
+        } else {
+            // Desktop: Place on right side
+            maxImgWidth = w * 0.35;
+            maxImgHeight = h * 0.7;
+            startX = w - maxImgWidth - 20;
+            startY = (h - maxImgHeight) / 2;
+        }
+        
+        const padding = 10;
+        
+        // Load and draw all images
+        let loadedCount = 0;
+        const images = [];
+        
+        imageUrls.forEach((url, index) => {
+            if (!url) {
+                loadedCount++;
+                return;
+            }
+            
+            const img = new Image();
+            // Note: CORS disabled for Supabase storage compatibility
+            // Images must be served with proper CORS headers from Supabase
+            
+            img.onload = () => {
+                loadedCount++;
+                images[index] = img;
+                
+                // Once all images are loaded, draw them
+                if (loadedCount === imageUrls.length) {
+                    this.drawImagesStacked(ctx, w, h, images, maxImgWidth, maxImgHeight, padding, startX, startY, isMobile, verbosity);
+                }
+            };
+            
+            img.onerror = () => {
+                loadedCount++;
+                console.warn(`[SigilTools] Failed to load image: ${url}`);
+                // Continue with other images even if one fails
+                if (loadedCount === imageUrls.length && images.length > 0) {
+                    this.drawImagesStacked(ctx, w, h, images.filter(Boolean), maxImgWidth, maxImgHeight, padding, startX, startY, isMobile, verbosity);
+                }
+            };
+            
+            // Add cache-busting parameter to prevent caching issues
+            const cacheBuster = `?cb=${Date.now()}`;
+            img.src = url + cacheBuster;
+        });
+    }
+    
+    /**
+     * Draw multiple images stacked vertically (or appropriately)
+     */
+    static drawImagesStacked(ctx, w, h, images, maxWidth, maxHeight, padding, startX, startY, isMobile, verbosity) {
+        if (images.length === 0) return;
+        
+        // Calculate individual image dimensions
+        const imgData = images.map(img => {
+            let imgWidth = img.width;
+            let imgHeight = img.height;
+            // Fit within the designated box
+            const scale = Math.min(maxWidth / imgWidth, (maxHeight / images.length) / imgHeight, 1);
+            imgWidth *= scale;
+            imgHeight *= scale;
+            return { img, width: imgWidth, height: imgHeight };
+        });
+        
+        // Calculate total height including padding
+        const totalHeight = imgData.reduce((sum, data) => sum + data.height, 0) + (imgData.length - 1) * padding;
+        
+        // Adjust startY to vertically center the stack within the available area if on desktop
+        // On mobile, startY is already calculated as the top of the bottom area
+        let currentY = isMobile ? startY : (h - totalHeight) / 2;
+        
+        ctx.save();
+        
+        imgData.forEach((data, index) => {
+            // On mobile, center horizontally
+            // On desktop, align right (based on passed startX which is left edge of image box)
+            const x = isMobile ? (w - data.width) / 2 : (w - data.width - 20);
+            
+            // Draw image with slight transparency
+            ctx.globalAlpha = 0.85;
+            ctx.drawImage(data.img, x, currentY, data.width, data.height);
+            
+            // Add subtle border
+            ctx.strokeStyle = '#d4af37';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.5;
+            ctx.strokeRect(x - 2, currentY - 2, data.width + 4, data.height + 4);
+            
+            if (verbosity >= 4) console.log(`[SigilTools:DEBUG] Reference image ${index + 1} drawn at ${x},${currentY} (${data.width}x${data.height})`);
+            
+            currentY += data.height + padding;
+        });
+        
+        ctx.restore();
+    }
+
+    // ========================================================================
+    // FDL (FULU DRAWING LANGUAGE) ENGINE v1.0
+    // ========================================================================
+
+    static drawFDL(ctx, w, h, fdl, defaultStroke) {
+        if (!fdl || !fdl.layers) return;
+
+        // 1. Calculate Bounding Box across all layers to prevent overflow
+        let minX = 1000, minY = 1000, maxX = 0, maxY = 0;
+        let hasBounds = false;
+
+        fdl.layers.forEach(layer => {
+            if (layer.visible === false) return;
+            (layer.commands || []).forEach(cmd => {
+                const normalized = this.normalizeFDLCommand(cmd);
+                const bounds = this.calculateCommandBounds(normalized);
+                if (bounds) {
+                    minX = Math.min(minX, bounds.minX);
+                    minY = Math.min(minY, bounds.minY);
+                    maxX = Math.max(maxX, bounds.maxX);
+                    maxY = Math.max(maxY, bounds.maxY);
+                    hasBounds = true;
+                }
+            });
+        });
+
+        // 2. Determine Scaling and Translation
+        // Base coordinate system is 1000x1000
+        // Always scale to fit content bounds within the canvas with proper padding
+        const padding = 60; // Pixel padding around the drawing
+        const usableW = w - padding * 2;
+        const usableH = h - padding * 2;
+        
+        if (hasBounds) {
+            const drawW = maxX - minX;
+            const drawH = maxY - minY;
+            
+            // Calculate scale to fit content within usable area
+            const scaleX = usableW / Math.max(drawW, 100);
+            const scaleY = usableH / Math.max(drawH, 100);
+            const finalScale = Math.min(scaleX, scaleY);
+            
+            // Center the content
+            const contentCenterX = (minX + maxX) / 2;
+            const contentCenterY = (minY + maxY) / 2;
+            const offsetX = w / 2 - contentCenterX * finalScale;
+            const offsetY = h / 2 - contentCenterY * finalScale;
+            
+            const tx = (x) => offsetX + x * finalScale;
+            const ty = (y) => offsetY + y * finalScale;
+            const ts = (s) => s * finalScale;
+            
+            this.renderLayers(ctx, fdl, tx, ty, ts, defaultStroke);
+        } else {
+            // Fallback: use standard 1000x1000 grid centered
+            const finalScale = Math.min(usableW, usableH) / 1000;
+            const offsetX = (w - 1000 * finalScale) / 2;
+            const offsetY = (h - 1000 * finalScale) / 2;
+            
+            const tx = (x) => offsetX + x * finalScale;
+            const ty = (y) => offsetY + y * finalScale;
+            const ts = (s) => s * finalScale;
+            
+            this.renderLayers(ctx, fdl, tx, ty, ts, defaultStroke);
+        }
+    }
+
+    /**
+     * Ensure a color string has a # prefix for use with canvas.
+     */
+    static normalizeColor(color) {
+        if (!color || typeof color !== 'string') return color;
+        color = color.trim();
+        if (color.startsWith('#') || color === 'none' || color === 'transparent') return color;
+        // Looks like a hex color without # (e.g., "d4af37", "e63946")
+        if (/^[0-9a-fA-F]{3,8}$/.test(color)) return '#' + color;
+        return color;
+    }
+
+    /**
+     * Normalize an FDL command from nested format to flat format.
+     * The API returns: { "path": { points: [...], style: {...} } }
+     * But executeFDLCommand expects: { type: "path", points: [...], style: {...} }
+     */
+    static normalizeFDLCommand(cmd) {
+        if (!cmd) return null;
+
+        // Already in flat format with explicit type
+        if (cmd.type) {
+            // Still normalize nested commands inside groups
+            if (cmd.type === 'group' && cmd.commands) {
+                cmd.commands = cmd.commands.map(c => this.normalizeFDLCommand(c)).filter(Boolean);
+            }
+            return cmd;
+        }
+
+        // Detect nested format: { "line": {...} }, { "path": {...} }, etc.
+        const knownTypes = ['line', 'path', 'polygon', 'circle', 'arc', 'rect', 'text', 'group'];
+        for (const type of knownTypes) {
+            if (cmd[type] !== undefined) {
+                const data = cmd[type];
+                const flat = { type, ...data };
+                // Recursively normalize sub-commands in groups
+                if (type === 'group' && flat.commands) {
+                    flat.commands = flat.commands.map(c => this.normalizeFDLCommand(c)).filter(Boolean);
+                }
+                return flat;
+            }
+        }
+
+        return cmd;
+    }
+
+    static renderLayers(ctx, fdl, tx, ty, ts, defaultStroke) {
+        fdl.layers.forEach(layer => {
+            if (layer.visible === false) return;
+            ctx.save();
+            ctx.globalAlpha = layer.opacity !== undefined ? layer.opacity : 1.0;
+            if (layer.blendMode) ctx.globalCompositeOperation = layer.blendMode;
+            (layer.commands || []).forEach(cmd => {
+                const normalized = this.normalizeFDLCommand(cmd);
+                this.executeFDLCommand(ctx, normalized, tx, ty, ts, defaultStroke);
+            });
+            ctx.restore();
+        });
+    }
+
+    static calculateCommandBounds(cmd) {
+        let offX = 0, offY = 0;
+        if (cmd.quadrant) {
+            const qPos = this.getQuadrantPos(cmd.quadrant);
+            offX = qPos.x;
+            offY = qPos.y;
+        }
+
+        switch (cmd.type) {
+            case 'line':
+                return {
+                    minX: Math.min(cmd.x1, cmd.x2 || cmd.x1) + offX,
+                    minY: Math.min(cmd.y1, cmd.y2 || cmd.y1) + offY,
+                    maxX: Math.max(cmd.x1, cmd.x2 || cmd.x1) + offX,
+                    maxY: Math.max(cmd.y1, cmd.y2 || cmd.y1) + offY
+                };
+            case 'path':
+            case 'polygon':
+                if (!cmd.points || cmd.points.length === 0) return null;
+                let px = cmd.points.map(p => p[0] + offX);
+                let py = cmd.points.map(p => p[1] + offY);
+                return {
+                    minX: Math.min(...px), minY: Math.min(...py),
+                    maxX: Math.max(...px), maxY: Math.max(...py)
+                };
+            case 'circle':
+            case 'arc':
+                const r = cmd.r || 50;
+                return {
+                    minX: (cmd.cx + offX) - r, minY: (cmd.cy + offY) - r,
+                    maxX: (cmd.cx + offX) + r, maxY: (cmd.cy + offY) + r
+                };
+            case 'rect':
+                const rx = cmd.x !== undefined ? cmd.x : (cmd.x1 !== undefined ? cmd.x1 : 0);
+                const ry = cmd.y !== undefined ? cmd.y : (cmd.y1 !== undefined ? cmd.y1 : 0);
+                const rw = cmd.w !== undefined ? cmd.w : (cmd.x2 !== undefined ? (cmd.x2 - rx) : 100);
+                const rh = cmd.h !== undefined ? cmd.h : (cmd.y2 !== undefined ? (cmd.y2 - ry) : 100);
+                return {
+                    minX: rx + offX, minY: ry + offY,
+                    maxX: rx + rw + offX, maxY: ry + rh + offY
+                };
+            case 'text':
+                const size = cmd.size || 40;
+                const textBoundsX = cmd.x !== undefined ? cmd.x : 0;
+                const textBoundsY = cmd.y !== undefined ? cmd.y : 0;
+                return {
+                    minX: textBoundsX + offX - size, minY: textBoundsY + offY - size,
+                    maxX: textBoundsX + offX + size, maxY: textBoundsY + offY + size
+                };
+            case 'group':
+                if (!cmd.commands) return null;
+                let gMinX = 1000, gMinY = 1000, gMaxX = 0, gMaxY = 0;
+                cmd.commands.forEach(sub => {
+                    const b = this.calculateCommandBounds(sub);
+                    if (b) {
+                        gMinX = Math.min(gMinX, b.minX); gMinY = Math.min(gMinY, b.minY);
+                        gMaxX = Math.max(gMaxX, b.maxX); gMaxY = Math.max(gMaxY, b.maxY);
+                    }
+                });
+                const gs = cmd.scale || 1;
+                const gx = cmd.x || 0;
+                const gy = cmd.y || 0;
+                return {
+                    minX: gx + gMinX * gs,
+                    minY: gy + gMinY * gs,
+                    maxX: gx + gMaxX * gs,
+                    maxY: gy + gMaxY * gs
+                };
+            default: return null;
+        }
+    }
+
+    static executeFDLCommand(ctx, cmd, tx, ty, ts, defaultStroke, parentScale) {
+        if (!cmd || !cmd.type) return;
+        ctx.save();
+
+        const style = cmd.style || {};
+        const stroke = this.normalizeColor(style.color) || defaultStroke;
+
+        // Custom High-Level Commands (Bagua, Lo Shu, Constellation, Seal, Bazi, Fengshui)
+        if (['bagua', 'loshu', 'constellation', 'seal', 'bazi', 'fengshui'].includes(cmd.type)) {
+            const size = ts(cmd.size || 200);
+
+            // Handle quadrant positioning for high-level commands
+            let x = cmd.x !== undefined ? cmd.x : 0;
+            let y = cmd.y !== undefined ? cmd.y : 0;
+            if (cmd.quadrant) {
+                const qPos = this.getQuadrantPos(cmd.quadrant);
+                x = qPos.x;
+                y = qPos.y;
+            }
+
+            // Check for relative coordinates (0-1 range)
+            const isRelative = x >= 0 && x <= 1 && y >= 0 && y <= 1;
+            
+            // Calculate actual position
+            let actualX, actualY;
+            if (isRelative && cmd.type === 'fengshui') {
+                // For fengshui, use relative coords directly in canvas space
+                const canvasW = ctx.canvas.width / (window.devicePixelRatio || 1);
+                const canvasH = ctx.canvas.height / (window.devicePixelRatio || 1);
+                actualX = x * canvasW;
+                actualY = y * canvasH;
+            } else {
+                actualX = tx(x);
+                actualY = ty(y);
+            }
+
+            if (cmd.type === 'bagua') {
+                this.drawBagua(ctx, actualX, actualY, size, cmd.style || {}, stroke);
+            } else if (cmd.type === 'loshu') {
+                this.drawLoShuGrid(ctx, actualX, actualY, size, stroke);
+            } else if (cmd.type === 'constellation') {
+                this.drawConstellation(ctx, actualX, actualY, size, cmd.name, stroke);
+            } else if (cmd.type === 'seal') {
+                this.drawSeal(ctx, actualX, actualY, size, cmd.variant, stroke);
+            } else if (cmd.type === 'bazi') {
+                this.drawBaziDiagram(ctx, actualX, actualY, size, cmd.pillars || {}, stroke);
+            } else if (cmd.type === 'fengshui') {
+                // For fengshui with relative coordinates, size should also be relative to canvas
+                let fengshuiSize = size;
+                if (isRelative) {
+                    // Size is relative (0-1), convert to canvas dimension
+                    const canvasW = ctx.canvas.width / (window.devicePixelRatio || 1);
+                    const canvasH = ctx.canvas.height / (window.devicePixelRatio || 1);
+                    const minDimension = Math.min(canvasW, canvasH);
+                    fengshuiSize = cmd.size * minDimension;
+                }
+                
+                // Check if this is new FS-DGL format with layers (full diagram with highlights)
+                if (cmd.config && cmd.config.layers && cmd.config.layers.length > 0) {
+                    // Use new FS-DGL rendering
+                    this.renderFengShuiDiagramInline(ctx, actualX, actualY, fengshuiSize, cmd.config, stroke);
+                } else {
+                    // Legacy simple Feng Shui diagram
+                    this.drawFengShuiDiagram(ctx, actualX, actualY, fengshuiSize, cmd.config || {}, stroke);
+                }
+            }
+            ctx.restore();
+            return;
+        }
+
+        ctx.strokeStyle = stroke;
+        const normalizedFill = style.fill === true ? stroke : (style.fill === 'none' ? 'transparent' : this.normalizeColor(style.fill) || 'transparent');
+        ctx.fillStyle = normalizedFill;
+        ctx.lineWidth = ts(style.width || 2);
+        ctx.lineCap = style.cap || 'round';
+        ctx.lineJoin = style.join || 'round';
+
+        if (style.glow) {
+            ctx.shadowBlur = ts(style.glow);
+            ctx.shadowColor = stroke;
+        } else {
+            ctx.shadowBlur = 0;
+        }
+
+        if (style.dash && Array.isArray(style.dash)) {
+            ctx.setLineDash(style.dash.map(d => ts(d)));
+        }
+
+        if (style.alpha !== undefined) {
+            ctx.globalAlpha *= style.alpha;
+        }
+
+        // Handle quadrant offset
+        let offX = 0, offY = 0;
+        if (cmd.quadrant) {
+            const qPos = this.getQuadrantPos(cmd.quadrant);
+            offX = qPos.x;
+            offY = qPos.y;
+        }
+
+        ctx.beginPath();
+
+        try {
+            // Helper to draw inner content
+            const drawInside = (centerX, centerY) => {
+                if (cmd.inside) {
+                    const innerCmd = {
+                        type: cmd.inside.type || 'text',
+                        content: cmd.inside.content,
+                        x: 0, y: 0, // Relative to translated origin
+                        size: cmd.inside.scale ? (cmd.size || 40) * cmd.inside.scale : (cmd.size || 40),
+                        ...cmd.inside
+                    };
+                    
+                    // Normalize inner command type if it's 'sigil' or 'symbol' to 'text' for now 
+                    // (assuming they use font-based rendering or we add specific handlers later)
+                    if (innerCmd.type === 'sigil' || innerCmd.type === 'symbol') {
+                        innerCmd.type = 'text';
+                    }
+
+                    // Translate to center of shape
+                    ctx.save();
+                    ctx.translate(tx(centerX + offX), ty(centerY + offY));
+                    // Reset scale/rotation for inner content to avoid distortion from parent shape context if any?
+                    // Actually, we are in the main context but translated. 
+                    // tx/ty already handle scaling. 
+                    // We need to pass identity tx/ty to the recursive call because we already translated ctx.
+                    
+                    // However, executeFDLCommand expects tx/ty to map logical coords to canvas coords.
+                    // If we pass x=0, y=0, tx(0) might add offsetX again!
+                    // The recursive call should use a local coordinate system.
+                    
+                    // Strategy: Use a simple identity transform helper for the recursive call
+                    // since we manually translated the context to the correct pixel location.
+                    const identityTx = (v) => v * ts(1); // Only scale, no translation
+                    const identityTy = (v) => v * ts(1); 
+                    const identityTs = (v) => v * ts(1);
+
+                    this.executeFDLCommand(ctx, innerCmd, (v) => v * ts(1), (v) => v * ts(1), (v) => v * ts(1), stroke, 1);
+                    ctx.restore();
+                }
+            };
+
+            switch (cmd.type) {
+                case 'group':
+                    if (cmd.commands) {
+                        ctx.translate(tx(cmd.x || 0), ty(cmd.y || 0));
+                        // Apply base coordinate scaling (1000-grid to pixels) for top-level groups
+                        // For nested groups (parentScale defined), ctx already carries the scale
+                        if (!parentScale) {
+                            const baseScale = ts(1);
+                            ctx.scale(baseScale, baseScale);
+                        }
+                        if (cmd.scale && cmd.scale !== 1) ctx.scale(cmd.scale, cmd.scale);
+                        if (cmd.rotation) {
+                            const rot = Math.abs(cmd.rotation) > Math.PI * 2
+                                ? cmd.rotation * Math.PI / 180
+                                : cmd.rotation;
+                            ctx.rotate(rot);
+                        }
+                        // Sub-commands use identity transforms since ctx handles positioning/scaling
+                        cmd.commands.forEach(sub => this.executeFDLCommand(ctx, sub, (x) => x, (y) => y, (s) => s, stroke, 1));
+                    }
+                    break;
+
+                case 'line':
+                    if (cmd.x1 !== undefined && cmd.y1 !== undefined) {
+                        ctx.moveTo(tx(cmd.x1 + offX), ty(cmd.y1 + offY));
+                        ctx.lineTo(tx((cmd.x2 || cmd.x1) + offX), ty((cmd.y2 || cmd.y1) + offY));
+                        ctx.stroke();
+                    }
+                    break;
+
+                case 'path':
+                case 'polygon':
+                    if (cmd.points && Array.isArray(cmd.points) && cmd.points.length >= 2) {
+                        ctx.moveTo(tx(cmd.points[0][0] + offX), ty(cmd.points[0][1] + offY));
+                        let minX = cmd.points[0][0], maxX = cmd.points[0][0];
+                        let minY = cmd.points[0][1], maxY = cmd.points[0][1];
+                        
+                        for (let i = 1; i < cmd.points.length; i++) {
+                            ctx.lineTo(tx(cmd.points[i][0] + offX), ty(cmd.points[i][1] + offY));
+                            minX = Math.min(minX, cmd.points[i][0]);
+                            maxX = Math.max(maxX, cmd.points[i][0]);
+                            minY = Math.min(minY, cmd.points[i][1]);
+                            maxY = Math.max(maxY, cmd.points[i][1]);
+                        }
+                        if (cmd.closed || cmd.type === 'polygon') ctx.closePath();
+                        if (style.fill && style.fill !== 'transparent') ctx.fill();
+                        ctx.stroke();
+
+                        // Draw inside content
+                        if (cmd.inside) {
+                            const centerX = (minX + maxX) / 2;
+                            const centerY = (minY + maxY) / 2;
+                            drawInside(centerX, centerY);
+                        }
+                    }
+                    break;
+
+                case 'circle':
+                    if (cmd.cx !== undefined && cmd.cy !== undefined) {
+                        ctx.arc(tx(cmd.cx + offX), ty(cmd.cy + offY), ts(cmd.r || 50), 0, Math.PI * 2);
+                        if (style.fill && style.fill !== 'transparent') ctx.fill();
+                        ctx.stroke();
+                        
+                        // Draw inside content
+                        drawInside(cmd.cx, cmd.cy);
+                    }
+                    break;
+
+                case 'rect':
+                    const rx = cmd.x !== undefined ? cmd.x : (cmd.x1 !== undefined ? cmd.x1 : 0);
+                    const ry = cmd.y !== undefined ? cmd.y : (cmd.y1 !== undefined ? cmd.y1 : 0);
+                    const rw = cmd.w !== undefined ? cmd.w : (cmd.x2 !== undefined ? (cmd.x2 - rx) : 100);
+                    const rh = cmd.h !== undefined ? cmd.h : (cmd.y2 !== undefined ? (cmd.y2 - ry) : 100);
+
+                    if (style.fill && style.fill !== 'transparent') {
+                        ctx.fillRect(tx(rx + offX), ty(ry + offY), ts(rw), ts(rh));
+                    }
+                    ctx.strokeRect(tx(rx + offX), ty(ry + offY), ts(rw), ts(rh));
+                    
+                    // Draw inside content
+                    drawInside(rx + rw / 2, ry + rh / 2);
+                    break;
+
+                case 'text':
+                    if (cmd.content) {
+                        // Always use CJK-capable font stack for Chinese characters
+                        const rawFont = cmd.font || 'serif';
+                        const font = (rawFont === 'serif' || rawFont === 'sans-serif')
+                            ? `'Noto Serif SC', 'Songti SC', ${rawFont}`
+                            : rawFont;
+                        const weight = cmd.weight || '900';
+                        const size = ts(cmd.size || 40);
+                        const textX = cmd.x !== undefined ? cmd.x : 0;
+                        const textY = cmd.y !== undefined ? cmd.y : 0;
+
+                        // Check for calligraphic style override
+                        // Support both cmd.style (if string) and cmd.font for backward compatibility
+                        // In FDL, 'style' is usually an object, so we prefer cmd.font or a specific 'calliStyle' property
+                        const calliStyle = (typeof cmd.style === 'string' ? cmd.style : (cmd.calliStyle || '')) || (
+                            cmd.font === 'seal' ? 'seal' : 
+                            cmd.font === 'worm' ? 'worm' : 
+                            cmd.font === 'thin' ? 'worm-thin' : // Jade Script alias
+                            cmd.font === 'fuwen' ? 'fuwen-flip-vertical' : 
+                            cmd.font === 'vertical' ? 'regular-vertical' : 'regular'
+                        );
+
+                        if (calliStyle === 'seal') {
+                            // Seal Script (篆書) — uses SealScript web font
+                            this.drawSealScript(ctx, cmd.content, tx(textX + offX), ty(textY + offY), size, stroke, {
+                                vertical: cmd.vertical || false,
+                                charSpacing: cmd.charSpacing || 1.3,
+                                glowColor: cmd.glowColor || '#8B0000'
+                            });
+                        } else if (calliStyle === 'worm' || calliStyle === 'worm-thin') {
+                            // Worm Writing (蟲書) — procedural stroke warping
+                            const isThin = calliStyle === 'worm-thin';
+                            this.drawWormWriting(ctx, cmd.content, tx(textX + offX), ty(textY + offY), size, stroke, {
+                                vertical: cmd.vertical || false,
+                                charSpacing: cmd.charSpacing || 1.3,
+                                amplitude: isThin ? Math.max(1, size * 0.02) : (cmd.amplitude ? ts(cmd.amplitude) : undefined),
+                                frequency: isThin ? 0.05 : (cmd.frequency || undefined),
+                                headSize: isThin ? Math.max(0.5, size * 0.01) : (cmd.headSize ? ts(cmd.headSize) : undefined)
+                            });
+                        } else if (calliStyle.startsWith('fuwen')) {
+                            // Fuwen / Inverted Characters (倒字) — canvas transform flips
+                            const fuwenMode = calliStyle.includes('-')
+                                ? calliStyle.substring(calliStyle.indexOf('-') + 1)
+                                : 'flip-vertical';
+                            this.drawFuwen(ctx, cmd.content, tx(textX + offX), ty(textY + offY), size, stroke, fuwenMode, {
+                                vertical: cmd.vertical || false,
+                                charSpacing: cmd.charSpacing || 1.3,
+                                tintColor: cmd.tintColor || undefined
+                            });
+                        } else if (calliStyle === 'regular-vertical' && cmd.content.length > 1) {
+                            // Regular vertical text rendering
+                            ctx.font = `${weight} ${size}px ${font}`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillStyle = stroke;
+                            const charSpacing = cmd.charSpacing || 1.1;
+                            const totalHeight = size * charSpacing * (cmd.content.length - 1);
+                            const startY = ty(textY + offY) - totalHeight / 2;
+                            for (let i = 0; i < cmd.content.length; i++) {
+                                ctx.fillText(cmd.content[i], tx(textX + offX), startY + i * size * charSpacing);
+                            }
+                        } else {
+                            // Regular text rendering
+                            ctx.font = `${weight} ${size}px ${font}`;
+                            ctx.textAlign = cmd.align || 'center';
+                            ctx.textBaseline = cmd.baseline || 'middle';
+                            ctx.fillStyle = stroke;
+                            ctx.fillText(cmd.content, tx(textX + offX), ty(textY + offY));
+                        }
+                    }
+                    break;
+
+                case 'arc':
+                    if (cmd.cx !== undefined && cmd.cy !== undefined) {
+                        ctx.arc(tx(cmd.cx + offX), ty(cmd.cy + offY), ts(cmd.r || 50), cmd.startAngle || 0, cmd.endAngle || Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    break;
+            }
+        } catch (e) {
+            console.warn(`[SigilTools] FDL Command Execution failed: ${e.message}`, cmd);
+        }
+
+        ctx.restore();
+    }
+
+    static getQuadrantPos(quadrant) {
+        const positions = {
+            'center': { x: 500, y: 500 },
+            'top': { x: 500, y: 200 },
+            'top-right': { x: 800, y: 200 },
+            'right': { x: 800, y: 500 },
+            'bottom-right': { x: 800, y: 800 },
+            'bottom': { x: 500, y: 800 },
+            'bottom-left': { x: 200, y: 800 },
+            'left': { x: 200, y: 500 },
+            'top-left': { x: 200, y: 200 }
+        };
+        return positions[quadrant] || { x: 500, y: 500 };
+    }
+
+    // ========================================================================
+    // FULU TALISMAN LAYOUT ENGINE
+    // ========================================================================
+
+    static drawFuluTalisman(ctx, w, h, content, stroke, bg) {
+        ctx.shadowBlur = 0;
+        const centerX = w / 2;
+        const L = this.computeFuluLayout(w, h, content);
+        const font = "'Noto Serif SC', 'Songti SC', serif";
+        const style = content.charStyle || 'regular';
+
+        // --- HEXAGRAM CHARACTER (top) ---
+        ctx.save();
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = stroke;
+        ctx.fillStyle = stroke;
+
+        if (style === 'seal') {
+            this.drawSealScript(ctx, content.hexagramChar || '', centerX, L.hexCharY, L.hexCharSize, stroke, {
+                glowColor: '#8B0000'
+            });
+        } else if (style === 'worm') {
+            this.drawWormWriting(ctx, content.hexagramChar || '', centerX, L.hexCharY, L.hexCharSize, stroke, {
+                amplitude: L.hexCharSize * 0.08,
+                headSize: L.hexCharSize * 0.05
+            });
+        } else if (style.startsWith('fuwen')) {
+            const mode = style.includes('-') ? style.substring(style.indexOf('-') + 1) : 'flip-vertical';
+            this.drawFuwen(ctx, content.hexagramChar || '', centerX, L.hexCharY, L.hexCharSize, stroke, mode);
+        } else {
+            ctx.font = `bold ${L.hexCharSize}px ${font}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(content.hexagramChar || '', centerX, L.hexCharY);
+        }
+        ctx.restore();
+
+        // --- TRIGRAM LINES (upper and lower) ---
+        this.drawTrigramLines(ctx, centerX, L.upperTrigramY, content.upperTrigramBinary, stroke, L.trigramLineW, L.trigramGap);
+        this.drawTrigramLines(ctx, centerX, L.lowerTrigramY, content.lowerTrigramBinary, stroke, L.trigramLineW, L.trigramGap);
+
+        // --- SEAL BORDER (dashed rectangle) ---
+        this.drawDashedRect(ctx, L.sealX, L.sealY, L.sealW, L.sealH, stroke, 2.5, [6, 4]);
+
+        // --- SPECIAL TYPE: MEDITATION PALACE GRID ---
+        if (content.type === "meditation_palace") {
+            this.drawPalaceGrid(ctx, L.sealX, L.sealY, L.sealW, L.sealH, stroke);
+        }
+
+        // --- SEAL CHARACTERS (vertical, centered) ---
+        const chars = content.sealChars || [];
+        if (chars.length > 0) {
+            ctx.save();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = stroke;
+            ctx.fillStyle = stroke;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const sealInnerTop = L.sealY + L.sealPadTop;
+            const sealInnerH = L.sealH - L.sealPadTop - L.sealPadBottom;
+            const charSpacing = sealInnerH / chars.length;
+
+            const baseFontSize = Math.min(L.sealCharSize, charSpacing * 0.85);
+
+            if (style === 'seal') {
+                // Seal script vertical rendering handles the layout internally if passed as a block,
+                // but here we have explicit spacing structure. Let's render char by char.
+                chars.forEach((char, i) => {
+                    const y = sealInnerTop + charSpacing * (i + 0.5);
+                    this.drawSealScript(ctx, char, centerX, y, baseFontSize, stroke);
+                });
+            } else if (style === 'worm') {
+                chars.forEach((char, i) => {
+                    const y = sealInnerTop + charSpacing * (i + 0.5);
+                    this.drawWormWriting(ctx, char, centerX, y, baseFontSize, stroke, {
+                        phase: i * 2 // Vary phase
+                    });
+                });
+            } else if (style.startsWith('fuwen')) {
+                const mode = style.includes('-') ? style.substring(style.indexOf('-') + 1) : 'flip-vertical';
+                chars.forEach((char, i) => {
+                    const y = sealInnerTop + charSpacing * (i + 0.5);
+                    this.drawFuwen(ctx, char, centerX, y, baseFontSize, stroke, mode);
+                });
+            } else {
+                chars.forEach((char, i) => {
+                    const y = sealInnerTop + charSpacing * (i + 0.5);
+                    ctx.font = `900 ${baseFontSize}px ${font}`;
+                    ctx.fillText(char, centerX, y);
+                });
+            }
+            ctx.restore();
+        }
+
+        // --- BOTTOM ROWS ---
+        const rows = content.bottomRows || [];
+        if (rows.length > 0) {
+            ctx.save();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = stroke;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const margin = L.margin;
+            rows.forEach((row, rowIdx) => {
+                const y = L.bottomStartY + rowIdx * L.bottomRowH;
+                const cols = Array.isArray(row) ? row : [row];
+                const availW = w - 2 * margin - 40;
+                const colW = availW / cols.length;
+
+                // Bottom rows usually stay regular font for readability, 
+                // unless specifically requested to be calligraphic too?
+                // For now, let's keep them regular or maybe 'seal' if seal style requested.
+                // Actually bottom rows are usually chanting instructions, so ease of reading is key.
+                // But for 'seal' style, maybe use seal font? Let's stick to regular for now to be safe.
+                ctx.font = `${L.bottomFontSize}px ${font}`;
+                if (style === 'seal' && this._sealFontLoaded) {
+                    ctx.font = `${L.bottomFontSize}px "SealScript", ${font}`;
+                }
+
+                cols.forEach((col, colIdx) => {
+                    const x = margin + 20 + colW * (colIdx + 0.5);
+                    ctx.fillText(col, x, y);
+                });
+            });
+            ctx.restore();
+        }
+
+        // --- HEXAGRAM NUMBER (small, bottom-right corner) ---
+        if (content.hexagramNumber) {
+            ctx.save();
+            ctx.fillStyle = stroke;
+            ctx.globalAlpha = 0.4;
+            ctx.font = `13px ${font}`;
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(`${content.hexagramNumber}`, w - L.margin - 8, h - L.margin - 6);
+            ctx.restore();
+        }
+    }
+
+    static computeFuluLayout(w, h, content) {
+        const margin = 20;
+        const usableH = h - 2 * margin;
+        const numBottomRows = (content.bottomRows || []).length;
+        const numSealChars = (content.sealChars || []).length;
+
+        // Hexagram character at top
+        const hexCharSize = Math.round(w * 0.085);
+        const hexCharY = margin + usableH * 0.055;
+
+        // Trigram lines
+        const trigramLineW = w * 0.28;
+        const trigramGap = h * 0.022;
+        const upperTrigramY = margin + usableH * 0.115;
+        const lowerTrigramY = upperTrigramY + 3.5 * trigramGap;
+
+        // Bottom area
+        const bottomRowH = Math.round(h * 0.05);
+        const bottomFontSize = Math.round(w * 0.038);
+        const bottomAreaH = numBottomRows * bottomRowH + 12;
+
+        // Seal area (fills the space between trigrams and bottom)
+        const sealTopY = lowerTrigramY + 3.5 * trigramGap + 8;
+        const sealBottomY = h - margin - bottomAreaH - 8;
+        const sealPadX = w * 0.14;
+        const sealCharSize = Math.round(w * 0.1);
+
+        return {
+            margin,
+            hexCharSize,
+            hexCharY,
+            trigramLineW,
+            trigramGap,
+            upperTrigramY,
+            lowerTrigramY,
+            sealX: sealPadX,
+            sealY: sealTopY,
+            sealW: w - 2 * sealPadX,
+            sealH: sealBottomY - sealTopY,
+            sealPadTop: 14,
+            sealPadBottom: 14,
+            sealCharSize,
+            bottomStartY: sealBottomY + 12 + bottomRowH * 0.5,
+            bottomRowH,
+            bottomFontSize
+        };
+    }
+
+    // ========================================================================
+    // DRAWING HELPERS
+    // ========================================================================
+
+    static drawTrigramLines(ctx, centerX, startY, binaryStr, stroke, lineW, gap) {
+        if (!binaryStr || binaryStr.length !== 3) return;
+
+        const halfLen = lineW / 2;
+        const breakGap = lineW * 0.1;
+
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.shadowBlur = 0;
+        ctx.setLineDash([]);
+
+        for (let i = 0; i < 3; i++) {
+            const y = startY + i * gap;
+            ctx.beginPath();
+
+            if (binaryStr[i] === '1') {
+                // Yang — solid line
+                ctx.moveTo(centerX - halfLen, y);
+                ctx.lineTo(centerX + halfLen, y);
+            } else {
+                // Yin — broken line
+                ctx.moveTo(centerX - halfLen, y);
+                ctx.lineTo(centerX - breakGap, y);
+                ctx.moveTo(centerX + breakGap, y);
+                ctx.lineTo(centerX + halfLen, y);
+            }
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    static drawDashedRect(ctx, x, y, w, h, stroke, lineWidth, dashPattern) {
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lineWidth;
+        ctx.shadowBlur = 0;
+        ctx.setLineDash(dashPattern);
+        ctx.strokeRect(x, y, w, h);
+        ctx.setLineDash([]);
+        ctx.restore();
+    }
+
+    static drawPalaceGrid(ctx, x, y, w, h, stroke) {
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.4;
+
+        // Vertical lines
+        for (let i = 1; i < 3; i++) {
+            const lx = x + (w * i / 3);
+            ctx.beginPath();
+            ctx.moveTo(lx, y);
+            ctx.lineTo(lx, y + h);
+            ctx.stroke();
+        }
+
+        // Horizontal lines
+        for (let i = 1; i < 3; i++) {
+            const ly = y + (h * i / 3);
+            ctx.beginPath();
+            ctx.moveTo(x, ly);
+            ctx.lineTo(x + w, ly);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    // ========================================================================
+    // ADVANCED DAOIST DIAGRAMS (Long Hu Shan Style)
+    // ========================================================================
+
+    static drawBagua(ctx, cx, cy, size, style, stroke) {
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 3;
+
+        // Houtian (Later Heaven) Sequence: South (Top) -> CW
+        // Li (S), Kun (SW), Dui (W), Qian (NW), Kan (N), Gen (NE), Zhen (E), Xun (SE)
+        // Trigrams: Top/Mid/Bottom lines (1=Solid, 0=Broken)
+        const trigrams = [
+            { name: 'Li', bin: [1, 0, 1], angle: -Math.PI / 2 },   // Top (South)
+            { name: 'Kun', bin: [0, 0, 0], angle: -Math.PI / 4 },   // Top Right (SW) - Wait, map S=Top, then SW is Top-Right? 
+            // Standard Compass: N=0, E=90, S=180, W=270. 
+            // Houtian Map (South at TOP):
+            // Top: Li. Top-Right: Kun. Right: Dui. Bot-Right: Qian. Bot: Kan. Bot-Left: Gen. Left: Zhen. Top-Left: Xun.
+            // Let's use angles relative to upright (South at -PI/2)
+            { name: 'Kun', bin: [0, 0, 0], angle: -Math.PI / 4 },   // Top-Right
+            { name: 'Dui', bin: [0, 1, 1], angle: 0 },            // Right
+            { name: 'Qian', bin: [1, 1, 1], angle: Math.PI / 4 },    // Bottom-Right
+            { name: 'Kan', bin: [0, 1, 0], angle: Math.PI / 2 },    // Bottom
+            { name: 'Gen', bin: [1, 0, 0], angle: 3 * Math.PI / 4 },  // Bottom-Left
+            { name: 'Zhen', bin: [0, 0, 1], angle: Math.PI },      // Left
+            { name: 'Xun', bin: [1, 1, 0], angle: -3 * Math.PI / 4 }  // Top-Left
+        ];
+
+        const r = size / 2;
+        const triW = size * 0.15;
+        const triH = size * 0.12;
+
+        trigrams.forEach(t => {
+            const x = cx + Math.cos(t.angle) * (r - triH);
+            const y = cy + Math.sin(t.angle) * (r - triH);
+
+            ctx.save();
+            ctx.translate(x, y);
+            // Rotate to face center? Or face outward? Usually bases face center.
+            // Angle is position from center. 
+            // Rotation: t.angle + PI/2 puts bottom of trigram towards center
+            ctx.rotate(t.angle + Math.PI / 2);
+
+            // Draw Trigram
+            const gap = triH / 3;
+            const lineW = triW;
+            const halfW = lineW / 2;
+
+            // Draw lines bottom-up (0 to 2)
+            // But 'bin' array is [Top, Mid, Bottom] or [Bottom, Mid, Top]?
+            // Code definitions above: Li=[1,0,1] symmetric. Dui=[0,1,1] (Broken Top, Solid, Solid).
+            // Usually binary is LSB=Bottom. Dui is 011 (binary 3? or 6 if top MSB?). 
+            // Dui ☱: Top broken, Mid solid, Bot solid.
+            // My bin [0,1,1]: 0=Broken (Top), 1=Solid, 1=Solid. Matches Dui.
+            // So index 0 is Top line.
+
+            const yStart = -triH / 2; // Top
+
+            t.bin.forEach((line, i) => {
+                const ly = yStart + i * gap;
+                ctx.beginPath();
+                if (line === 1) {
+                    ctx.moveTo(-halfW, ly);
+                    ctx.lineTo(halfW, ly);
+                } else {
+                    ctx.moveTo(-halfW, ly);
+                    ctx.lineTo(-halfW * 0.2, ly);
+                    ctx.moveTo(halfW * 0.2, ly);
+                    ctx.lineTo(halfW, ly);
+                }
+                ctx.stroke();
+            });
+
+            ctx.restore();
+        });
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw a Bazi (Four Pillars) diagram with Bagua (Houtian - Later Heaven) arrangement
+     * Shows the four pillars arranged around a central Bagua circle
+     */
+    static drawBaziDiagram(ctx, cx, cy, size, pillars, stroke) {
+        ctx.save();
+
+        const radius = size / 2;
+        const innerRadius = radius * 0.55;
+
+        // Draw outer circle — slightly larger than radius to encircle all content
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius * 1.08, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Draw inner circle (Bagua boundary)
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, innerRadius * 1.05, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Draw Bagua trigrams inside inner circle
+        this.drawBagua(ctx, cx, cy, innerRadius * 1.9, {}, stroke);
+
+        // Draw connecting lines from center to outer ring (8 directions)
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.4;
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) - Math.PI / 2; // Start from top
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(angle) * innerRadius, cy + Math.sin(angle) * innerRadius);
+            ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
+            ctx.stroke();
+        }
+        ctx.globalAlpha = 1.0;
+
+        // Draw Bazi pillars at cardinal and intercardinal positions
+        // Later Heaven (Houtian) arrangement with South at top
+        const pillarPositions = [
+            { angle: -Math.PI / 2, label: 'Year', pillar: pillars.year },      // Top - South
+            { angle: -Math.PI / 4, label: '', pillar: null },                  // Top-Right
+            { angle: 0, label: 'Month', pillar: pillars.month },               // Right - West
+            { angle: Math.PI / 4, label: '', pillar: null },                   // Bottom-Right
+            { angle: Math.PI / 2, label: 'Day', pillar: pillars.day },         // Bottom - North
+            { angle: 3 * Math.PI / 4, label: '', pillar: null },               // Bottom-Left
+            { angle: Math.PI, label: 'Hour', pillar: pillars.hour },           // Left - East
+            { angle: -3 * Math.PI / 4, label: '', pillar: null }               // Top-Left
+        ];
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = stroke;
+
+        pillarPositions.forEach(pos => {
+            if (!pos.pillar) return;
+
+            const px = cx + Math.cos(pos.angle) * (radius + 25);
+            const py = cy + Math.sin(pos.angle) * (radius + 25);
+
+            // Draw pillar box
+            const boxW = 45;
+            const boxH = 35;
+            ctx.save();
+            ctx.strokeStyle = stroke;
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(px - boxW / 2, py - boxH / 2, boxW, boxH);
+
+            // Draw pillar text (Stem on top, Branch below)
+            ctx.font = `bold 14px "Noto Serif SC", serif`;
+            if (pos.pillar.stem) {
+                ctx.fillText(pos.pillar.stem, px, py - 7);
+            }
+            if (pos.pillar.branch) {
+                ctx.font = `12px "Noto Serif SC", serif`;
+                ctx.fillText(pos.pillar.branch, px, py + 10);
+            }
+            ctx.restore();
+
+            // Draw label
+            if (pos.label) {
+                ctx.font = `10px sans-serif`;
+                ctx.globalAlpha = 0.6;
+                const lx = cx + Math.cos(pos.angle) * (radius + 55);
+                const ly = cy + Math.sin(pos.angle) * (radius + 55);
+                ctx.fillText(pos.label, lx, ly);
+                ctx.globalAlpha = 1.0;
+            }
+        });
+
+        // Draw center element symbol
+        if (pillars.day && pillars.day.element) {
+            ctx.save();
+            ctx.font = `bold 24px "Noto Serif SC", serif`;
+            ctx.fillStyle = this.getElementColor(pillars.day.element);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.fillText(pillars.day.stem || '日', cx, cy);
+            ctx.restore();
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw a Feng Shui Qi Retention diagram
+     * Octagonal formation with directional trigrams and central Qi character
+     */
+    static drawFengShuiDiagram(ctx, cx, cy, size, config, stroke) {
+        ctx.save();
+
+        const radius = size * 0.48; // Outer octagon bits
+        // For proper encircling, trigrams must be INSIDE the octagon.
+        // Octagon apothem is ~0.92 * radius. So trigrams should be at ~0.8 * radius to be safe.
+        const trigramRadius = radius * 0.78;
+        const innerRadius = radius * 0.55;
+
+        const style = config.charStyle || 'regular';
+
+        // Draw octagonal boundary
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) - Math.PI / 8;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        // Draw inner circle
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Draw directional trigrams at cardinal/intercardinal points
+        // Houtian arrangement: South (top), West (right), North (bottom), East (left)
+        // Note: Canvas Y is down. So Top is -PI/2.
+        const directions = [
+            { angle: -Math.PI / 2, trigram: '☲', name: 'Li', element: 'fire' },      // South - Top
+            { angle: -Math.PI / 4, trigram: '☴', name: 'Xun', element: 'wood' },     // SE
+            { angle: 0, trigram: '☱', name: 'Dui', element: 'metal' },              // West - Right
+            { angle: Math.PI / 4, trigram: '☰', name: 'Qian', element: 'metal' },   // NW
+            { angle: Math.PI / 2, trigram: '☵', name: 'Kan', element: 'water' },    // North - Bottom
+            { angle: 3 * Math.PI / 4, trigram: '☶', name: 'Gen', element: 'earth' }, // NE
+            { angle: Math.PI, trigram: '☳', name: 'Zhen', element: 'wood' },        // East - Left
+            { angle: -3 * Math.PI / 4, trigram: '☷', name: 'Kun', element: 'earth' } // SW
+        ];
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const trigramFontSize = Math.max(14, Math.round(radius * 0.15));
+
+        directions.forEach(dir => {
+            const px = cx + Math.cos(dir.angle) * trigramRadius;
+            const py = cy + Math.sin(dir.angle) * trigramRadius;
+
+            // Draw Trigram Symbol
+            ctx.save();
+            ctx.fillStyle = this.getElementColor(dir.element);
+
+            // Trigrams are symbols, usually best in standard font or specific font. 
+            // 'SealScript' might not have trigram unicode chars or might look weird.
+            // But if style is 'worm', we might want to warp them? 
+            // Trigram symbols are geometric, worm/seal might not apply well to ☰ etc unless we draw lines manually.
+            // Let's stick to standard font for the SYMBOL itself, but maybe use style for the NAME if we were drawing it 
+            // (but we are only drawing the symbol here).
+            // Actually, let's just use standard font for trigrams for clarity, 
+            // unless 'seal' is requested and we have a font that supports them.
+            // Noto Serif SC supports them well.
+            ctx.font = `bold ${trigramFontSize}px "Noto Serif SC", serif`;
+
+            // If user really wants 'new engine', maybe we should use drawSealScript if it supports the symbol?
+            // Most seal fonts don't have trigrams. Safest is standard font.
+            // However, we can apply the GLOW effect from seal style.
+            if (style === 'seal') {
+                ctx.shadowColor = '#8B0000';
+                ctx.shadowBlur = 10;
+            }
+
+            ctx.fillText(dir.trigram, px, py);
+            ctx.restore();
+        });
+
+        // Draw central Qi character
+        const centerChar = config.centerChar || '氣';
+        const centerSize = radius * 0.45;
+
+        if (style === 'seal') {
+            this.drawSealScript(ctx, centerChar, cx, cy, centerSize * 0.9, stroke, { glowColor: '#8B0000' });
+        } else if (style === 'worm') {
+            this.drawWormWriting(ctx, centerChar, cx, cy, centerSize, stroke);
+        } else if (style.startsWith('fuwen')) {
+            const mode = style.includes('-') ? style.substring(style.indexOf('-') + 1) : 'flip-vertical';
+            this.drawFuwen(ctx, centerChar, cx, cy, centerSize, stroke, mode);
+        } else {
+            ctx.save();
+            ctx.font = `bold ${centerSize}px "Noto Serif SC", serif`;
+            ctx.fillStyle = stroke;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = stroke;
+            ctx.fillText(centerChar, cx, cy);
+            ctx.restore();
+        }
+
+        // Draw connecting energy lines from center to directions
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.3;
+        ctx.setLineDash([5, 5]);
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) - Math.PI / 2;
+            // Draw from inner circle to trigram (not full center to avoid cluttering text)
+            // or center to inner radius?
+            // Previous code: center to innerRadius. 
+            // Let's draw from near center char to inner circle.
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(angle) * innerRadius, cy + Math.sin(angle) * innerRadius);
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        ctx.restore();
+    }
+
+    static drawLoShuGrid(ctx, cx, cy, size, stroke) {
+        ctx.save();
+
+        // Grid Box
+        const cellSize = size / 3;
+        const halfSize = size / 2;
+        const startX = cx - halfSize;
+        const startY = cy - halfSize;
+
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(startX, startY, size, size);
+
+        // Inner Lines
+        ctx.beginPath();
+        // Verticals
+        ctx.moveTo(startX + cellSize, startY); ctx.lineTo(startX + cellSize, startY + size);
+        ctx.moveTo(startX + cellSize * 2, startY); ctx.lineTo(startX + cellSize * 2, startY + size);
+        // Horizontals
+        ctx.moveTo(startX, startY + cellSize); ctx.lineTo(startX + size, startY + cellSize);
+        ctx.moveTo(startX, startY + cellSize * 2); ctx.lineTo(startX + size, startY + cellSize * 2);
+        ctx.stroke();
+
+        // Numbers (Dots or Arabic? Image shows dots connected. Let's do Arabic for clarity/simplicity first, or Dots for authenticity)
+        // Image shows: 4 9 2 / 3 5 7 / 8 1 6
+        // Let's draw dots for a cleaner visual language if size permits, otherwise numbers.
+        // Given complexity, let's draw Numbers for now to ensure readability.
+        const loshu = [
+            [4, 9, 2],
+            [3, 5, 7],
+            [8, 1, 6]
+        ];
+
+        ctx.fillStyle = stroke;
+        ctx.font = `bold ${cellSize * 0.4}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        loshu.forEach((row, r) => {
+            row.forEach((num, c) => {
+                const nx = startX + c * cellSize + cellSize / 2;
+                const ny = startY + r * cellSize + cellSize / 2;
+
+                // Draw dots (authenticity)
+                this.drawLoShuDots(ctx, nx, ny, cellSize * 0.8, num, stroke);
+            });
+        });
+
+        ctx.restore();
+    }
+
+    static drawLoShuDots(ctx, x, y, size, num, color) {
+        // Simple dot patterns (like dice)
+        const r = size / 10;
+        const s = size / 3; // spacing
+
+        const dots = [];
+        // Center
+        if (num % 2 !== 0) dots.push([0, 0]);
+        // Corners
+        if (num >= 2 && num !== 3 && num !== 7) { dots.push([-1, -1], [1, 1]); } // 2,4,5,6,8,9
+        if (num >= 4 && num !== 7) { dots.push([1, -1], [-1, 1]); } // 4,5,6,8,9 (3 no, 7 no... wait 3 is diagonal?)
+        // 3 is diagonal; 2 is diagonal?
+        // Let's just implement standard positions
+        // 1: Center
+        // 2: TopLeft, BottomRight
+        // 3: TopLeft, Center, BottomRight
+        // 4: TL, TR, BL, BR
+        // 5: TL, TR, C, BL, BR
+        // 6: TL, TR, ML, MR, BL, BR (2x3)
+        // 7: H shape? Or 2 rows of 3 + 1 center?
+        // 8: 2 rows of 4?
+        // 9: 3 rows of 3?
+
+        ctx.fillStyle = color;
+        // Simplified: Just draw the number for now to avoid clutter and mismatch
+        ctx.fillText(num, x, y);
+
+        // If we want dots, we need a robust dot mapper. The number is safer for v1.
+    }
+
+    static drawConstellation(ctx, cx, cy, size, name, stroke) {
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.fillStyle = stroke;
+        ctx.lineWidth = 2;
+
+        // Big Dipper (Beidou)
+        // Dubhe -> Merak -> Phecda -> Megrez -> Alioth -> Mizar -> Alkaid
+        // Shape: ~ (Bucket) --- (Handle)
+        const stars = [
+            { x: 0.6, y: -0.5 },  // Alpha (Dubhe) - Bucket Lip Top
+            { x: 0.6, y: -0.2 },  // Beta (Merak) - Bucket Lip Bottom
+            { x: 0.3, y: -0.25 }, // Gamma (Phecda) - Bucket Bottom
+            { x: 0.3, y: -0.55 }, // Delta (Megrez) - Bucket Top/Handle join
+            { x: 0.0, y: -0.4 },  // Epsilon (Alioth) - Handle 1
+            { x: -0.3, y: -0.25 }, // Zeta (Mizar) - Handle 2
+            { x: -0.7, y: 0.0 }    // Eta (Alkaid) - Handle Tip
+        ];
+
+        // Scale and translate
+        const points = stars.map(s => ({
+            x: cx + s.x * size * 0.8,
+            y: cy + s.y * size * 0.8
+        }));
+
+        // Draw connections
+        ctx.beginPath();
+        // Bucket: Alpha -> Beta -> Gamma -> Delta -> Alpha
+        ctx.moveTo(points[0].x, points[0].y); // Alpha
+        ctx.lineTo(points[1].x, points[1].y); // Beta
+        ctx.lineTo(points[2].x, points[2].y); // Gamma
+        ctx.lineTo(points[3].x, points[3].y); // Delta
+        ctx.lineTo(points[0].x, points[0].y); // Close bucket
+
+        // Handle: Delta -> Epsilon -> Zeta -> Eta
+        ctx.moveTo(points[3].x, points[3].y); // Delta
+        ctx.lineTo(points[4].x, points[4].y); // Epsilon
+        ctx.lineTo(points[5].x, points[5].y); // Zeta
+        ctx.lineTo(points[6].x, points[6].y); // Eta
+
+        ctx.stroke();
+
+        // Draw Stars
+        points.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, size * 0.04, 0, Math.PI * 2);
+            ctx.fill();
+            // Glow
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, size * 0.07, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+
+        ctx.restore();
+    }
+
+    static drawSeal(ctx, cx, cy, size, variant, stroke) {
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 4;
+
+        const hw = size / 2;
+        const hh = size / 2 * 1.2; // Tall rectangle
+
+        // Border (Red usually, but use stroke)
+        ctx.strokeRect(cx - hw, cy - hh, size, size * 1.2);
+
+        // Inner Content
+        ctx.lineWidth = 2;
+        // "Thunder Order" Seal Pattern (stylized)
+        ctx.beginPath();
+        // Top curve (Cloud)
+        ctx.moveTo(cx - hw * 0.6, cy - hh * 0.7);
+        ctx.bezierCurveTo(cx - hw * 0.3, cy - hh * 0.9, cx + hw * 0.3, cy - hh * 0.9, cx + hw * 0.6, cy - hh * 0.7);
+        // Center Column (Power)
+        ctx.moveTo(cx, cy - hh * 0.7);
+        ctx.lineTo(cx, cy + hh * 0.5);
+        // Spirals (Mystic)
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, hw * 0.3, 0, Math.PI * 2);
+
+        ctx.stroke();
+
+        // Add "ORDER" (Lei Ling) characters roughly if no text provided
+        // Placeholder for ancient seal script
+        ctx.font = `${size * 0.4}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText("勅", cx, cy - hh * 0.2);
+        ctx.fillText("令", cx, cy + hh * 0.4);
+
+    }
+
+    // ========================================================================
+    // CALLIGRAPHIC SCRIPT GENERATORS
+    // ========================================================================
+
+    /**
+     * Track whether the seal script font has been loaded.
+     * @type {boolean}
+     */
+    static _sealFontLoaded = false;
+    static _sealFontLoading = null;
+
+    /**
+     * Ensure the SealScript web font is loaded and available for canvas use.
+     * Uses the FontFace API for reliable canvas rendering.
+     * @returns {Promise<boolean>} true if font is available, false if fallback needed
+     */
+    static async ensureSealFontLoaded() {
+        // Already loaded — skip
+        if (this._sealFontLoaded) return true;
+
+        // Loading in progress — wait for it
+        if (this._sealFontLoading) return this._sealFontLoading;
+
+        this._sealFontLoading = (async () => {
+            try {
+                // Check if the font is already declared via CSS @font-face
+                if (document.fonts.check('12px "SealScript"')) {
+                    this._sealFontLoaded = true;
+                    return true;
+                }
+
+                // Attempt to load via FontFace API from local fonts directory
+                const fontFace = new FontFace('SealScript', 'url(fonts/seal-script.woff2)', {
+                    style: 'normal',
+                    weight: 'normal',
+                    display: 'swap'
+                });
+
+                const loaded = await fontFace.load();
+                document.fonts.add(loaded);
+                this._sealFontLoaded = true;
+                console.log('[SigilTools] SealScript font loaded successfully');
+                return true;
+            } catch (err) {
+                console.warn('[SigilTools] SealScript font not available, using fallback:', err.message);
+                this._sealFontLoaded = false;
+                return false;
+            } finally {
+                this._sealFontLoading = null;
+            }
+        })();
+
+        return this._sealFontLoading;
+    }
+
+    /**
+     * Draw text in Seal Script (篆書 Zhuànshū).
+     * Uses the SealScript web font if available, falls back to Noto Serif SC weight 900.
+     * Adds cinnabar glow effect typical of Daoist seals.
+     *
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {string} text - Characters to render
+     * @param {number} x - Center X position
+     * @param {number} y - Center Y position (or top Y for vertical mode)
+     * @param {number} fontSize - Font size in pixels
+     * @param {string} stroke - Stroke/fill color
+     * @param {object} [options] - Optional settings
+     * @param {boolean} [options.vertical=false] - Render characters vertically (top to bottom)
+     * @param {number} [options.charSpacing=1.3] - Vertical spacing multiplier between characters
+     * @param {string} [options.glowColor='#8B0000'] - Glow color (cinnabar red by default)
+     */
+    static drawSealScript(ctx, text, x, y, fontSize, stroke, options = {}) {
+        ctx.save();
+
+        const vertical = options.vertical || false;
+        const charSpacing = options.charSpacing || 1.3;
+        const glowColor = options.glowColor || '#8B0000';
+
+        // Determine font — use SealScript if loaded, else heavy Noto Serif SC
+        const fontFamily = this._sealFontLoaded
+            ? '"SealScript", "Noto Serif SC", "Songti SC", serif'
+            : '"Noto Serif SC", "Songti SC", serif';
+        const weight = this._sealFontLoaded ? 'normal' : '900';
+
+        ctx.font = `${weight} ${fontSize}px ${fontFamily}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = stroke;
+
+        // Cinnabar glow effect (subtle red shadow behind gold text)
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = Math.max(6, fontSize * 0.15);
+
+        if (vertical && text.length > 1) {
+            // Vertical writing — render each character in a column
+            const totalHeight = fontSize * charSpacing * (text.length - 1);
+            const startY = y - totalHeight / 2;
+
+            for (let i = 0; i < text.length; i++) {
+                const charY = startY + i * fontSize * charSpacing;
+                ctx.fillText(text[i], x, charY);
+            }
+        } else {
+            // Horizontal or single character
+            ctx.fillText(text, x, y);
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw text as Fuwen / Inverted Characters (倒字 Dàozì).
+     * Characters are deliberately written upside-down, mirrored, or rotated 180°
+     * for ritualistic purposes in Daoist talismans.
+     *
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {string} text - Characters to render
+     * @param {number} x - Center X position
+     * @param {number} y - Center Y position
+     * @param {number} fontSize - Font size in pixels
+     * @param {string} stroke - Stroke/fill color
+     * @param {string} [mode='flip-vertical'] - Inversion mode:
+     *   'flip-vertical' — Upside-down (most common in Daoist fu)
+     *   'flip-horizontal' — Mirror writing (left-right flip)
+     *   'flip-both' — Both axes flipped (equivalent to 180° rotation)
+     *   'rotate-180' — 180° rotation (same visual as flip-both)
+     * @param {object} [options] - Optional settings
+     * @param {boolean} [options.vertical=false] - Render characters vertically
+     * @param {number} [options.charSpacing=1.3] - Vertical spacing multiplier
+     * @param {string} [options.tintColor] - Optional tint color for inverted text
+     */
+    static drawFuwen(ctx, text, x, y, fontSize, stroke, mode = 'flip-vertical', options = {}) {
+        ctx.save();
+
+        const vertical = options.vertical || false;
+        const charSpacing = options.charSpacing || 1.3;
+        const font = '"Noto Serif SC", "Songti SC", serif';
+
+        ctx.font = `900 ${fontSize}px ${font}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = options.tintColor || stroke;
+        ctx.shadowColor = stroke;
+        ctx.shadowBlur = Math.max(4, fontSize * 0.1);
+
+        // Helper: draw a single character with the specified transform
+        const drawChar = (char, cx, cy) => {
+            ctx.save();
+
+            // Move origin to character center
+            ctx.translate(cx, cy);
+
+            // Apply the inversion transform
+            switch (mode) {
+                case 'flip-vertical':
+                    // Upside-down: flip Y axis
+                    ctx.scale(1, -1);
+                    break;
+                case 'flip-horizontal':
+                    // Mirror: flip X axis
+                    ctx.scale(-1, 1);
+                    break;
+                case 'flip-both':
+                    // Both axes: equivalent to 180° rotation
+                    ctx.scale(-1, -1);
+                    break;
+                case 'rotate-180':
+                    // Explicit rotation (same visual as flip-both)
+                    ctx.rotate(Math.PI);
+                    break;
+                default:
+                    // Default to vertical flip if unknown mode
+                    ctx.scale(1, -1);
+                    break;
+            }
+
+            // Draw the character at origin (0,0) since we translated
+            ctx.fillText(char, 0, 0);
+
+            ctx.restore();
+        };
+
+        if (vertical && text.length > 1) {
+            // Vertical writing — each character inverted individually
+            const totalHeight = fontSize * charSpacing * (text.length - 1);
+            const startY = y - totalHeight / 2;
+
+            for (let i = 0; i < text.length; i++) {
+                const charY = startY + i * fontSize * charSpacing;
+                drawChar(text[i], x, charY);
+            }
+        } else if (text.length > 1) {
+            // Horizontal text — invert the entire string at once
+            ctx.save();
+            ctx.translate(x, y);
+            switch (mode) {
+                case 'flip-vertical': ctx.scale(1, -1); break;
+                case 'flip-horizontal': ctx.scale(-1, 1); break;
+                case 'flip-both': ctx.scale(-1, -1); break;
+                case 'rotate-180': ctx.rotate(Math.PI); break;
+                default: ctx.scale(1, -1); break;
+            }
+            ctx.fillText(text, 0, 0);
+            ctx.restore();
+        } else {
+            // Single character
+            drawChar(text, x, y);
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw text in Worm Writing (蟲書 Chóngshū / 鳥蟲篆 Bird-Worm Seal Script).
+     * Procedurally warps character strokes into sinuous, worm-like curves.
+     * Each character is rendered to an offscreen canvas, its pixels are extracted,
+     * then redrawn with sinusoidal displacement and worm-head bulbs at endpoints.
+     *
+     * @param {CanvasRenderingContext2D} ctx - Target canvas context
+     * @param {string} text - Characters to render
+     * @param {number} x - Center X position
+     * @param {number} y - Center Y position (or top Y for vertical mode)
+     * @param {number} fontSize - Base font size in pixels
+     * @param {string} stroke - Stroke/fill color
+     * @param {object} [options] - Optional settings
+     * @param {number} [options.amplitude=3] - Warp intensity (pixels of sinusoidal displacement)
+     * @param {number} [options.frequency=0.08] - Wave density (lower = broader waves)
+     * @param {number} [options.headSize=2.5] - Worm head/tail bulb radius in pixels
+     * @param {boolean} [options.vertical=false] - Render characters vertically
+     * @param {number} [options.charSpacing=1.3] - Vertical spacing multiplier
+     * @param {number} [options.phase=0] - Phase offset for the sine wave
+     */
+    static drawWormWriting(ctx, text, x, y, fontSize, stroke, options = {}) {
+        const amplitude = options.amplitude !== undefined ? options.amplitude : Math.max(2, fontSize * 0.06);
+        const frequency = options.frequency !== undefined ? options.frequency : 0.08;
+        const headSize = options.headSize !== undefined ? options.headSize : Math.max(1.5, fontSize * 0.04);
+        const vertical = options.vertical || false;
+        const charSpacing = options.charSpacing || 1.3;
+        const phase = options.phase || 0;
+
+        // Process each character individually
+        const chars = text.split('');
+
+        // Calculate positions
+        let positions;
+        if (vertical && chars.length > 1) {
+            const totalHeight = fontSize * charSpacing * (chars.length - 1);
+            const startY = y - totalHeight / 2;
+            positions = chars.map((_, i) => ({
+                x: x,
+                y: startY + i * fontSize * charSpacing
+            }));
+        } else {
+            // Horizontal layout — measure each character width
+            const tempFont = `900 ${fontSize}px "Noto Serif SC", "Songti SC", serif`;
+            ctx.save();
+            ctx.font = tempFont;
+            const totalWidth = ctx.measureText(text).width;
+            ctx.restore();
+            const startX = x - totalWidth / 2;
+
+            positions = [];
+            let currentX = startX;
+            ctx.save();
+            ctx.font = tempFont;
+            for (const char of chars) {
+                const charW = ctx.measureText(char).width;
+                positions.push({ x: currentX + charW / 2, y: y });
+                currentX += charW;
+            }
+            ctx.restore();
+        }
+
+        // Render each character with worm warping
+        chars.forEach((char, idx) => {
+            this._drawWormChar(ctx, char, positions[idx].x, positions[idx].y, fontSize, stroke, {
+                amplitude,
+                frequency,
+                headSize,
+                phase: phase + idx * 1.7 // Different phase per character for variety
+            });
+        });
+    }
+
+    /**
+     * Internal: Render a single character with worm-writing warping.
+     * 1. Renders the character to an offscreen canvas at 2x resolution
+     * 2. Scans horizontal rows for filled pixel segments ("strokes")
+     * 3. Applies sinusoidal X-displacement to each row
+     * 4. Adds bulb decorations at stroke endpoints
+     */
+    static _drawWormChar(ctx, char, cx, cy, fontSize, stroke, params) {
+        const { amplitude, frequency, headSize, phase } = params;
+
+        // Create offscreen canvas for character rasterization
+        const scale = 2; // Render at 2x for better detail
+        const canvasSize = Math.ceil(fontSize * 1.5);
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = canvasSize * scale;
+        offCanvas.height = canvasSize * scale;
+        const offCtx = offCanvas.getContext('2d');
+
+        // Render the character to the offscreen canvas (white on black for easy detection)
+        offCtx.fillStyle = '#000';
+        offCtx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+        offCtx.font = `900 ${fontSize * scale}px "Noto Serif SC", "Songti SC", serif`;
+        offCtx.textAlign = 'center';
+        offCtx.textBaseline = 'middle';
+        offCtx.fillStyle = '#FFF';
+        offCtx.fillText(char, offCanvas.width / 2, offCanvas.height / 2);
+
+        // Extract pixel data
+        const imageData = offCtx.getImageData(0, 0, offCanvas.width, offCanvas.height);
+        const pixels = imageData.data;
+        const w = offCanvas.width;
+        const h = offCanvas.height;
+
+        // Scan for stroke segments and redraw with worm warping
+        ctx.save();
+        ctx.fillStyle = stroke;
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = Math.max(1, fontSize * 0.02);
+        ctx.shadowColor = stroke;
+        ctx.shadowBlur = Math.max(3, fontSize * 0.08);
+
+        // Offset from center to top-left in target space
+        const halfSize = canvasSize / 2;
+        const targetLeft = cx - halfSize;
+        const targetTop = cy - halfSize;
+
+        // Track stroke endpoints for worm head/tail decorations
+        const endpoints = [];
+
+        // Scan each row of the offscreen canvas
+        for (let row = 0; row < h; row++) {
+            let inStroke = false;
+            let strokeStart = -1;
+
+            for (let col = 0; col <= w; col++) {
+                const pixelIndex = (row * w + col) * 4;
+                // Check if pixel is "filled" (red channel > 128 in the white text)
+                const isFilled = col < w && pixels[pixelIndex] > 128;
+
+                if (isFilled && !inStroke) {
+                    // Stroke start
+                    inStroke = true;
+                    strokeStart = col;
+                } else if (!isFilled && inStroke) {
+                    // Stroke end — draw this segment with worm warping
+                    inStroke = false;
+                    const strokeEnd = col;
+
+                    // Convert to target space (divide by scale to go back to 1x)
+                    const y1 = targetTop + row / scale;
+
+                    // Apply sinusoidal X displacement — varies with Y position
+                    const warpX = amplitude * Math.sin(frequency * row + phase);
+
+                    const x1 = targetLeft + strokeStart / scale + warpX;
+                    const x2 = targetLeft + strokeEnd / scale + warpX;
+
+                    // Draw the warped stroke segment as a thin filled rectangle
+                    const segWidth = x2 - x1;
+                    if (segWidth > 0.5) {
+                        ctx.fillRect(x1, y1, segWidth, 1 / scale);
+                    }
+
+                    // Record endpoints for head/tail bulbs (only for prominent segments)
+                    if (segWidth > fontSize * 0.04) {
+                        // Track unique endpoints (avoid duplicates from consecutive rows)
+                        const addEndpoint = (ex, ey) => {
+                            const tooClose = endpoints.some(ep =>
+                                Math.abs(ep.x - ex) < headSize * 2 && Math.abs(ep.y - ey) < headSize * 2
+                            );
+                            if (!tooClose) {
+                                endpoints.push({ x: ex, y: ey });
+                            }
+                        };
+                        addEndpoint(x1, y1);
+                        addEndpoint(x2, y1);
+                    }
+                }
+            }
+        }
+
+        // Draw worm head/tail bulbs at stroke endpoints
+        ctx.shadowBlur = Math.max(2, headSize);
+        endpoints.forEach(ep => {
+            ctx.beginPath();
+            ctx.arc(ep.x, ep.y, headSize, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        ctx.restore();
+    }
+
+    // ========================================================================
+    // LEGACY RENDERERS (backward compatibility)
+    // ========================================================================
+
+    static drawVectorInstructions(ctx, instructions, defaultStroke, w, h, layoutInstructions) {
+        const BASE_SIZE = 400;
+        const PADDING = 40; // Base space padding
+        const SAFE_ZONE = BASE_SIZE - (PADDING * 2);
+
+        // 1. Calculate Bounding Box in Base Coordinates (0-400)
+        let minX = BASE_SIZE, minY = BASE_SIZE, maxX = 0, maxY = 0;
+        let hasPoints = false;
+
+        const getQuadrantPosBase = (quadrant) => {
+            const positions = {
+                'center': { x: 200, y: 200 },
+                'top': { x: 200, y: 60 },
+                'top-right': { x: 320, y: 80 },
+                'right': { x: 340, y: 200 },
+                'bottom-right': { x: 320, y: 320 },
+                'bottom': { x: 200, y: 340 },
+                'bottom-left': { x: 80, y: 320 },
+                'left': { x: 60, y: 200 },
+                'top-left': { x: 80, y: 80 }
+            };
+            return positions[quadrant] || { x: 200, y: 200 };
+        };
+
+        // First pass: Find bounds
+        instructions.forEach(inst => {
+            let baseX = inst.x !== undefined ? inst.x : (inst.cx !== undefined ? inst.cx : 0);
+            let baseY = inst.y !== undefined ? inst.y : (inst.cy !== undefined ? inst.cy : 0);
+
+            if (inst.quadrant) {
+                const qPos = getQuadrantPosBase(inst.quadrant);
+                baseX += qPos.x;
+                baseY += qPos.y;
+            }
+
+            const updateBounds = (x, y, r = 0) => {
+                minX = Math.min(minX, x - r);
+                minY = Math.min(minY, y - r);
+                maxX = Math.max(maxX, x + r);
+                maxY = Math.max(maxY, y + r);
+                hasPoints = true;
+            };
+
+            if (inst.type === 'circle') {
+                updateBounds(baseX, baseY, inst.r || 10);
+            } else if (inst.points && Array.isArray(inst.points)) {
+                inst.points.forEach(p => {
+                    if (Array.isArray(p) && p.length >= 2) {
+                        updateBounds(baseX + p[0], baseY + p[1]);
+                    }
+                });
+            } else {
+                updateBounds(baseX, baseY, (inst.size || 30) / 2);
+            }
+        });
+
+        // 2. Calculate Final Scaling and Translation to keep drawing inside BASE_SIZE
+        let finalScale = Math.min(w, h) / BASE_SIZE;
+        let internalOffsetX = 0;
+        let internalOffsetY = 0;
+
+        if (hasPoints) {
+            const drawW = maxX - minX;
+            const drawH = maxY - minY;
+            const overflowScale = Math.min(SAFE_ZONE / Math.max(drawW, 1), SAFE_ZONE / Math.max(drawH, 1));
+
+            if (overflowScale < 1.0) {
+                // Drawing is too big, scale it down internally within the 400x400 space
+                const internalScale = overflowScale;
+                const centerX = (minX + maxX) / 2;
+                const centerY = (minY + maxY) / 2;
+
+                // We will apply this internalScale to all coordinates below
+                // and then center it in the 400x400 space
+                internalOffsetX = 200 - centerX * internalScale;
+                internalOffsetY = 200 - centerY * internalScale;
+
+                // Multiply our global scale by internal scale
+                // (Wait, it's easier to just adjust the coordinates in the second pass)
+            }
+        }
+
+        const fitCoord = (val, offset, internalScale = 1.0) => (offset + val * internalScale) * finalScale;
+
+        // Second pass: Draw
+        instructions.forEach(inst => {
+            ctx.save();
+
+            let baseX = inst.x !== undefined ? inst.x : 0;
+            let baseY = inst.y !== undefined ? inst.y : 0;
+            if (inst.quadrant) {
+                const qPos = getQuadrantPosBase(inst.quadrant);
+                baseX += qPos.x;
+                baseY += qPos.y;
+            }
+
+            // Determine if we need internal scaling (to fit complex drawings)
+            let drawW = maxX - minX;
+            let drawH = maxY - minY;
+            let internalS = (hasPoints && Math.max(drawW, drawH) > SAFE_ZONE)
+                ? SAFE_ZONE / Math.max(drawW, drawH)
+                : 1.0;
+
+            // Adjust offsets to center the drawing in the 400x400 space
+            let centerOffX = hasPoints ? (200 - ((minX + maxX) / 2) * internalS) : 0;
+            let centerOffY = hasPoints ? (200 - ((minY + maxY) / 2) * internalS) : 0;
+
+            const tX = (x) => (centerOffX + x * internalS) * finalScale;
+            const tY = (y) => (centerOffY + y * internalS) * finalScale;
+
+            ctx.beginPath();
+            ctx.lineWidth = (inst.width || 2) * finalScale * internalS;
+            if (inst.color) {
+                ctx.strokeStyle = inst.color;
+                ctx.shadowColor = inst.color;
+                ctx.fillStyle = inst.color;
+            } else {
+                ctx.strokeStyle = defaultStroke;
+                ctx.shadowColor = defaultStroke;
+                ctx.fillStyle = defaultStroke;
+            }
+
+            switch (inst.type) {
+                case 'path':
+                case 'line':
+                    if (inst.points && Array.isArray(inst.points) && inst.points.length >= 2) {
+                        // Points are absolute coordinates (0-400 space), don't add baseX/baseY
+                        ctx.moveTo(tX(inst.points[0][0]), tY(inst.points[0][1]));
+                        for (let i = 1; i < inst.points.length; i++) {
+                            const p = inst.points[i];
+                            if (Array.isArray(p) && p.length >= 2) {
+                                ctx.lineTo(tX(p[0]), tY(p[1]));
+                            }
+                        }
+                        ctx.stroke();
+                    }
+                    break;
+                case 'polygon':
+                    if (inst.points && Array.isArray(inst.points) && inst.points.length >= 3) {
+                        // Points are absolute coordinates (0-400 space), don't add baseX/baseY
+                        ctx.moveTo(tX(inst.points[0][0]), tY(inst.points[0][1]));
+                        for (let i = 1; i < inst.points.length; i++) {
+                            const p = inst.points[i];
+                            if (Array.isArray(p) && p.length >= 2) {
+                                ctx.lineTo(tX(p[0]), tY(p[1]));
+                            }
+                        }
+                        ctx.closePath();
+                        if (inst.fill) {
+                            ctx.fillStyle = inst.fill === true ? ctx.strokeStyle : inst.fill;
+                            ctx.fill();
+                        }
+                        ctx.stroke();
+                    }
+                    break;
+                case 'circle':
+                    // Use cx/cy directly if provided, otherwise use baseX/baseY
+                    // When quadrant is specified, cx/cy are offsets from quadrant center
+                    const useCx = inst.cx !== undefined ? inst.cx : 0;
+                    const useCy = inst.cy !== undefined ? inst.cy : 0;
+                    const cx = inst.quadrant ? baseX + useCx : (inst.cx !== undefined ? inst.cx : baseX);
+                    const cy = inst.quadrant ? baseY + useCy : (inst.cy !== undefined ? inst.cy : baseY);
+                    ctx.arc(tX(cx), tY(cy), (inst.r || 10) * internalS * finalScale, 0, Math.PI * 2);
+                    if (inst.fill) {
+                        ctx.fillStyle = inst.fill === true ? ctx.strokeStyle : inst.fill;
+                        ctx.fill();
+                    }
+                    ctx.stroke();
+                    break;
+                case 'text':
+                    const fSize = (inst.size || 30) * finalScale * internalS;
+                    // When quadrant is specified, x/y are offsets from quadrant center
+                    // Otherwise, x/y are absolute coordinates in the 0-400 space
+                    const textX = inst.quadrant ? baseX : (inst.x !== undefined ? inst.x : baseX);
+                    const textY = inst.quadrant ? baseY : (inst.y !== undefined ? inst.y : baseY);
+                    const tPosX = tX(textX);
+                    const tPosY = tY(textY);
+
+                    const style = inst.style || (inst.font === 'seal' ? 'seal' : inst.font === 'worm' ? 'worm' : 'regular');
+
+                    if (style === 'seal') {
+                        this.drawSealScript(ctx, inst.text || '', tPosX, tPosY, fSize, ctx.fillStyle, {
+                            glowColor: '#8B0000'
+                        });
+                    } else if (style === 'worm') {
+                        this.drawWormWriting(ctx, inst.text || '', tPosX, tPosY, fSize, ctx.fillStyle);
+                    } else if (style.startsWith('fuwen')) {
+                        const mode = style.includes('-') ? style.substring(style.indexOf('-') + 1) : 'flip-vertical';
+                        this.drawFuwen(ctx, inst.text || '', tPosX, tPosY, fSize, ctx.fillStyle, mode);
+                    } else {
+                        ctx.font = `900 ${fSize}px 'Noto Serif SC', 'Songti SC', serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.shadowBlur = 10 * finalScale * internalS;
+                        ctx.fillText(inst.text || '', tPosX, tPosY);
+                    }
+                    break;
+                case 'grid':
+                    if (inst.rows && inst.cols) {
+                        this.drawGridLayout(ctx, w, h, inst.rows, inst.cols, inst.labels, ctx.strokeStyle, finalScale * internalS);
+                    }
+                    break;
+            }
+            ctx.restore();
+        });
+
+        // Render layout labels (seal characters and directional labels)
+        if (layoutInstructions && layoutInstructions.labels && layoutInstructions.labels.length > 0) {
+            this.drawLayoutLabels(ctx, layoutInstructions.labels, defaultStroke, finalScale, getQuadrantPosBase);
+        }
+    }
+
+    static drawLayoutLabels(ctx, labels, defaultStroke, finalScale, getQuadrantPosBase) {
+        const font = "'Noto Serif SC', 'Songti SC', serif";
+
+        labels.forEach(label => {
+            ctx.save();
+
+            // Determine position
+            let baseX = 200; // Default center
+            let baseY = 200;
+
+            if (label.position) {
+                const qPos = getQuadrantPosBase(label.position);
+                baseX = qPos.x;
+                baseY = qPos.y;
+            }
+
+            // If explicit y is provided, use it (for vertical seal characters)
+            if (label.y !== undefined) {
+                baseY = label.y;
+            }
+
+            // Calculate pixel coordinates
+            const x = baseX * finalScale;
+            const y = baseY * finalScale;
+
+            // Determine styling
+            const isSeal = label.isSeal === true;
+            const size = (label.size || (isSeal ? 60 : 14)) * finalScale;
+
+            if (isSeal) {
+                // Seal characters - cinnabar red, bold, with glow
+                const style = label.style || 'seal'; // Default to seal for seal characters
+                const sealColor = '#8B0000';
+                
+                if (style === 'seal') {
+                    this.drawSealScript(ctx, label.text, x, y, size, sealColor, { glowColor: sealColor });
+                } else if (style === 'worm') {
+                    this.drawWormWriting(ctx, label.text, x, y, size, sealColor);
+                } else if (style.startsWith('fuwen')) {
+                    const mode = style.includes('-') ? style.substring(style.indexOf('-') + 1) : 'flip-vertical';
+                    this.drawFuwen(ctx, label.text, x, y, size, sealColor, mode);
+                } else {
+                    ctx.fillStyle = sealColor;
+                    ctx.shadowBlur = 8 * finalScale;
+                    ctx.shadowColor = sealColor;
+                    ctx.font = `900 ${size}px ${font}`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(label.text, x, y);
+                }
+            } else {
+                // Directional/element labels
+                ctx.fillStyle = label.element ? this.getElementColor(label.element) : '#333';
+                ctx.shadowBlur = 0;
+                ctx.font = `${size}px ${font}`;
+            }
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label.text, x, y);
+
+            ctx.restore();
+        });
+    }
+
+    static getElementColor(element) {
+        const colors = {
+            'wood': '#228B22',
+            'fire': '#DC143C',
+            'earth': '#DAA520',
+            'metal': '#C0C0C0',
+            'water': '#1E90FF'
+        };
+        return colors[element] || '#333';
+    }
+
+    static drawGridLayout(ctx, w, h, rows, cols, labels, stroke, scale) {
+        const margin = 40 * scale;
+        const cellW = (w - margin * 2) / cols;
+        const cellH = (h - margin * 2) / rows;
+
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1 * scale;
+        ctx.globalAlpha = 0.4;
+
+        // Draw grid lines
+        for (let i = 0; i <= cols; i++) {
+            const x = margin + i * cellW;
+            ctx.beginPath();
+            ctx.moveTo(x, margin);
+            ctx.lineTo(x, h - margin);
+            ctx.stroke();
+        }
+
+        for (let i = 0; i <= rows; i++) {
+            const y = margin + i * cellH;
+            ctx.beginPath();
+            ctx.moveTo(margin, y);
+            ctx.lineTo(w - margin, y);
+            ctx.stroke();
+        }
+
+        // Draw labels in cells
+        if (labels && labels.length > 0) {
+            ctx.globalAlpha = 0.6;
+            ctx.font = `${20 * scale}px 'Noto Serif SC', serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            labels.forEach((label, idx) => {
+                const row = Math.floor(idx / cols);
+                const col = idx % cols;
+                const x = margin + col * cellW + cellW / 2;
+                const y = margin + row * cellH + cellH / 2;
+                ctx.fillText(label, x, y);
+            });
+        }
+
+        ctx.restore();
+    }
+
+    static drawAsciiFallback(ctx, w, h, grid, stroke) {
+        const gridDim = grid.length;
+        const cellSize = w / gridDim;
+
+        grid.forEach((row, y) => {
+            const chars = row.split('');
+            chars.forEach((char, x) => {
+                const cx = x * cellSize + cellSize / 2;
+                const cy = y * cellSize + cellSize / 2;
+
+                ctx.beginPath();
+                switch (char) {
+                    case '=':
+                    case '-':
+                        ctx.moveTo(cx - cellSize / 2, cy);
+                        ctx.lineTo(cx + cellSize / 2, cy);
+                        break;
+                    case '|':
+                        ctx.moveTo(cx, cy - cellSize / 2);
+                        ctx.lineTo(cx, cy + cellSize / 2);
+                        break;
+                    case '/':
+                        ctx.moveTo(cx + cellSize / 3, cy - cellSize / 2);
+                        ctx.lineTo(cx - cellSize / 3, cy + cellSize / 2);
+                        break;
+                    case '\\':
+                        ctx.moveTo(cx - cellSize / 3, cy - cellSize / 2);
+                        ctx.lineTo(cx + cellSize / 3, cy + cellSize / 2);
+                        break;
+                    case '(':
+                        ctx.arc(cx + cellSize / 2, cy, cellSize / 2, Math.PI * 0.5, Math.PI * 1.5);
+                        break;
+                    case ')':
+                        ctx.arc(cx - cellSize / 2, cy, cellSize / 2, Math.PI * 1.5, Math.PI * 0.5);
+                        break;
+                    case '@':
+                    case '*':
+                    case '#':
+                        ctx.arc(cx, cy, cellSize / 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                    case '.':
+                        break;
+                    default:
+                        ctx.font = `${cellSize * 0.9}px var(--font-zh)`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(char, cx, cy);
+                        break;
+                }
+                ctx.stroke();
+            });
+        });
+    }
+
+    /**
+     * Draw a placeholder for a talisman that doesn't have authenticated drawing data yet.
+     * Shows the talisman name prominently with a "DRAW" instruction and basic structural frame.
+     */
+    static drawTalismanPlaceholder(ctx, w, h, fuluContent, stroke, bg) {
+        const font = "'Noto Serif SC', 'Songti SC', serif";
+        const centerX = w / 2;
+        const centerY = h / 2;
+        const margin = 20;
+
+        // Background
+        ctx.fillStyle = bg || '#0a0a0a';
+        ctx.fillRect(0, 0, w, h);
+
+        // Outer border frame
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.4;
+        ctx.setLineDash([8, 4]);
+        ctx.strokeRect(margin, margin, w - margin * 2, h - margin * 2);
+        ctx.setLineDash([]);
+
+        // Inner border
+        const inner = margin + 15;
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.2;
+        ctx.strokeRect(inner, inner, w - inner * 2, h - inner * 2);
+        ctx.globalAlpha = 1.0;
+
+        // Cross-hair lines (subtle grid reference)
+        ctx.globalAlpha = 0.1;
+        ctx.beginPath();
+        ctx.moveTo(centerX, margin + 10);
+        ctx.lineTo(centerX, h - margin - 10);
+        ctx.moveTo(margin + 10, centerY);
+        ctx.lineTo(w - margin - 10, centerY);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+
+        // "DRAW" label at top
+        ctx.fillStyle = '#e63946';
+        ctx.globalAlpha = 0.7;
+        const drawSize = Math.round(w * 0.055);
+        ctx.font = `bold ${drawSize}px ${font}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('DRAW', centerX, margin + 35);
+        ctx.globalAlpha = 1.0;
+
+        // Talisman name in Chinese (large, centered)
+        const nameZh = fuluContent.talismanNameZh || '';
+        const chars = nameZh.split('');
+        if (chars.length > 0) {
+            const charSize = Math.min(
+                Math.round(w * 0.18),
+                Math.round((h - margin * 4 - 80) / chars.length * 0.85)
+            );
+            
+            // Use new calligraphic engine for placeholder too
+            this.drawSealScript(ctx, nameZh, centerX, centerY, charSize, stroke, {
+                vertical: true,
+                charSpacing: 1.0,
+                glowColor: '#8B0000'
+            });
+        }
+
+        // Seal chars at bottom (if different from name)
+        const sealChars = fuluContent.sealChars || [];
+        if (sealChars.length > 0 && sealChars.join('') !== nameZh) {
+            ctx.fillStyle = stroke;
+            ctx.globalAlpha = 0.5;
+            const sealSize = Math.round(w * 0.06);
+            ctx.font = `${sealSize}px ${font}`;
+            ctx.fillText(sealChars.join(' '), centerX, h - margin - 25);
+            ctx.globalAlpha = 1.0;
+        }
+
+        // Hexagram number indicator (small, bottom-right)
+        if (fuluContent.hexagramNumber) {
+            ctx.fillStyle = stroke;
+            ctx.globalAlpha = 0.3;
+            ctx.font = `12px ${font}`;
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(`${fuluContent.hexagramNumber}`, w - margin - 5, h - margin - 5);
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    static drawPendingState(ctx, w, h) {
+        ctx.fillStyle = '#1a1a1a';
+        ctx.fillRect(0, 0, w, h);
+        ctx.font = '14px serif';
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        ctx.fillText('Celestial blueprint pending...', w / 2, h / 2);
+    }
+
+    // ========================================================================
+    // FULU GENERATOR ENGINE
+    // ========================================================================
+
+    /**
+     * Main Generator Function
+     * Generates procedural FDL (Fulu Drawing Language) JSON based on Daoist structural rules.
+     * @param {string} styleKey - 'SHANGQING', 'THUNDER', etc.
+     * @param {string[]} characters - Array of chars to inscribe (e.g., ["開", "心"])
+     * @param {number} verbosity - Logging level (4 = verbose)
+     */
+    static generateFuluVisuals(styleKey = 'DEFAULT', characters = [], verbosity = 0) {
+        if (verbosity >= 4) {
+            console.log(`[SigilTools:GEN] Generating Fulu visuals`, { styleKey, characters });
+        }
+
+        const FULU_STYLES = {
+            SHANGQING: {
+                color: "#8B0000", // Cinnabar
+                strokeWidth: 3,
+                headerType: "THREE_PURE_ONES", // The 3 circles/loops
+                bodyStyle: "CLOUD_SEAL", // Curvy, elongated
+                footerStyle: "KNOT"
+            },
+            THUNDER: {
+                color: "#000000", // Black ink
+                strokeWidth: 5,
+                headerType: "THUNDER_V", // The V shape with dots
+                bodyStyle: "MARTIAL", // Jagged, sharp lines
+                footerStyle: "TRIDENT"
+            },
+            DEFAULT: {
+                color: "#d4af37", // Gold
+                strokeWidth: 3,
+                headerType: "IMPERIAL", // "Chi Ling"
+                bodyStyle: "SEAL",
+                footerStyle: "BAGUA"
+            }
+        };
+
+        const style = FULU_STYLES[styleKey] || FULU_STYLES.DEFAULT;
+        if (verbosity >= 4) console.log(`[SigilTools:GEN] Applied style:`, style);
+
+        const layers = [];
+
+        // 1. Generate Header Layer (Fu Tou)
+        layers.push({
+            name: "fu_tou",
+            opacity: 1,
+            commands: this.generateHeaderCommands(style)
+        });
+        if (verbosity >= 4) console.log(`[SigilTools:GEN] Generated Header (${style.headerType})`);
+
+        // 2. Generate Body Layer (Fu Shen) - The complex lattice
+        layers.push({
+            name: "fu_shen",
+            opacity: 1,
+            commands: this.generateBodyCommands(style, characters)
+        });
+        if (verbosity >= 4) console.log(`[SigilTools:GEN] Generated Body (${style.bodyStyle}) with ${characters.length} characters`);
+
+        // 3. Generate Footer Layer (Fu Jiao)
+        layers.push({
+            name: "fu_jiao",
+            opacity: 1,
+            commands: this.generateFooterCommands(style)
+        });
+        if (verbosity >= 4) console.log(`[SigilTools:GEN] Generated Footer (${style.footerStyle})`);
+
+        return {
+            fdl: {
+                version: "1.0",
+                background: styleKey === 'THUNDER' ? "#ffff00" : "#fffbf0", // Yellow paper for Thunder
+                source: "procedural_generator",
+                layers: layers
+            }
+        };
+    }
+
+    static generateHeaderCommands(style) {
+        const cmds = [];
+
+        if (style.headerType === "THREE_PURE_ONES") {
+            // The "Three Points of Light" (San Qing)
+            cmds.push(
+                { type: "circle", cx: 440, cy: 60, r: 12, style: { fill: style.color } },
+                { type: "circle", cx: 500, cy: 45, r: 15, style: { fill: style.color, glow: 5 } },
+                { type: "circle", cx: 560, cy: 60, r: 12, style: { fill: style.color } },
+                // The "Gate" frame
+                { type: "path", points: [[300, 115], [700, 115]], style: { width: style.strokeWidth, color: style.color } },
+                { type: "text", x: 500, y: 165, content: "勅令", size: 65, font: "seal", style: { color: style.color } }
+            );
+        }
+        else if (style.headerType === "THUNDER_V") {
+            // The "V" shape common in Exorcism talismans
+            cmds.push(
+                { type: "path", points: [[350, 50], [500, 150], [650, 50]], style: { width: style.strokeWidth + 2, color: style.color } },
+                { type: "circle", cx: 350, cy: 50, r: 15, style: { fill: style.color } },
+                { type: "circle", cx: 650, cy: 50, r: 15, style: { fill: style.color } },
+                { type: "text", x: 500, y: 100, content: "雷", size: 60, font: "seal", style: { color: style.color } }
+            );
+        }
+        else {
+            // Imperial Header (Default)
+            cmds.push(
+                { type: "circle", cx: 500, cy: 50, r: 15, style: { fill: style.color, glow: 5 } },
+                { type: "text", x: 500, y: 120, content: "勅令", size: 60, font: "seal", style: { color: style.color } },
+                { type: "path", points: [[200, 160], [800, 160]], style: { width: style.strokeWidth, color: style.color } }
+            );
+        }
+
+        return cmds;
+    }
+
+    static generateBodyCommands(style, chars) {
+        const cmds = [];
+        let yPos = 250;
+
+        // 1. Create the "Pillars" or Frame (The Container)
+        if (style.bodyStyle === "CLOUD_SEAL") {
+            // Wavy, smoke-like pillars typical of Zhengao text
+            cmds.push(
+                // Left Pillar (S-curve)
+                { type: "path", points: [[300, 200], [280, 400], [310, 600], [290, 800]], style: { width: style.strokeWidth, color: style.color, alpha: 0.6 } },
+                // Right Pillar (S-curve)
+                { type: "path", points: [[700, 200], [720, 400], [690, 600], [710, 800]], style: { width: style.strokeWidth, color: style.color, alpha: 0.6 } }
+            );
+        } else {
+            // Rigid pillars
+            cmds.push(
+                { type: "line", x1: 300, y1: 200, x2: 300, y2: 800, style: { width: style.strokeWidth, color: style.color } },
+                { type: "line", x1: 700, y1: 200, x2: 700, y2: 800, style: { width: style.strokeWidth, color: style.color } }
+            );
+        }
+
+        // 2. Insert the Characters (The Contents)
+        // We stack them vertically and apply specific font styles
+        const bodyHeight = 550;
+        const spacing = chars.length > 1 ? bodyHeight / (chars.length - 1) : 0;
+        
+        if (chars.length === 1) yPos = 500; // Center if single character
+
+        chars.forEach((char, index) => {
+            cmds.push({
+                type: "text",
+                x: 500,
+                y: yPos,
+                content: char,
+                size: chars.length > 3 ? 120 : 160,
+                font: style.bodyStyle === "CLOUD_SEAL" ? "worm" : "seal", // "Worm" script is the squiggly Daoist style
+                style: {
+                    color: style.color,
+                    glow: style.bodyStyle === "CLOUD_SEAL" ? 8 : 0
+                }
+            });
+
+            // Add "Lattice" lines between characters to connect them physically
+            if (index < chars.length - 1) {
+                cmds.push({
+                    type: "path",
+                    points: [[400, yPos + spacing * 0.4], [500, yPos + spacing * 0.5], [600, yPos + spacing * 0.4]],
+                    style: { width: 2, color: style.color, alpha: 0.4 }
+                });
+            }
+
+            yPos += spacing;
+        });
+
+        return cmds;
+    }
+
+    static generateFooterCommands(style) {
+        const cmds = [];
+        const yBase = 850;
+
+        if (style.footerStyle === "KNOT") {
+            // The "Well" or "Knot" symbol to lock the magic in
+            cmds.push(
+                { type: "path", points: [[350, yBase], [650, yBase]], style: { width: style.strokeWidth, color: style.color } },
+                { type: "text", x: 500, y: yBase + 60, content: "罡", size: 65, font: "seal", style: { color: style.color } }, // Gang (Star/Strength)
+                { type: "circle", cx: 500, cy: yBase + 100, r: 20, style: { fill: style.color, alpha: 0.5 } },
+                { type: "path", points: [[450, yBase + 120], [550, yBase + 120]], style: { width: 4, color: style.color } }
+            );
+        }
+        else if (style.footerStyle === "TRIDENT") {
+            // The Trident/Fork for exorcism
+            cmds.push(
+                { type: "path", points: [[500, 800], [500, 950]], style: { width: 6, color: style.color } }, // Central shaft
+                { type: "path", points: [[400, 850], [500, 950], [600, 850]], style: { width: 6, color: style.color } }, // Prongs
+                { type: "text", x: 500, y: 900, content: "煞", size: 85, font: "seal", style: { color: style.color } } // Sha (Kill/Stop)
+            );
+        }
+        else {
+            // Bagua Footer (Default)
+            cmds.push(
+                { type: "path", points: [[300, yBase], [700, yBase]], style: { width: style.strokeWidth, color: style.color } },
+                { type: "text", x: 500, y: yBase + 50, content: "泰", size: 60, font: "seal", style: { color: style.color } },
+                { type: "circle", cx: 500, cy: yBase + 100, r: 25, style: { fill: style.color, alpha: 0.4 } }
+            );
+        }
+
+        return cmds;
+    }
+
+    // ========================================================================
+    // FENG SHUI DIAGRAM RENDERING (FS-DGL Implementation)
+    // ========================================================================
+
+    /**
+     * Render a Feng Shui Bagua diagram with highlighting and instructions
+     * Implements the Feng Shui DGL Specification
+     * @param {string} canvasId - Canvas element ID
+     * @param {Object} fsDglData - FS-DGL data structure
+     * @param {Object} options - Rendering options
+     */
+    static renderFengShuiDiagram(canvasId, fsDglData, options = {}) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.warn(`[SigilTools:FengShui] Canvas ${canvasId} not found`);
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+
+        // Set canvas resolution
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const logicalW = rect.width;
+        const logicalH = rect.height;
+        const centerX = logicalW / 2;
+        const centerY = logicalH / 2;
+        const size = Math.min(logicalW, logicalH) * 0.9;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, logicalW, logicalH);
+
+        // Draw background
+        const bg = fsDglData.background || '#1a1a2e';
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, logicalW, logicalH);
+
+        // Draw base Bagua
+        const arrangement = fsDglData.arrangement || 'houtian';
+        this.drawBagua(ctx, centerX, centerY, size, {}, '#d4af37');
+
+        // Process layers
+        if (fsDglData.layers) {
+            fsDglData.layers.forEach(layer => {
+                if (layer.visible === false) return;
+                
+                ctx.save();
+                if (layer.opacity !== undefined) {
+                    ctx.globalAlpha = layer.opacity;
+                }
+
+                (layer.commands || []).forEach(cmd => {
+                    this.executeFengShuiCommand(ctx, cmd, centerX, centerY, size, arrangement);
+                });
+
+                ctx.restore();
+            });
+        }
+
+        // Draw border
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.3;
+        ctx.strokeRect(8, 8, logicalW - 16, logicalH - 16);
+        ctx.globalAlpha = 1.0;
+    }
+
+    /**
+     * Render Feng Shui diagram inline (for use within existing canvas context)
+     * Uses relative coordinates (0-1 range) for proper scaling
+     */
+    static renderFengShuiDiagramInline(ctx, cx, cy, size, fsDglData, stroke = '#d4af37') {
+        const arrangement = fsDglData?.arrangement || 'houtian';
+        
+        console.log('[SigilTools:FengShui] Rendering diagram:', {
+            hasLayers: !!(fsDglData && fsDglData.layers),
+            layerCount: fsDglData?.layers?.length || 0,
+            size: size,
+            arrangement: arrangement
+        });
+        
+        // Process layers if present - the FS-DGL data includes bagua in the layers
+        if (fsDglData && fsDglData.layers) {
+            fsDglData.layers.forEach((layer, idx) => {
+                // FIX: Do not process "bagua_base" if we are in inline mode, 
+                // as the parent context might have already established the frame.
+                // Actually, logic below: "Draw Bagua is already drawn as base" inside executeFengShuiCommand.
+                if (layer.visible === false) return;
+                
+                ctx.save();
+                if (layer.opacity !== undefined) {
+                    ctx.globalAlpha = layer.opacity;
+                }
+                
+                (layer.commands || []).forEach(cmd => {
+                    console.log('[SigilTools:FengShui] Executing command:', cmd.type, cmd.trigram || '');
+                    this.executeFengShuiCommand(ctx, cmd, cx, cy, size, arrangement);
+                });
+                
+                ctx.restore();
+            });
+        } else {
+            // Legacy: simple Feng Shui with just config - draw base bagua only here
+            console.log('[SigilTools:FengShui] Using legacy rendering');
+            // FIX: Ensure we don't draw double baguas if the caller already drew one. 
+            // But renderFengShuiDiagramInline is usually called via executeFDLCommand('fengshui').
+            // That command handles positioning. We SHOULD draw the bagua here.
+            this.drawBagua(ctx, cx, cy, size, {}, stroke);
+            this.drawFengShuiDiagram(ctx, cx, cy, size, fsDglData || {}, stroke);
+        }
+    }
+
+    /**
+     * Execute a Feng Shui-specific command
+     */
+    static executeFengShuiCommand(ctx, cmd, cx, cy, size, arrangement) {
+        const trigramData = this.getTrigramData(arrangement);
+        
+        try {
+            switch (cmd.type) {
+                case 'bagua':
+                    // FIX: If this is the base layer bagua, we might want to skip it if 
+                    // we want to avoid the "concentric" look when the outer container 
+                    // might have drawn something. 
+                    // However, in FS-DGL, the bagua IS the base. 
+                    // The issue is likely that "drawBagua" draws outlines, and this draws ANOTHER outline.
+                    const baguaSize = cmd.size || size;
+                    const baguaX = cmd.x !== undefined ? cx + (cmd.x - 500) * (size / 1000) : cx;
+                    const baguaY = cmd.y !== undefined ? cy + (cmd.y - 500) * (size / 1000) : cy;
+                    this.drawBagua(ctx, baguaX, baguaY, baguaSize * (size / 1000), cmd.style || {}, '#d4af37');
+                    break;
+                    
+                case 'highlight_sector':
+                    this.drawSectorHighlight(ctx, cmd, cx, cy, size, trigramData);
+                    break;
+                    
+                case 'instruction_marker':
+                    this.drawInstructionMarker(ctx, cmd, cx, cy, size, trigramData);
+                    break;
+                    
+                case 'connection_line':
+                    this.drawSectorConnection(ctx, cmd, cx, cy, size, trigramData);
+                    break;
+                    
+                case 'annotation':
+                    this.drawFengShuiAnnotation(ctx, cmd, cx, cy, size);
+                    break;
+                    
+                case 'directional_lines':
+                    this.drawDirectionalLines(ctx, cx, cy, cmd.radius || size * 0.4);
+                    break;
+                    
+                default:
+                    console.log(`[SigilTools:FengShui] Unknown command type: ${cmd.type}`);
+            }
+        } catch (e) {
+            console.warn(`[SigilTools:FengShui] Command execution failed:`, e.message, cmd);
+        }
+    }
+
+    /**
+     * Get trigram data for a specific arrangement
+     */
+    static getTrigramData(arrangement) {
+        // Houtian (Later Heaven) arrangement
+        const houtianTrigrams = [
+            { name: 'Li', chinese: '離', direction: 'S', angle: -Math.PI / 2, element: 'Fire', color: '#F44336' },
+            { name: 'Kun', chinese: '坤', direction: 'SW', angle: -Math.PI / 4, element: 'Earth', color: '#E91E63' },
+            { name: 'Dui', chinese: '兌', direction: 'W', angle: 0, element: 'Metal', color: '#FFC107' },
+            { name: 'Qian', chinese: '乾', direction: 'NW', angle: Math.PI / 4, element: 'Metal', color: '#FF9800' },
+            { name: 'Kan', chinese: '坎', direction: 'N', angle: Math.PI / 2, element: 'Water', color: '#2196F3' },
+            { name: 'Gen', chinese: '艮', direction: 'NE', angle: 3 * Math.PI / 4, element: 'Earth', color: '#00BCD4' },
+            { name: 'Zhen', chinese: '震', direction: 'E', angle: Math.PI, element: 'Wood', color: '#4CAF50' },
+            { name: 'Xun', chinese: '巽', direction: 'SE', angle: -3 * Math.PI / 4, element: 'Wood', color: '#8BC34A' }
+        ];
+
+        // Xiantian (Early Heaven) arrangement
+        const xiantianTrigrams = [
+            { name: 'Qian', chinese: '乾', direction: 'S', angle: -Math.PI / 2, element: 'Metal', color: '#FF9800' },
+            { name: 'Dui', chinese: '兌', direction: 'SE', angle: -Math.PI / 4, element: 'Metal', color: '#FFC107' },
+            { name: 'Li', chinese: '離', direction: 'E', angle: Math.PI, element: 'Fire', color: '#F44336' },
+            { name: 'Zhen', chinese: '震', direction: 'NE', angle: 3 * Math.PI / 4, element: 'Wood', color: '#4CAF50' },
+            { name: 'Xun', chinese: '巽', direction: 'SW', angle: -3 * Math.PI / 4, element: 'Wood', color: '#8BC34A' },
+            { name: 'Kan', chinese: '坎', direction: 'W', angle: 0, element: 'Water', color: '#2196F3' },
+            { name: 'Gen', chinese: '艮', direction: 'NW', angle: Math.PI / 4, element: 'Earth', color: '#00BCD4' },
+            { name: 'Kun', chinese: '坤', direction: 'N', angle: Math.PI / 2, element: 'Earth', color: '#E91E63' }
+        ];
+
+        return arrangement === 'xiantian' ? xiantianTrigrams : houtianTrigrams;
+    }
+
+    /**
+     * Draw sector highlight - works with absolute size from caller
+     */
+    static drawSectorHighlight(ctx, cmd, cx, cy, size, trigramData) {
+        const trigramName = cmd.trigram || this.getTrigramByDirection(cmd.direction, trigramData);
+        const trigram = trigramData.find(t => t.name === trigramName);
+        
+        if (!trigram) return;
+
+        const style = cmd.style || {};
+        const r = size / 2;
+        const innerR = r * 0.35;
+        const outerR = r * 0.85;
+        
+        // Calculate sector angle (45 degrees per sector)
+        const sectorAngle = Math.PI / 4;
+        const startAngle = trigram.angle - sectorAngle / 2;
+        const endAngle = trigram.angle + sectorAngle / 2;
+
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(startAngle) * innerR, cy + Math.sin(startAngle) * innerR);
+        ctx.arc(cx, cy, outerR, startAngle, endAngle);
+        ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
+        ctx.closePath();
+
+        // Fill
+        if (style.fill) {
+            ctx.fillStyle = style.fill;
+            ctx.fill();
+        }
+
+        // Stroke
+        if (style.stroke) {
+            ctx.strokeStyle = style.stroke;
+            ctx.lineWidth = style.strokeWidth || 2;
+            ctx.stroke();
+        }
+
+        // Glow effect
+        if (style.glow) {
+            ctx.save();
+            ctx.shadowColor = style.glowColor || trigram.color;
+            ctx.shadowBlur = style.glowRadius || 15;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Label
+        if (cmd.label) {
+            const labelR = r * 0.95;
+            const labelX = cx + Math.cos(trigram.angle) * labelR;
+            const labelY = cy + Math.sin(trigram.angle) * labelR;
+
+            ctx.save();
+            ctx.fillStyle = cmd.label.color || trigram.color;
+            ctx.font = `bold ${cmd.label.fontSize || 12}px "Noto Serif SC", serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            if (cmd.label.text) {
+                ctx.fillText(cmd.label.text, labelX, labelY - 8);
+            }
+            if (cmd.label.subtext) {
+                ctx.font = `${(cmd.label.fontSize || 12) * 0.8}px sans-serif`;
+                ctx.fillText(cmd.label.subtext, labelX, labelY + 8);
+            }
+            ctx.restore();
+        }
+    }
+
+    /**
+     * Draw instruction marker
+     */
+    static drawInstructionMarker(ctx, cmd, cx, cy, size, trigramData) {
+        const trigramName = cmd.trigram || this.getTrigramByDirection(cmd.direction, trigramData);
+        const trigram = trigramData.find(t => t.name === trigramName);
+        
+        if (!trigram) return;
+
+        const style = cmd.style || {};
+        const r = size / 2 * 0.6;
+        const x = cx + Math.cos(trigram.angle) * r;
+        const y = cy + Math.sin(trigram.angle) * r;
+        const markerSize = style.size || 20;
+        const color = style.color || '#d4af37';
+
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+
+        switch (style.markerType) {
+            case 'circle':
+                ctx.beginPath();
+                ctx.arc(x, y, markerSize / 2, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+                
+            case 'triangle':
+                ctx.beginPath();
+                ctx.moveTo(x, y - markerSize / 2);
+                ctx.lineTo(x + markerSize / 2, y + markerSize / 2);
+                ctx.lineTo(x - markerSize / 2, y + markerSize / 2);
+                ctx.closePath();
+                ctx.fill();
+                break;
+                
+            case 'star':
+                this.drawStarMarker(ctx, x, y, markerSize / 2, color);
+                break;
+                
+            case 'arrow':
+                // Draw arrow pointing to center
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(trigram.angle + Math.PI);
+                ctx.beginPath();
+                ctx.moveTo(0, -markerSize / 2);
+                ctx.lineTo(markerSize / 3, markerSize / 2);
+                ctx.lineTo(-markerSize / 3, markerSize / 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+                break;
+                
+            default:
+                // Default circle
+                ctx.beginPath();
+                ctx.arc(x, y, markerSize / 2, 0, Math.PI * 2);
+                ctx.stroke();
+        }
+
+        // Draw instruction text if provided
+        if (cmd.instruction && cmd.instruction.text) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Draw text below marker
+            const textY = y + markerSize;
+            ctx.fillText(cmd.instruction.text.substring(0, 20), x, textY);
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw star marker
+     */
+    static drawStarMarker(ctx, cx, cy, outerRadius, color, innerRadius = null) {
+        innerRadius = innerRadius || outerRadius * 0.4;
+        const spikes = 5;
+        let rot = Math.PI / 2 * 3;
+        let x = cx;
+        let y = cy;
+        let step = Math.PI / spikes;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - outerRadius);
+        for (let i = 0; i < spikes; i++) {
+            x = cx + Math.cos(rot) * outerRadius;
+            y = cy + Math.sin(rot) * outerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+
+            x = cx + Math.cos(rot) * innerRadius;
+            y = cy + Math.sin(rot) * innerRadius;
+            ctx.lineTo(x, y);
+            rot += step;
+        }
+        ctx.lineTo(cx, cy - outerRadius);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+    }
+
+    /**
+     * Draw connection line between sectors
+     */
+    static drawSectorConnection(ctx, cmd, cx, cy, size, trigramData) {
+        const fromTrigram = trigramData.find(t => 
+            t.name === cmd.from || t.direction === cmd.from
+        );
+        const toTrigram = trigramData.find(t => 
+            t.name === cmd.to || t.direction === cmd.to
+        );
+
+        if (!fromTrigram || !toTrigram) return;
+
+        const r = size / 2 * 0.6;
+        const x1 = cx + Math.cos(fromTrigram.angle) * r;
+        const y1 = cy + Math.sin(fromTrigram.angle) * r;
+        const x2 = cx + Math.cos(toTrigram.angle) * r;
+        const y2 = cy + Math.sin(toTrigram.angle) * r;
+
+        const style = cmd.style || {};
+
+        ctx.save();
+        ctx.strokeStyle = style.color || '#d4af37';
+        ctx.lineWidth = style.width || 2;
+        
+        if (style.dash) {
+            ctx.setLineDash(style.dash);
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        // Draw arrowheads if requested
+        if (style.arrow) {
+            this.drawArrowHead(ctx, x1, y1, x2, y2, style.color || '#d4af37');
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw arrow head
+     */
+    static drawArrowHead(ctx, fromX, fromY, toX, toY, color) {
+        const angle = Math.atan2(toY - fromY, toX - fromX);
+        const headLength = 10;
+
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.translate(toX, toY);
+        ctx.rotate(angle);
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-headLength, -headLength / 2);
+        ctx.lineTo(-headLength, headLength / 2);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw directional grid lines
+     */
+    static drawDirectionalLines(ctx, cx, cy, radius) {
+        ctx.save();
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.3;
+        ctx.setLineDash([5, 5]);
+
+        for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI / 4) - Math.PI / 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(
+                cx + Math.cos(angle) * radius,
+                cy + Math.sin(angle) * radius
+            );
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Draw annotation text - uses relative coordinates (0-1 range)
+     */
+    static drawFengShuiAnnotation(ctx, cmd, cx, cy, size) {
+        const style = cmd.style || {};
+        let x, y;
+
+        // Use relative coordinates (0-1 range normalized to size)
+        // Position [0.5, 0.1] = 10% from top center
+        if (Array.isArray(cmd.position)) {
+            x = cx + (cmd.position[0] - 0.5) * size;
+            y = cy + (cmd.position[1] - 0.5) * size;
+        } else {
+            switch (cmd.position) {
+                case 'top': x = cx; y = cy - size * 0.4; break;
+                case 'bottom': x = cx; y = cy + size * 0.4; break;
+                case 'center': x = cx; y = cy; break;
+                default: x = cx; y = cy + size * 0.45;
+            }
+        }
+
+        ctx.save();
+        
+        // Background
+        if (style.background) {
+            const textWidth = ctx.measureText(cmd.text || '').width + 20;
+            const textHeight = cmd.subtext ? 50 : 30;
+            ctx.fillStyle = style.background;
+            ctx.fillRect(x - textWidth / 2, y - textHeight / 2, textWidth, textHeight);
+        }
+
+        // Text - scale font size relative to diagram size
+        ctx.fillStyle = style.color || '#d4af37';
+        const scaledFontSize = (style.fontSize || 16) * (size / 400); // Scale to diagram size
+        ctx.font = `bold ${scaledFontSize}px "Noto Serif SC", serif`;
+        ctx.textAlign = style.align || 'center';
+        ctx.textBaseline = 'middle';
+
+        if (cmd.text) {
+            ctx.fillText(cmd.text, x, y - (cmd.subtext ? scaledFontSize * 0.6 : 0));
+        }
+
+        if (cmd.subtext) {
+            ctx.font = `${scaledFontSize * 0.8}px sans-serif`;
+            ctx.fillText(cmd.subtext, x, y + scaledFontSize * 0.7);
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Get trigram name by direction
+     */
+    static getTrigramByDirection(direction, trigramData) {
+        const trigram = trigramData.find(t => t.direction === direction);
+        return trigram ? trigram.name : null;
+    }
+}

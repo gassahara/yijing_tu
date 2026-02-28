@@ -1,0 +1,1128 @@
+/**
+ * Responsive Layout System for I Ching Oracle
+ * Multiple breakpoints: 320px, 480px, 700px, 1024px, 1440px+
+ * Mobile-first approach with progressive enhancement
+ */
+
+/* ============================================
+   HAMBURGER MENU & MOBILE CONTROLS
+   ============================================ */
+
+/* Hamburger Trigger Button */
+.hamburger-trigger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-alpha);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    padding: var(--space-sm);
+    gap: 5px;
+}
+
+.hamburger-line {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: all var(--transition-fast);
+}
+
+.hamburger-trigger:hover .hamburger-line {
+    background: var(--gold-bright);
+}
+
+/* Mobile Header Controls */
+.mobile-header-controls {
+    display: none;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.mobile-header-controls button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: var(--space-sm);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-alpha);
+    border-radius: var(--radius-md);
+    color: var(--gold);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mobile-header-controls button:hover {
+    background: rgba(251, 191, 36, 0.2);
+    border-color: var(--gold);
+}
+
+.mobile-header-controls .icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Hamburger Menu Overlay */
+.hamburger-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-panel);
+    z-index: var(--z-modal);
+    padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+    overflow-y: auto;
+}
+
+.hamburger-menu.active {
+    transform: translateX(0);
+}
+
+.hamburger-close {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: var(--text-3xl);
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    transition: background var(--transition-fast);
+}
+
+.hamburger-close:hover {
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.mobile-menu-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--border-alpha);
+}
+
+.mobile-menu-section:last-child {
+    border-bottom: none;
+}
+
+.mobile-menu-section h3,
+.mobile-menu-section h4 {
+    color: var(--gold);
+    margin: 0;
+    font-size: var(--text-lg);
+}
+
+.mobile-menu-section select {
+    width: 100%;
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-alpha);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: var(--text-base);
+}
+
+/* ============================================
+   CSS CUSTOM PROPERTIES - RESPONSIVE SCALE
+   ============================================ */
+:root {
+    /* Base spacing scale */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+    
+    /* Typography scale */
+    --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+    --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+    --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+    --text-lg: clamp(1.125rem, 1rem + 0.65vw, 1.25rem);
+    --text-xl: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem);
+    --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+    --text-3xl: clamp(1.875rem, 1.6rem + 1.4vw, 2.5rem);
+    --text-4xl: clamp(2.25rem, 1.9rem + 1.8vw, 3rem);
+    
+    /* Container widths - Fluid percentages */
+    --container-sm: 100%;
+    --container-md: 100%;
+    --container-lg: 100%;
+    --container-xl: 100%;
+    --container-2xl: 100%;
+    
+    /* Border radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.5);
+    --shadow-xl: 0 20px 25px rgba(0,0,0,0.6);
+    
+    /* Z-index scale */
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-popover: 600;
+    --z-tooltip: 700;
+}
+
+/* ============================================
+   BREAKPOINT 1: MOBILE SMALL (320px - 479px)
+   ============================================ */
+@media (max-width: 479px) {
+    :root {
+        --container-padding: var(--space-sm);
+        --grid-columns: 1;
+        --hexagon-size: 80px;
+    }
+    
+    /* Header - Mobile */
+    header {
+        padding: var(--space-sm) 0;
+        position: sticky;
+        top: 0;
+        z-index: var(--z-sticky);
+        background: var(--bg-void);
+    }
+    
+    .header-content {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: 0 var(--space-sm);
+    }
+    
+    .header-title {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .header-title h1 {
+        font-size: var(--text-base);
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: var(--space-xs);
+    }
+    
+    .header-title h1 .icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .header-title p {
+        font-size: var(--text-xs);
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
+    }
+    
+    /* Mobile Controls */
+    .header-controls {
+        display: none;
+    }
+    
+    .mobile-header-controls {
+        display: flex;
+        flex-direction: row;
+        gap: var(--space-xs);
+        width: auto;
+    }
+    
+    .hamburger-trigger {
+        display: flex;
+    }
+    
+    /* Main Navigation - Bottom Sheet Style */
+    .main-tabs {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--bg-panel);
+        border-top: 1px solid var(--border-alpha);
+        padding: var(--space-xs) 0;
+        z-index: var(--z-fixed);
+        display: flex;
+        justify-content: space-around;
+    }
+    
+    .nav-tab {
+        flex: 1;
+        padding: var(--space-sm);
+        font-size: var(--text-xs);
+        border-radius: 0;
+        min-height: 44px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+    
+    .nav-tab .icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* Bagua Strip - Horizontal Scroll */
+    .bagua-strip-container {
+        padding: var(--space-md) 0;
+    }
+    
+    .bagua-hex-strip {
+        gap: var(--space-sm);
+        padding: 0 var(--space-sm);
+        justify-content: flex-start;
+    }
+    
+    .bagua-strip-item {
+        min-width: 80px;
+        padding: var(--space-xs) var(--space-sm);
+    }
+    
+    .bagua-strip-symbol {
+        width: 28px;
+        height: 36px;
+    }
+    
+    .bagua-strip-symbol svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .bagua-strip-name {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+    
+    .trigram-chinese-text {
+        font-size: 1.25rem;
+    }
+    
+    .trigram-direction {
+        font-size: 0.65rem;
+    }
+    
+    /* Main Container */
+    main.container {
+        padding: var(--space-sm);
+        padding-bottom: 80px; /* Space for bottom nav */
+    }
+    
+    /* Wizard Steps - Full Width */
+    .wizard-step {
+        padding: var(--space-sm);
+    }
+    
+    .step-title {
+        font-size: var(--text-lg);
+        margin-bottom: var(--space-md);
+    }
+    
+    /* Panels - Stacked */
+    .panel {
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+    
+    /* Question Input */
+    #questionInput {
+        font-size: var(--text-base);
+        min-height: 80px;
+    }
+    
+    /* Buttons - Full Width Touch */
+    .btn-cast,
+    .btn-memory,
+    .btn-export {
+        width: 100%;
+        min-height: 48px;
+        font-size: var(--text-base);
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    /* Results Layout - Stacked Cards */
+    .results-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .result-card {
+        padding: var(--space-md);
+    }
+    
+    /* Hexagram Display - Compact */
+    .hexagram-display {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .hexagram-lines {
+        transform: scale(0.8);
+    }
+    
+    /* Remedies Section - Accordion Style */
+    .remedy-card {
+        padding: var(--space-md);
+    }
+    
+    .remedy-canvas {
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+    }
+    
+    /* Bazi Display - Scrollable */
+    .bazi-comparison-view {
+        overflow-x: auto;
+        padding: var(--space-sm);
+    }
+    
+    .bazi-classical-table {
+        font-size: var(--text-xs);
+        min-width: 300px;
+    }
+    
+    /* Export Panels - Stacked */
+    .export-panels {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .export-panel {
+        width: 100%;
+    }
+    
+    /* Journal - Compact List */
+    .question-list {
+        gap: var(--space-sm);
+    }
+    
+    .question-item {
+        padding: var(--space-sm);
+        font-size: var(--text-sm);
+    }
+    
+    /* History Grid - Single Column */
+    .history-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    /* Meditation - Full Screen Overlay */
+    #meditation-overlay {
+        padding: var(--space-md);
+    }
+    
+    .meditation-title {
+        font-size: var(--text-2xl);
+    }
+    
+    .timer-display {
+        font-size: var(--text-3xl);
+    }
+    
+    /* Hamburger Menu - Full Screen Drawer */
+    .hamburger-menu {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--bg-void);
+        z-index: var(--z-modal);
+        flex-direction: column;
+        padding: var(--space-lg);
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+    }
+    
+    .hamburger-menu.active {
+        transform: translateX(0);
+    }
+    
+    .hamburger-close {
+        position: absolute;
+        top: var(--space-md);
+        right: var(--space-md);
+        background: none;
+        border: none;
+        color: var(--gold);
+        font-size: var(--text-2xl);
+        cursor: pointer;
+    }
+    
+    /* Language Selector - Grid */
+    .lang-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+        width: 100%;
+    }
+    
+    .lang-btn {
+        padding: var(--space-md);
+        font-size: var(--text-base);
+    }
+    
+    /* Accessibility Controls */
+    .accessibility-controls {
+        flex-direction: column;
+        gap: var(--space-sm);
+        width: 100%;
+    }
+    
+    .acc-btn {
+        flex: 1;
+        min-height: 48px;
+        font-size: var(--text-base);
+    }
+}
+
+/* ============================================
+   BREAKPOINT 2: MOBILE LARGE (480px - 699px)
+   ============================================ */
+@media (min-width: 480px) and (max-width: 699px) {
+    :root {
+        --container-padding: var(--space-md);
+        --grid-columns: 2;
+        --hexagon-size: 100px;
+    }
+    
+    /* Header */
+    header {
+        position: sticky;
+        top: 0;
+        z-index: var(--z-sticky);
+        background: var(--bg-void);
+    }
+    
+    .header-content {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-md);
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .header-title {
+        flex: 1;
+        text-align: left;
+    }
+    
+    .header-title h1 {
+        font-size: var(--text-lg);
+        justify-content: flex-start;
+    }
+    
+    .header-controls {
+        display: none;
+    }
+    
+    .mobile-header-controls {
+        display: flex;
+        flex-direction: row;
+        gap: var(--space-sm);
+        width: auto;
+    }
+    
+    .hamburger-trigger {
+        display: flex;
+    }
+    
+    /* Main Navigation - Bottom Bar */
+    .main-tabs {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: var(--space-xs) var(--space-sm);
+    }
+    
+    .nav-tab {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+    }
+    
+    /* Main Container */
+    main.container {
+        padding: var(--space-md);
+        padding-bottom: 80px;
+    }
+    
+    /* Results Grid - Auto-fit fluid columns */
+    .results-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-md);
+    }
+    
+    /* History Grid - Auto-fit fluid */
+    .history-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+    
+    /* Bagua Strip */
+    .bagua-strip-item {
+        min-width: 100px;
+        padding: 16px 12px;
+    }
+    
+    .bagua-strip-symbol {
+        width: 32px;
+        height: 40px;
+    }
+    
+    /* Panels */
+    .panel {
+        padding: var(--space-lg);
+    }
+    
+    /* Export Panels - Side by Side */
+    .export-panels {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .export-panel {
+        flex: 1 1 calc(50% - var(--space-sm));
+    }
+    
+    /* Buttons */
+    .btn-cast,
+    .btn-memory {
+        width: auto;
+        min-width: 200px;
+    }
+    
+    /* Hamburger Menu */
+    .hamburger-menu {
+        width: 80%;
+        max-width: 360px;
+        right: 0;
+        left: auto;
+        transform: translateX(100%);
+        box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+    }
+    
+    .hamburger-menu.active {
+        transform: translateX(0);
+    }
+    
+    /* Main Navigation - Bottom Bar */
+    .main-tabs {
+        padding: var(--space-xs) 0;
+    }
+    
+    .nav-tab {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--text-xs);
+    }
+}
+
+/* ============================================
+   BREAKPOINT 3: TABLET (700px - 1023px)
+   ============================================ */
+@media (min-width: 700px) and (max-width: 1023px) {
+    :root {
+        --container-padding: var(--space-lg);
+        --grid-columns: 3;
+        --hexagon-size: 120px;
+    }
+    
+    /* Header - Full Layout */
+    header {
+        position: relative;
+    }
+    
+    .header-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--space-md) var(--space-lg);
+    }
+    
+    .header-title h1 {
+        font-size: var(--text-xl);
+    }
+    
+    .header-title p {
+        white-space: normal;
+        overflow: visible;
+    }
+    
+    .header-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        justify-content: flex-end;
+        align-items: center;
+    }
+    
+    .mobile-header-controls,
+    .hamburger-trigger,
+    .hamburger-menu {
+        display: none !important;
+    }
+    
+    /* Main Navigation - Top Tabs */
+    .main-tabs {
+        position: static;
+        border-top: none;
+        border-bottom: 1px solid var(--border-alpha);
+        padding: var(--space-sm) var(--space-lg);
+        justify-content: flex-start;
+        gap: var(--space-sm);
+    }
+    
+    .nav-tab {
+        flex: 0 1 auto;
+        border-radius: var(--radius-md);
+        min-height: 40px;
+        flex-direction: row;
+        gap: var(--space-xs);
+    }
+    
+    /* Main Container */
+    main.container {
+        padding: var(--space-lg);
+        padding-bottom: var(--space-lg);
+    }
+    
+    /* Wizard Layout */
+    .wizard-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    /* Results Grid - Auto-fit fluid columns */
+    .results-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-lg);
+    }
+    
+    .result-card:nth-child(1) {
+        grid-column: span 2;
+    }
+    
+    /* Hexagram Display */
+    .hexagram-display {
+        flex-direction: row;
+        gap: var(--space-xl);
+    }
+    
+    /* Remedies Grid - Auto-fit fluid */
+    .remedies-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-lg);
+    }
+    
+    /* History Grid - Auto-fit fluid */
+    .history-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    
+    /* Export Panels */
+    .export-panels {
+        flex-direction: row;
+        gap: var(--space-md);
+    }
+    
+    /* Bazi Display */
+    .bazi-comparison-view {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-lg);
+    }
+    
+    /* Bagua Strip */
+    .bagua-strip-item {
+        min-width: 120px;
+        padding: 20px 16px;
+    }
+    
+    .bagua-strip-symbol {
+        width: 36px;
+        height: 44px;
+    }
+    
+    /* Controls Group */
+    .control-group {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+}
+
+/* ============================================
+   BREAKPOINT 4: DESKTOP (1024px - 1439px)
+   ============================================ */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    :root {
+        --container-padding: var(--space-xl);
+        --grid-columns: 4;
+        --hexagon-size: 140px;
+    }
+    
+    /* Header - Fluid width */
+    .header-content {
+        width: 100%;
+        max-width: none;
+        padding: 0 5%;
+    }
+    
+    .header-controls {
+        flex-wrap: nowrap;
+        gap: var(--space-lg);
+    }
+    
+    /* Main Navigation - Fluid width */
+    .main-tabs {
+        width: 100%;
+        max-width: none;
+        padding: var(--space-md) 5%;
+    }
+    
+    /* Main Container - Fluid width */
+    main.container {
+        width: 100%;
+        max-width: none;
+        padding: var(--space-xl) 5%;
+    }
+    
+    /* Results Layout - Fluid grid */
+    .results-content {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: var(--space-xl);
+    }
+    
+    .results-main {
+        grid-column: 1;
+    }
+    
+    .results-sidebar {
+        grid-column: 2;
+        position: sticky;
+        top: var(--space-xl);
+        height: fit-content;
+    }
+    
+    /* Results Grid - Auto-fit fluid columns */
+    .results-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .result-card:nth-child(1) {
+        grid-column: span 2;
+    }
+    
+    .result-card:nth-child(2) {
+        grid-column: span 2;
+    }
+    
+    /* Remedies Grid - Auto-fit fluid */
+    .remedies-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    /* History Grid - Auto-fit fluid */
+    .history-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    /* Bazi Display */
+    .bazi-comparison-view {
+        grid-template-columns: 1fr 1fr 200px;
+    }
+    
+    /* Bagua Hex Layout - Full Display */
+    .bagua-hex-layout {
+        height: 700px;
+    }
+    
+    .trigram-card-node {
+        width: 160px;
+        min-height: 180px;
+    }
+}
+
+/* ============================================
+   BREAKPOINT 5: LARGE DESKTOP (1440px+)
+   ============================================ */
+@media (min-width: 1440px) {
+    :root {
+        --container-padding: var(--space-2xl);
+        --grid-columns: 6;
+        --hexagon-size: 160px;
+    }
+    
+    /* Header - Fluid width */
+    .header-content {
+        width: 100%;
+        max-width: none;
+        padding: 0 4%;
+    }
+    
+    .header-title h1 {
+        font-size: var(--text-2xl);
+    }
+    
+    .header-title p {
+        font-size: var(--text-base);
+    }
+    
+    /* Main Navigation - Fluid width */
+    .main-tabs {
+        width: 100%;
+        max-width: none;
+        padding: var(--space-md) 4%;
+    }
+    
+    .nav-tab {
+        padding: var(--space-md) var(--space-xl);
+        font-size: var(--text-base);
+    }
+    
+    /* Main Container - Fluid width */
+    main.container {
+        width: 100%;
+        max-width: none;
+        padding: var(--space-2xl) 4%;
+    }
+    
+    /* Results Layout */
+    .results-content {
+        grid-template-columns: 1fr 350px;
+        gap: var(--space-2xl);
+    }
+    
+    /* Results Grid - Auto-fit fluid columns */
+    .results-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    
+    .result-card:nth-child(1) {
+        grid-column: span 2;
+    }
+    
+    .result-card:nth-child(2) {
+        grid-column: span 2;
+    }
+    
+    .result-card:nth-child(3) {
+        grid-column: span 2;
+    }
+    
+    /* Remedies Grid - Auto-fit fluid */
+    .remedies-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    
+    /* History Grid - Auto-fit fluid */
+    .history-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    
+    /* Bagua Hex Layout - Fluid max-width */
+    .bagua-hex-layout {
+        height: 800px;
+        max-width: 100%;
+    }
+    
+    .trigram-card-node {
+        width: 180px;
+        min-height: 200px;
+        padding: var(--space-lg);
+    }
+    
+    /* Bazi Display */
+    .bazi-comparison-view {
+        grid-template-columns: 1fr 1fr 250px 200px;
+    }
+    
+    /* Panels - Larger Padding */
+    .panel {
+        padding: var(--space-2xl);
+    }
+    
+    /* Typography Scale Up */
+    .step-title {
+        font-size: var(--text-2xl);
+    }
+    
+    .panel h2 {
+        font-size: var(--text-xl);
+    }
+}
+
+/* ============================================
+   REMEDIES GRID LAYOUT
+   ============================================ */
+
+/* Remedies Container - Grid Layout */
+#remediesContent {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+    width: 100%;
+}
+
+/* Mobile Large: 1 column still, but wider cards */
+@media (min-width: 480px) {
+    #remediesContent {
+        gap: var(--space-xl);
+    }
+}
+
+/* Single column layout for all screen sizes - better readability */
+@media (min-width: 700px) {
+    #remediesContent {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    /* Full width for remedy items */
+    #remediesContent .remedy-item-wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Desktop: Larger containers, still 1 column */
+@media (min-width: 1024px) {
+    #remediesContent {
+        grid-template-columns: 1fr;
+        gap: var(--space-xl);
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Large Desktop: Maximum screen usage, still 1 column */
+@media (min-width: 1440px) {
+    #remediesContent {
+        grid-template-columns: 1fr;
+        gap: var(--space-2xl);
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Single column override for mobile */
+@media (max-width: 699px) {
+    #remediesContent {
+        grid-template-columns: 1fr;
+    }
+    
+    .remedy-item-wrapper {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Display Utilities */
+.hidden { display: none !important; }
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+.grid { display: grid; }
+
+/* Flex Utilities */
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.flex-1 { flex: 1 1 0%; }
+.flex-auto { flex: 1 1 auto; }
+.flex-none { flex: none; }
+
+/* Grid Utilities */
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Spacing Utilities */
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+.gap-xl { gap: var(--space-xl); }
+
+/* Text Utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Mobile-only utilities */
+@media (min-width: 700px) {
+    .mobile-only { display: none !important; }
+}
+
+@media (max-width: 699px) {
+    .desktop-only { display: none !important; }
+}
+
+/* Print styles */
+@media print {
+    .no-print { display: none !important; }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .panel {
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+}

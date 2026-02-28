@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Astrology Display Test v4.0</title>
+    <link rel="stylesheet" href="chinese-astrology.css">
+    <style>
+        body { font-family: Georgia, serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #8B0000; margin: 0; }
+        .controls { margin-bottom: 20px; padding: 20px; background: white; border-radius: 10px; text-align: center; }
+        .controls button { padding: 12px 24px; margin: 0 10px; font-size: 1em; cursor: pointer; border: none; border-radius: 6px; background: #8B0000; color: white; }
+        .controls button:hover { background: #a00000; }
+        .test-info { margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 6px; font-family: monospace; font-size: 0.85em; }
+        .diagram-test { margin: 20px 0; padding: 20px; background: white; border-radius: 10px; }
+        .diagram-test h3 { color: #8B0000; margin-bottom: 15px; }
+        #output { min-height: 400px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐉 Chinese Astrology Display Test v4.0</h1>
+        <p>Complete refactor with working diagrams</p>
+    </div>
+    
+    <div class="controls">
+        <button onclick="testCurrent()">⚡ Test Current Sky</button>
+        <button onclick="testBirth()">🏛️ Test Birth Chart</button>
+        <button onclick="testBoth()">📊 Test Comparison</button>
+        <div class="test-info" id="status">Click a button to test</div>
+    </div>
+    
+    <div class="diagram-test">
+        <h3>🧪 Direct Diagram Tests</h3>
+        <button onclick="testXianTian()">☯ Xian Tian</button>
+        <button onclick="testHouTian()">☯ Hou Tian</button>
+        <button onclick="testHeTu()">🌊 He Tu</button>
+        <button onclick="testLuoShu()">🔢 Luo Shu</button>
+    </div>
+
+    <div class="astrology-container" id="output"></div>
+
+    <script src="chinese-astrology-client.js"></script>
+    <script>
+        const testContainer = document.getElementById('output');
+        const statusEl = document.getElementById('status');
+        
+        // Mock data for testing
+        const mockData = {
+            data: {
+                timestamp: new Date().toISOString(),
+                ayanamsa: {
+                    referenceMeridian: 120,
+                    timeDifference: '-23 min',
+                    trueSolarTime: new Date().toISOString(),
+                    longitudeCorrection: -23.5,
+                    location: { latitude: 40.7, longitude: -74 }
+                },
+                bazi: {
+                    year: { stem: { name: 'Jia', zh: '甲', element: 'Wood', polarity: 'Yang' }, branch: { name: 'Yin', zh: '寅', element: 'Wood', zodiac: 'Tiger' }, hiddenStems: ['甲', '丙', '戊'], tenGod: { zh: 'Direct Resource' } },
+                    month: { stem: { name: 'Bing', zh: '丙', element: 'Fire', polarity: 'Yang' }, branch: { name: 'Wu', zh: '午', element: 'Fire', zodiac: 'Horse' }, hiddenStems: ['丁', '己'], tenGod: { zh: 'Hurting Officer' } },
+                    day: { stem: { name: 'Xin', zh: '辛', element: 'Metal', polarity: 'Yin' }, branch: { name: 'Si', zh: '巳', element: 'Fire', zodiac: 'Snake' }, hiddenStems: ['丙', '戊', '庚'], tenGod: { zh: 'Seven Killings' } },
+                    hour: { stem: { name: 'Ji', zh: '己', element: 'Earth', polarity: 'Yin' }, branch: { name: 'Chou', zh: '丑', element: 'Earth', zodiac: 'Ox' }, hiddenStems: ['己', '癸', '辛'], tenGod: { zh: 'Indirect Resource' } },
+                    dayMaster: { name: 'Xin', zh: '辛', element: 'Metal', polarity: 'Yin' },
+                    strength: { result: 'Moderately Strong', score: 8, yongShen: 'Water' },
+                    shenSha: {
+                        noblePerson: { name: 'Tian Yi', zh: '天乙', presentIn: ['year', 'hour'] },
+                        peachBlossom: { name: 'Tao Hua', zh: '桃花', presentIn: ['month'] },
+                        academicStar: { name: 'Wen Chang', zh: '文昌', presentIn: [] },
+                        travellingHorse: { name: 'Yi Ma', zh: '驛馬', presentIn: ['day'] },
+                        goatBlade: { name: 'Yang Ren', zh: '羊刃', presentIn: ['hour'] }
+                    }
+                },
+                bagua: {
+                    xiantian: {
+                        personalTrigram: { name: 'Qian', zh: '乾', binary: '111', element: 'Metal', quality: 'Creative', position: 6 },
+                        elementFlow: 'Heaven descends to nourish Earth'
+                    },
+                    houtian: {
+                        lifePalaceTrigram: { name: 'Li', zh: '離', binary: '101', element: 'Fire', direction_houtian: 'S', temporalInfluence: 'Summer' },
+                        annualInfluence: 'Fire year'
+                    },
+                    hexiangua: {
+                        hexagramNumber: 13,
+                        hexagramName: 'Tong Ren - Fellowship',
+                        lines: [1, 0, 1, 1, 1, 1],
+                        upper: { name: 'Qian', zh: '乾', binary: '111', element: 'Metal' },
+                        lower: { name: 'Li', zh: '離', binary: '101', element: 'Fire' },
+                        guaCi: 'Fellowship with men in the open. Success.'
+                    }
+                },
+                hetu: {
+                    personalNumbers: {
+                        yearNumber: 8,
+                        monthNumber: 3,
+                        dayNumber: 7,
+                        hourNumber: 6,
+                        lifeNumber: 5,
+                        destinyNumber: 2
+                    },
+                    elementalFlow: {
+                        sequence: ['Wood', 'Fire', 'Earth', 'Metal', 'Water'],
+                        dominant: 'Fire',
+                        deficient: 'Water',
+                        recommendations: ['Meditation', 'Water features', 'Blue colors']
+                    },
+                    constellations: ['Big Dipper', 'Vermilion Bird']
+                },
+                luoshu: {
+                    mingGua: { number: 6, trigram: 'Qian', element: 'Metal', zh: '乾' },
+                    favorableDirections: {
+                        shengQi: 'W',
+                        tianYi: 'SW',
+                        yanNian: 'NW',
+                        fuWei: 'NE'
+                    },
+                    palaceStars: { current: 5, annual: 2 }
+                },
+                lunarMansion: {
+                    mansion: { num: 4, name: 'Fang', zh: '房', element: 'Wood', direction: 'E', group: 'Azure Dragon', animal: 'Rabbit' },
+                    degree: 98.5,
+                    exactLongitude: 98.7,
+                    dayRuler: 'Mao',
+                    hourRuler: 'Fang'
+                },
+                taiSui: {
+                    currentPosition: { branch: 'Mao', zh: '卯', direction: 'E', degree: 90, zodiac: 'Rabbit' },
+                    sanSha: { direction: 'W', description: 'Avoid West direction for construction' },
+                    suiPo: { branch: 'You', zh: '酉', direction: 'W', degree: 270 },
+                    annualTaiSui: { text: 'Year of the Wood Rabbit', caution: 'Avoid disturbing the East' }
+                }
+            }
+        };
+        
+        // Birth chart mock (different data to test comparison)
+        const birthData = {
+            data: {
+                timestamp: new Date().toISOString(),
+                bazi: {
+                    year: { stem: { name: 'Jia', zh: '甲', element: 'Wood', polarity: 'Yang' }, branch: { name: 'Yin', zh: '寅', element: 'Wood', zodiac: 'Tiger' }, hiddenStems: ['甲', '丙', '戊'], tenGod: { zh: 'Direct Resource' } },
+                    month: { stem: { name: 'Ding', zh: '丁', element: 'Fire', polarity: 'Yin' }, branch: { name: 'Mao', zh: '卯', element: 'Wood', zodiac: 'Rabbit' }, hiddenStems: ['乙'], tenGod: { zh: 'Seven Killings' } },
+                    day: { stem: { name: 'Geng', zh: '庚', element: 'Metal', polarity: 'Yang' }, branch: { name: 'Wu', zh: '午', element: 'Fire', zodiac: 'Horse' }, hiddenStems: ['丁', '己'], tenGod: { zh: 'Hurting Officer' } },
+                    hour: { stem: { name: 'Ren', zh: '壬', element: 'Water', polarity: 'Yang' }, branch: { name: 'Zi', zh: '子', element: 'Water', zodiac: 'Rat' }, hiddenStems: ['癸'], tenGod: { zh: 'Rob Wealth' } },
+                    dayMaster: { name: 'Geng', zh: '庚', element: 'Metal', polarity: 'Yang' },
+                    strength: { result: 'Strong', score: 15, yongShen: 'Fire' },
+                    shenSha: {
+                        noblePerson: { name: 'Tian Yi', zh: '天乙', presentIn: ['year'] },
+                        peachBlossom: { name: 'Tao Hua', zh: '桃花', presentIn: ['day', 'hour'] },
+                        academicStar: { name: 'Wen Chang', zh: '文昌', presentIn: ['month'] },
+                        travellingHorse: { name: 'Yi Ma', zh: '驛馬', presentIn: ['month'] },
+                        goatBlade: { name: 'Yang Ren', zh: '羊刃', presentIn: [] }
+                    }
+                }
+            }
+        };
+        
+        function testCurrent() {
+            statusEl.textContent = 'Testing current sky display...';
+            testContainer.innerHTML = '';
+            ChineseAstrologyDisplay.render(mockData, testContainer);
+            statusEl.textContent = '✅ Current sky rendered successfully';
+        }
+        
+        function testBirth() {
+            statusEl.textContent = 'Testing birth chart display...';
+            testContainer.innerHTML = '';
+            const data = { data: { ...mockData.data, ...birthData.data, comparison: { birthBazi: birthData.data.bazi } } };
+            ChineseAstrologyDisplay.render(data, testContainer);
+            statusEl.textContent = '✅ Birth chart rendered successfully';
+        }
+        
+        function testBoth() {
+            statusEl.textContent = 'Testing comparison display...';
+            testContainer.innerHTML = '';
+            const data = { 
+                data: { 
+                    ...mockData.data, 
+                    comparison: { birthBazi: birthData.data.bazi }
+                } 
+            };
+            ChineseAstrologyDisplay.render(data, testContainer);
+            statusEl.textContent = '✅ Comparison rendered - matching pillars highlighted';
+        }
+        
+        // Direct diagram tests
+        function testXianTian() {
+            statusEl.textContent = 'Rendering Xian Tian diagram...';
+            testContainer.innerHTML = '<div class="section bagua"><h3>☯ Xian Tian (Pre-Heaven) 先天八卦</h3><div class="bagua-half">' + 
+                ChineseAstrologyDisplay.createXianTianSVG() + '</div></div>';
+            statusEl.textContent = '✅ Xian Tian Bagua diagram rendered';
+        }
+        
+        function testHouTian() {
+            statusEl.textContent = 'Rendering Hou Tian diagram...';
+            testContainer.innerHTML = '<div class="section bagua"><h3>☯ Hou Tian (Post-Heaven) 后天八卦</h3><div class="bagua-half">' + 
+                ChineseAstrologyDisplay.createHouTianSVG() + '</div></div>';
+            statusEl.textContent = '✅ Hou Tian Bagua diagram rendered';
+        }
+        
+        function testHeTu() {
+            statusEl.textContent = 'Rendering He Tu diagram...';
+            testContainer.innerHTML = '<div class="section hetu"><h3>🌊 He Tu (River Map) 河图</h3><div class="hetu-container"><div class="hetu-svg-container">' + 
+                '<svg viewBox="0 0 400 400" class="hetu-svg"><circle cx="200" cy="200" r="50" fill="#8B4513"/><text x="200" y="195" text-anchor="middle" fill="white" font-size="18" font-weight="bold">5/10</text><text x="200" y="215" text-anchor="middle" fill="white" font-size="12">Earth</text><circle cx="200" cy="80" r="40" fill="#1E90FF"/><text x="200" y="75" text-anchor="middle" fill="white" font-size="16">1•6</text><text x="200" y="90" text-anchor="middle" fill="white" font-size="10">Water</text><circle cx="200" cy="320" r="40" fill="#FF4500"/><text x="200" y="315" text-anchor="middle" fill="white" font-size="16">2•7</text><text x="200" y="330" text-anchor="middle" fill="white" font-size="10">Fire</text><circle cx="320" cy="200" r="40" fill="#228B22"/><text x="320" y="195" text-anchor="middle" fill="white" font-size="16">3•8</text><text x="320" y="210" text-anchor="middle" fill="white" font-size="10">Wood</text><circle cx="80" cy="200" r="40" fill="#FFD700"/><text x="80" y="195" text-anchor="middle" fill="#333" font-size="16">4•9</text><text x="80" y="210" text-anchor="middle" fill="#333" font-size="10">Metal</text></svg>' +
+                '</div><div class="hetu-info"><div class="hetu-numbers"><h4>He Tu Numbers</h4><div class="num-grid"><div><span>Year:</span><b>8</b></div><div><span>Month:</span><b>3</b></div><div><span>Day:</span><b>7</b></div><div><span>Hour:</span><b>6</b></div></div></div></div></div></div>';
+            statusEl.textContent = '✅ He Tu diagram rendered';
+        }
+        
+        function testLuoShu() {
+            statusEl.textContent = 'Rendering Luo Shu diagram...';
+            const data = { data: { luoshu: { mingGua: { number: 6, trigram: 'Qian', element: 'Metal' }, favorableDirections: { shengQi: 'W', tianYi: 'SW', yanNian: 'NW' } } } };
+            testContainer.innerHTML = '';
+            testContainer.appendChild(ChineseAstrologyDisplay.renderLuoShu(data.data.luoshu));
+            statusEl.textContent = '✅ Luo Shu Magic Square rendered';
+        }
+        
+        // Auto-run current sky test
+        setTimeout(testCurrent, 500);
+    </script>
+</body>
+</html>

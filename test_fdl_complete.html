@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDL Canvas Renderer - Fengshui & Bagua Tests</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #d4af37;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .talisman-card {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            min-width: 420px;
+        }
+        canvas {
+            border: 2px solid #8B0000;
+            background-color: #F5E6CA;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+        h3 {
+            color: #333;
+            margin: 10px 0;
+            font-family: "Kaiti", "STKaiti", "Noto Serif SC", serif;
+        }
+        .meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #d4af37;
+            margin-top: 30px;
+            border-bottom: 1px solid #d4af37;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>FDL Renderer - Fengshui & Bazi Diagrams</h1>
+    
+    <h2>1. Original API Data (Fulu & Fengshui)</h2>
+    <div class="container" id="container1"></div>
+    
+    <h2>2. FDL Bagua (Houtian - Later Heaven)</h2>
+    <div class="container" id="container2"></div>
+    
+    <h2>3. FDL Bazi Diagram</h2>
+    <div class="container" id="container3"></div>
+    
+    <h2>4. FDL Fengshui Qi Diagram</h2>
+    <div class="container" id="container4"></div>
+
+<script src="sigil_tools.js"></script>
+<script>
+/**
+ * TEST DATA
+ */
+
+// 1. Original API Data
+const API_DATA = {
+    "fuluContentList": [
+        {
+            "id": "fulu_004",
+            "remedyType": "fulu",
+            "talismanNameZh": "開心秘忘符",
+            "hexagramNumber": 49,
+            "type": "character_composite",
+            "sigilInstructions": [
+                { "type": "circle", "cx": 200, "cy": 200, "r": 150, "width": 2 },
+                { "type": "circle", "cx": 200, "cy": 200, "r": 100, "width": 1 }
+            ],
+            "layoutInstructions": {
+                "labels": [
+                    { "text": "開", "position": "center", "y": 110, "size": 80, "isSeal": true },
+                    { "text": "心", "position": "center", "y": 170, "size": 80, "isSeal": true },
+                    { "text": "通", "position": "center", "y": 230, "size": 80, "isSeal": true },
+                    { "text": "真", "position": "center", "y": 290, "size": 80, "isSeal": true }
+                ]
+            }
+        },
+        {
+            "id": "fs_002",
+            "remedyType": "fengshui",
+            "talismanNameZh": "葬書五行氣脈法",
+            "hexagramNumber": 49,
+            "type": "qi_retention",
+            "sigilInstructions": [
+                { 
+                    "type": "polygon", "width": 2, 
+                    "points": [[200, 50], [306, 100], [350, 200], [306, 300], [200, 350], [94, 300], [50, 200], [94, 100]] 
+                },
+                { "type": "circle", "cx": 200, "cy": 200, "r": 50, "width": 1 },
+                { "type": "text", "text": "氣", "x": 200, "y": 200, "size": 40, "quadrant": "center" },
+                { "type": "text", "text": "☰", "x": 200, "y": 70, "size": 24, "quadrant": "top" },
+                { "type": "text", "text": "☷", "x": 200, "y": 330, "size": 24, "quadrant": "bottom" },
+                { "type": "text", "text": "☵", "x": 70, "y": 200, "size": 24, "quadrant": "left" },
+                { "type": "text", "text": "☲", "x": 330, "y": 200, "size": 24, "quadrant": "right" }
+            ],
+            "layoutInstructions": {
+                "labels": [
+                    { "text": "葬", "position": "center", "y": 110, "size": 80, "isSeal": true },
+                    { "text": "書", "position": "center", "y": 170, "size": 80, "isSeal": true },
+                    { "text": "五", "position": "center", "y": 230, "size": 80, "isSeal": true },
+                    { "text": "行", "position": "center", "y": 290, "size": 80, "isSeal": true }
+                ]
+            }
+        }
+    ]
+};
+
+// 2. FDL Bagua Example
+const FDL_BAGUA = {
+    "layers": [
+        {
+            "commands": [
+                { "type": "bagua", "x": 200, "y": 200, "size": 280, "style": { "color": "8B0000" } }
+            ]
+        }
+    ]
+};
+
+// 3. FDL Bazi Example
+const FDL_BAZI = {
+    "layers": [
+        {
+            "commands": [
+                { 
+                    "type": "bazi", 
+                    "x": 200, 
+                    "y": 200, 
+                    "size": 320,
+                    "pillars": {
+                        "year": { "stem": "甲", "branch": "子", "element": "wood" },
+                        "month": { "stem": "乙", "branch": "丑", "element": "earth" },
+                        "day": { "stem": "丙", "branch": "寅", "element": "fire" },
+                        "hour": { "stem": "丁", "branch": "卯", "element": "wood" }
+                    }
+                }
+            ]
+        }
+    ]
+};
+
+// 4. FDL Fengshui Example
+const FDL_FENGSHUI = {
+    "layers": [
+        {
+            "commands": [
+                { 
+                    "type": "fengshui", 
+                    "x": 200, 
+                    "y": 200, 
+                    "size": 300,
+                    "config": {
+                        "centerChar": "氣"
+                    }
+                }
+            ]
+        }
+    ]
+};
+
+/**
+ * HELPER FUNCTIONS
+ */
+function createCard(container, title, subtitle) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'talisman-card';
+
+    const h3 = document.createElement('h3');
+    h3.innerText = title;
+    
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerText = subtitle;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 400;
+    
+    wrapper.appendChild(h3);
+    wrapper.appendChild(meta);
+    wrapper.appendChild(canvas);
+    container.appendChild(wrapper);
+    
+    return canvas;
+}
+
+/**
+ * RENDER TESTS
+ */
+
+// Test 1: Original API data
+API_DATA.fuluContentList.forEach((item, idx) => {
+    const canvas = createCard(
+        document.getElementById('container1'),
+        item.talismanNameZh,
+        `${item.remedyType} | ID: ${item.id}`
+    );
+    canvas.id = `test1_${idx}`;
+    
+    SigilTools.draw(canvas.id, {
+        fuluContent: item,
+        sigilInstructions: item.sigilInstructions,
+        layoutInstructions: item.layoutInstructions,
+        backgroundColor: '#F5E6CA',
+        strokeColor: '#8B0000'
+    });
+});
+
+// Test 2: FDL Bagua
+const canvas2 = createCard(
+    document.getElementById('container2'),
+    'Bagua (Houtian)',
+    'Later Heaven Arrangement - South at Top'
+);
+canvas2.id = 'test2';
+SigilTools.draw('test2', {
+    fdl: FDL_BAGUA,
+    backgroundColor: '#0a0a0a',
+    strokeColor: '#d4af37'
+});
+
+// Test 3: FDL Bazi
+const canvas3 = createCard(
+    document.getElementById('container3'),
+    'Bazi (Four Pillars)',
+    'Year-Month-Day-Hour with Bagua'
+);
+canvas3.id = 'test3';
+SigilTools.draw('test3', {
+    fdl: FDL_BAZI,
+    backgroundColor: '#0a0a0a',
+    strokeColor: '#d4af37'
+});
+
+// Test 4: FDL Fengshui
+const canvas4 = createCard(
+    document.getElementById('container4'),
+    'Feng Shui (Qi Retention)',
+    'Octagonal formation with directional trigrams'
+);
+canvas4.id = 'test4';
+SigilTools.draw('test4', {
+    fdl: FDL_FENGSHUI,
+    backgroundColor: '#0a0a0a',
+    strokeColor: '#d4af37'
+});
+
+</script>
+</body>
+</html>

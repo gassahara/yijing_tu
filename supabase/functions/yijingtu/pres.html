@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Proceso - Derecho Procesal Civil</title>
+    <!-- Fuentes de Google para un aspecto académico y profesional -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome para los íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #1a2a40;
+            /* Azul oscuro institucional */
+            --secondary-color: #cda34f;
+            /* Dorado / Bronce */
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            height: 100%;
+            font-family: 'Lato', sans-serif;
+            background-color: var(--primary-color);
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        /* Contenedor Principal */
+        .presentation-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(rgba(26, 42, 64, 0.85), rgba(26, 42, 64, 0.95)), url('https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Diapositivas */
+        .slide {
+            position: absolute;
+            width: 85%;
+            height: 80%;
+            background: var(--bg-color);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            padding: 3rem 4rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-top: 8px solid var(--secondary-color);
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+        }
+
+        /* Tipografía */
+        h1,
+        h2,
+        h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        p,
+        li {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+        }
+
+        /* Estilos específicos de diapositivas */
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--white);
+        }
+
+        .title-slide h1 {
+            color: var(--primary-color);
+            font-size: 4rem;
+        }
+
+        .title-slide h3 {
+            color: #666;
+            font-family: 'Lato', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--secondary-color);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .authors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 80%;
+            margin-top: 3rem;
+            text-align: left;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        /* Grid de 2 columnas para comparaciones */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .card.accent {
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        /* Iconos */
+        .icon {
+            color: var(--secondary-color);
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        /* Fases (Línea de tiempo simple) */
+        .fase-box {
+            background: var(--white);
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .fase-box h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Controles */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            z-index: 100;
+        }
+
+        button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.3s;
+            font-family: 'Lato', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        #counter {
+            color: var(--white);
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Highlight text */
+        .highlight {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="presentation-container">
+
+        <!-- DIAPOSITIVA 1 -->
+        <div class="slide title-slide active">
+            <h3>Universidad Nacional Experimental de los Llanos Centrales "Rómulo Gallegos"</h3>
+            <h3>Programa Municipalizado de Formación en Derecho - Núcleo: Calabozo</h3>
+            <br>
+            <h1>EL PROCESO</h1>
+            <div class="subtitle">Derecho Procesal Civil – Tema IV</div>
+
+            <div class="authors-grid">
+                <div>
+                    <h3 style="color: var(--primary-color)"><i class="fas fa-user-graduate"></i> Bachilleres:</h3>
+                    <p>Carlos Pérez</p>
+                    <p>Carmen Villavicencio</p>
+                </div>
+                <div>
+                    <h3 style="color: var(--primary-color)"><i class="fas fa-chalkboard-teacher"></i> Profesor:</h3>
+                    <p>Abg. Juan Aguirre</p>
+                    <p style="margin-top: 1rem; font-size: 1.1rem; color: #666;">Febrero 2026</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 2 -->
+        <div class="slide">
+            <h2><i class="fas fa-book-open icon"></i> Concepto de Proceso</h2>
+            <p>El proceso es una <strong>secuencia de actos procesales</strong> interrelacionados entre sí.</p>
+
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div class="card">
+                    <h3>Elementos Fundamentales</h3>
+                    <ul>
+                        <li><strong>Intervienen:</strong> Partes, juez y auxiliares.</li>
+                        <li><strong>Finalidad:</strong> Obtener sentencia definitiva.</li>
+                        <li><strong>Regulación:</strong> Código de Procedimiento Civil (CPC).</li>
+                    </ul>
+                </div>
+                <div class="card accent">
+                    <h3>Fases Principales</h3>
+                    <ul>
+                        <li><i class="fas fa-file-import icon" style="font-size:1rem;"></i> Introductoria</li>
+                        <li><i class="fas fa-search icon" style="font-size:1rem;"></i> Probatoria</li>
+                        <li><i class="fas fa-gavel icon" style="font-size:1rem;"></i> Decisoria</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 3 -->
+        <div class="slide">
+            <h2><i class="fas fa-balance-scale icon"></i> Proceso y Procedimiento</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="text-align: center;"><i class="fas fa-project-diagram"></i> Proceso</h3>
+                    <ul style="margin-top: 1rem;">
+                        <li>Conjunto dinámico de actos.</li>
+                        <li>Busca resolver un conflicto jurídico.</li>
+                        <li>Tiene una finalidad teleológica (la sentencia).</li>
+                    </ul>
+                </div>
+                <div class="card accent">
+                    <h3 style="text-align: center;"><i class="fas fa-tasks"></i> Procedimiento</h3>
+                    <ul style="margin-top: 1rem;">
+                        <li>Conjunto de normas formales.</li>
+                        <li>Regula el modo, tiempo y lugar.</li>
+                        <li>Es el <strong>"cómo"</strong> del proceso.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 4 -->
+        <div class="slide">
+            <h2><i class="fas fa-not-equal icon"></i> Diferencias Fundamentales</h2>
+
+            <div class="fase-box">
+                <h3>1. Naturaleza</h3>
+                <p><strong>Proceso:</strong> Es dinámico, vivo y en constante evolución.<br>
+                    <strong>Procedimiento:</strong> Es formal, estático y preestablecido en la ley.
+                </p>
+            </div>
+
+            <div class="fase-box">
+                <h3>2. Finalidad</h3>
+                <p><strong>Proceso:</strong> Responde al "qué" (resolver un conflicto material).<br>
+                    <strong>Procedimiento:</strong> Responde al "cómo" (el trámite legal a seguir).
+                </p>
+            </div>
+
+            <div class="fase-box" style="border-left-color: var(--primary-color)">
+                <h3>3. Relación</h3>
+                <p><em>Todo proceso requiere de un procedimiento para existir, pero <strong>no todo procedimiento es un
+                            proceso</strong> (ej. procedimientos administrativos).</em></p>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 5 -->
+        <div class="slide">
+            <h2><i class="fas fa-yin-yang icon"></i> Naturaleza Jurídica</h2>
+            <p>El proceso ostenta una <strong>doble naturaleza</strong> que conjuga intereses del Estado y de los
+                particulares.</p>
+
+            <div class="grid-2" style="margin-top: 1rem;">
+                <div class="card">
+                    <h3><i class="fas fa-university icon"></i> Naturaleza Pública</h3>
+                    <ul>
+                        <li>Supremacía y autoridad del Juez.</li>
+                        <li>Dirección e impulso procesal de oficio.</li>
+                        <li>Garantiza la paz social.</li>
+                    </ul>
+                </div>
+                <div class="card accent">
+                    <h3><i class="fas fa-user-shield icon"></i> Naturaleza Privada</h3>
+                    <ul>
+                        <li>Iniciativa y disposición de las partes.</li>
+                        <li>Defensa de intereses particulares.</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top: 1rem; text-align: center; font-weight: bold; font-size: 1.2rem;">
+                Es una relación jurídica compleja entre: <span class="highlight">Juez - Actor - Demandado</span>
+            </p>
+        </div>
+
+        <!-- DIAPOSITIVA 6 -->
+        <div class="slide">
+            <h2><i class="fas fa-file-signature icon"></i> Formas Procesales</h2>
+            <p>Son los requisitos de <strong>modo, tiempo y lugar</strong> que revisten los actos jurídicos dentro del
+                juicio.</p>
+
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div>
+                    <h3>Garantizan:</h3>
+                    <ul>
+                        <li>Orden procesal.</li>
+                        <li>Igualdad de defensa.</li>
+                        <li>Lealtad en el debate.</li>
+                    </ul>
+                </div>
+                <div style="background: var(--primary-color); color: white; padding: 2rem; border-radius: 8px;">
+                    <h3 style="color: var(--secondary-color);">Características en Venezuela:</h3>
+                    <ul style="list-style-type: none; margin-left: 0;">
+                        <li><i class="fas fa-pen-nib"></i> Predominio del sistema escrito.</li>
+                        <li><i class="fas fa-language"></i> Uso obligatorio del idioma castellano.</li>
+                        <li><i class="fas fa-building"></i> Actos realizados en la sede del Tribunal.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 7 -->
+        <div class="slide">
+            <h2><i class="fas fa-sitemap icon"></i> Estructura del Proceso Civil</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">El proceso ordinario se divide lógicamente en cuatro
+                fases sucesivas:</p>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                <div
+                    style="width: 80%; background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 10px solid var(--secondary-color); font-size: 1.5rem; font-weight: bold;">
+                    1️⃣ Fase Introductoria
+                </div>
+                <div style="color: var(--primary-color); font-size: 2rem;"><i class="fas fa-arrow-down"></i></div>
+                <div
+                    style="width: 80%; background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 10px solid var(--primary-color); font-size: 1.5rem; font-weight: bold;">
+                    2️⃣ Fase Probatoria
+                </div>
+                <div style="color: var(--primary-color); font-size: 2rem;"><i class="fas fa-arrow-down"></i></div>
+                <div
+                    style="width: 80%; background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 10px solid var(--secondary-color); font-size: 1.5rem; font-weight: bold;">
+                    3️⃣ Fase Decisoria
+                </div>
+                <div style="color: var(--primary-color); font-size: 2rem;"><i class="fas fa-arrow-down"></i></div>
+                <div
+                    style="width: 80%; background: #f0f0f0; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 10px solid #888; font-size: 1.5rem; font-weight: bold;">
+                    4️⃣ Ejecución (Si es necesaria)
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 8 -->
+        <div class="slide">
+            <h2><i class="fas fa-door-open icon"></i> Fase I: Introductoria</h2>
+            <p>Es la etapa donde se plantea la controversia y se fija el objeto del litigio.</p>
+
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div class="card">
+                    <h3>Actos del Demandante y Tribunal</h3>
+                    <ul>
+                        <li><strong>Demanda:</strong> Escrito inicial que activa el aparato jurisdiccional.</li>
+                        <li><strong>Admisión:</strong> Revisión formal por el Juez.</li>
+                        <li><strong>Citación/Emplazamiento:</strong> Llamado formal al demandado.</li>
+                    </ul>
+                </div>
+                <div class="card accent">
+                    <h3>Actos del Demandado</h3>
+                    <ul>
+                        <li><strong>Cuestiones Previas:</strong> Defensa de forma (depuración del proceso).</li>
+                        <li><strong>Contestación:</strong> Defensa de fondo (aceptación o rechazo de alegatos).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 9 -->
+        <div class="slide">
+            <h2><i class="fas fa-microscope icon"></i> Fase II: Probatoria</h2>
+            <p>Etapa destinada a demostrar la veracidad de los hechos alegados en la fase introductoria.</p>
+
+            <div class="fase-box" style="margin-top: 2rem;">
+                <h3><i class="fas fa-list-ol icon"></i> Sub-fases principales:</h3>
+                <ul>
+                    <li><strong>Promoción de pruebas:</strong> Las partes anuncian qué medios usarán.</li>
+                    <li><strong>Evacuación de pruebas:</strong> Materialización y práctica de las pruebas admitidas en
+                        el Tribunal.</li>
+                </ul>
+            </div>
+
+            <div
+                style="background: var(--primary-color); color: white; padding: 1.5rem; border-radius: 8px; text-align: center; margin-top: 1rem;">
+                <h3 style="color: var(--secondary-color); margin-bottom: 0;">Principio de Carga de la Prueba</h3>
+                <p style="margin-bottom: 0;"><em>"Quien alega un hecho, debe probarlo"</em></p>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 10 -->
+        <div class="slide">
+            <h2><i class="fas fa-gavel icon"></i> Fase III: Decisoria</h2>
+            <p>Es la culminación del proceso en primera instancia, donde el Juez valora lo actuado y dicta su fallo.</p>
+
+            <div class="card" style="margin-top: 2rem; border-left: 8px solid var(--secondary-color);">
+                <ul>
+                    <li><strong>Informes:</strong> Conclusiones escritas u orales finales de las partes.</li>
+                    <li><strong>Observaciones:</strong> Oportunidad para refutar los informes de la contraparte.</li>
+                    <li><strong>Sentencia Definitiva:</strong> Decisión judicial que pone fin al litigio.</li>
+                </ul>
+            </div>
+
+            <p style="text-align: center; margin-top: 2rem; font-size: 1.6rem;">
+                <i class="fas fa-info-circle icon"></i> El tribunal decide <strong>conforme a lo alegado y
+                    probado</strong> en autos (Verdad Procesal).
+            </p>
+        </div>
+
+        <!-- DIAPOSITIVA 11 -->
+        <div class="slide">
+            <h2><i class="fas fa-comment-alt icon"></i> Oralidad y Escritura</h2>
+            <p>El sistema procesal venezolano actual es de carácter <strong>mixto</strong>.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="text-align: center;"><i class="fas fa-pen-fancy"></i> Predominio Escrito</h3>
+                    <p style="text-align: center; margin-bottom: 1rem;">(Proceso Ordinario Clásico)</p>
+                    <ul>
+                        <li>Demandas</li>
+                        <li>Contestaciones</li>
+                        <li>Recursos</li>
+                        <li>Formación del expediente</li>
+                    </ul>
+                </div>
+                <div class="card accent">
+                    <h3 style="text-align: center;"><i class="fas fa-comments"></i> Oralidad</h3>
+                    <p style="text-align: center; margin-bottom: 1rem;">(Tendencia Moderna)</p>
+                    <ul>
+                        <li>Audiencias preliminares y de juicio.</li>
+                        <li>Inmediación directa del juez.</li>
+                        <li>Debate directo entre partes.</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 1rem; font-weight: bold; color: var(--primary-color);">
+                Fundamento Constitucional: Derecho a la Tutela Judicial Efectiva.
+            </p>
+        </div>
+
+        <!-- DIAPOSITIVA 12 -->
+        <div class="slide">
+            <h2><i class="fas fa-network-wired icon"></i> Proceso como Relación Jurídica</h2>
+            <p>El proceso no es un mero trámite, es una auténtica relación de derecho público que genera:</p>
+
+            <ul style="display: flex; justify-content: space-around; list-style: none; margin: 2rem 0;">
+                <li
+                    style="background: var(--white); padding: 1rem 3rem; border-radius: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold;">
+                    Derechos</li>
+                <li
+                    style="background: var(--white); padding: 1rem 3rem; border-radius: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold;">
+                    Deberes</li>
+                <li
+                    style="background: var(--white); padding: 1rem 3rem; border-radius: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold;">
+                    Poderes</li>
+            </ul>
+
+            <div class="fase-box" style="border-left-color: var(--primary-color)">
+                <h3>El Rol del Juez en la Relación:</h3>
+                <p>Dentro de esta relación, el juez actúa como director: <strong>Ordena, Permite y Prohíbe</strong>
+                    actos procesales.</p>
+            </div>
+
+            <p style="text-align: center; margin-top: 1rem; font-size: 1.5rem; font-style: italic;">
+                Se genera el estado de <span class="highlight">"Pendencia Procesal"</span> (Litispendencia).
+            </p>
+        </div>
+
+        <!-- DIAPOSITIVA 13 -->
+        <div class="slide">
+            <h2><i class="fas fa-weight-hanging icon"></i> Poderes y Cargas Procesales</h2>
+
+            <div class="grid-2">
+                <div class="card" style="background: var(--primary-color); color: white;">
+                    <h3 style="color: var(--secondary-color);"><i class="fas fa-crown"></i> Poderes (Del Juez)</h3>
+                    <p style="color: #ddd; font-size: 1.1rem; margin-bottom: 1rem;">Facultades de autoridad para guiar
+                        el proceso.</p>
+                    <ul style="list-style-type: square; margin-left: 1.5rem;">
+                        <li>Dirección del proceso.</li>
+                        <li>Decreto de pruebas de oficio.</li>
+                        <li>Poder de coerción.</li>
+                        <li>Ejecución forzosa de la sentencia.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-user-clock"></i> Cargas (De las Partes)</h3>
+                    <p style="color: #666; font-size: 1.1rem; margin-bottom: 1rem;">Requerimientos cuyo incumplimiento
+                        perjudica a la propia parte.</p>
+                    <ul style="list-style-type: square; margin-left: 1.5rem;">
+                        <li>Probar los hechos alegados.</li>
+                        <li>Contestar la demanda en el lapso.</li>
+                        <li>Interponer recursos oportunamente.</li>
+                        <li>Impulsar el procedimiento.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 14 -->
+        <div class="slide">
+            <h2><i class="fas fa-star icon"></i> Características del Proceso Civil</h2>
+            <p>El proceso civil venezolano se caracteriza por ser:</p>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                <div class="fase-box" style="margin-bottom: 0;"><strong>1. De Orden Público:</strong> Normas
+                    imperativas.</div>
+                <div class="fase-box" style="margin-bottom: 0;"><strong>2. Dispositivo:</strong> Las partes fijan el
+                    tema a decidir.</div>
+                <div class="fase-box" style="margin-bottom: 0;"><strong>3. Dirección Judicial:</strong> Juez como
+                    rector.</div>
+                <div class="fase-box" style="margin-bottom: 0;"><strong>4. Celeridad:</strong> Economía de tiempo y
+                    esfuerzo.</div>
+                <div class="fase-box" style="margin-bottom: 0;"><strong>5. Publicidad:</strong> Actos accesibles al
+                    público.</div>
+                <div class="fase-box" style="margin-bottom: 0;"><strong>6. Preclusión:</strong> Lapsos fatales para
+                    actuar.</div>
+                <div class="fase-box" style="margin-bottom: 0;"><strong>7. Contradicción:</strong> Derecho al derecho a
+                    la defensa.</div>
+                <div class="fase-box" style="margin-bottom: 0;"><strong>8. Verdad Procesal:</strong> Búsqueda de lo
+                    probado en autos.</div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 15 -->
+        <div class="slide">
+            <h2><i class="fas fa-play-circle icon"></i> Iniciativa de las Partes</h2>
+
+            <div class="card" style="text-align: center; padding: 3rem;">
+                <h3 style="font-size: 2rem;">Principio Dispositivo</h3>
+                <p style="font-size: 1.5rem; margin-top: 1.5rem;">
+                    El juez civil no actúa de oficio para iniciar un juicio.
+                </p>
+                <ul style="text-align: left; display: inline-block; margin-top: 2rem;">
+                    <li>Las partes impulsan el inicio.</li>
+                    <li>Ellas fijan el objeto y límites del litigio.</li>
+                    <li>Tienen la carga de aportar las pruebas.</li>
+                </ul>
+                <div
+                    style="margin-top: 3rem; font-size: 2rem; color: var(--secondary-color); font-family: 'Playfair Display', serif; font-style: italic;">
+                    "Nemo iudex sine actore"
+                </div>
+                <p style="font-size: 1rem; color: #666;">(No hay juez sin actor / Sin demanda no hay proceso)</p>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 16 -->
+        <div class="slide">
+            <h2><i class="fas fa-hands-helping icon"></i> Mediación e Inmediación</h2>
+
+            <div class="grid-2">
+                <div class="card accent">
+                    <div
+                        style="text-align: center; font-size: 3rem; color: var(--secondary-color); margin-bottom: 1rem;">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 style="text-align: center;">Inmediación</h3>
+                    <ul>
+                        <li>Presencia directa e ininterrumpida del Juez.</li>
+                        <li>Contacto visual y auditivo con las partes y pruebas.</li>
+                        <li>Permite la correcta formación de la convicción judicial.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div style="text-align: center; font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3 style="text-align: center;">Mediación</h3>
+                    <ul>
+                        <li>Mecanismo alternativo de resolución.</li>
+                        <li>Intervención de un tercero para acercar posturas.</li>
+                        <li>Facilita la autocomposición procesal (acuerdos entre las partes).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 17 -->
+        <div class="slide">
+            <h2><i class="fas fa-sliders-h icon"></i> Principio Dispositivo e Inquisitivo</h2>
+            <p>En el derecho procesal civil contemporáneo se aplica un <strong>Sistema Mixto</strong>.</p>
+
+            <div class="fase-box" style="margin-top: 2rem; background: #e8f4f8; border-left-color: #3498db;">
+                <p style="font-size: 1.6rem; text-align: center; margin-bottom: 0;">
+                    Predomina el principio dispositivo, pero existe un <strong>sistema inquisitivo atenuado</strong>.
+                </p>
+            </div>
+
+            <h3 style="margin-top: 2rem;"><i class="fas fa-tools"></i> Bajo este sistema atenuado, el Juez puede:</h3>
+            <ul style="font-size: 1.5rem;">
+                <li>Impulsar el proceso para evitar su paralización.</li>
+                <li>Decretar pruebas de oficio para aclarar dudas (Ej. Auto para mejor proveer).</li>
+                <li>Buscar activamente la verdad material, más allá de la simple verdad formal.</li>
+            </ul>
+        </div>
+
+        <!-- DIAPOSITIVA 18 -->
+        <div class="slide">
+            <h2><i class="fas fa-compass icon"></i> Principios Rectores</h2>
+            <p style="margin-bottom: 2rem;">Son las directrices fundamentales que estructuran y garantizan el
+                <strong>debido proceso</strong>:</p>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+                <span
+                    style="background: var(--white); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--primary-color); font-weight: bold;">Contradicción</span>
+                <span
+                    style="background: var(--white); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--primary-color); font-weight: bold;">Igualdad
+                    procesal</span>
+                <span
+                    style="background: var(--white); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--primary-color); font-weight: bold;">Lealtad
+                    y probidad</span>
+                <span
+                    style="background: var(--white); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--primary-color); font-weight: bold;">Publicidad</span>
+                <span
+                    style="background: var(--white); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--primary-color); font-weight: bold;">Celeridad</span>
+                <span
+                    style="background: var(--white); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--primary-color); font-weight: bold;">Inmediación</span>
+            </div>
+
+            <div
+                style="margin-top: 3rem; text-align: center; background: var(--secondary-color); color: white; padding: 1.5rem; border-radius: 8px;">
+                <h3 style="color: white; margin-bottom: 0;"><i class="fas fa-shield-alt"></i> Fin Último</h3>
+                <p style="font-size: 1.6rem; margin-bottom: 0;">Garantizar la Tutela Judicial Efectiva (Art. 26 CRBV)
+                </p>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 19 -->
+        <div class="slide">
+            <h2><i class="fas fa-book icon"></i> El CPC como Norma Supletoria</h2>
+            <p>El Código de Procedimiento Civil actúa como <strong>norma matriz o supletoria</strong> en el sistema
+                jurídico venezolano.</p>
+
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div class="fase-box">
+                    <h3>Regla de Aplicación</h3>
+                    <ul>
+                        <li>Se aplica en vacíos de otros procesos (laboral, agrario, mercantil).</li>
+                        <li>Cubre lagunas o vacíos legales procedimentales.</li>
+                        <li><strong>Límite:</strong> No aplica si contradice principios de la ley especial respectiva.
+                        </li>
+                    </ul>
+                </div>
+                <div class="fase-box" style="border-left-color: var(--primary-color)">
+                    <h3>Ejemplos de Aplicación</h3>
+                    <ul>
+                        <li>Reglas para valoración de pruebas.</li>
+                        <li>Lapsos no regulados expresamente.</li>
+                        <li>Normas sobre competencia y recusación de jueces.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 20 -->
+        <div class="slide title-slide">
+            <h2 style="border-bottom: none;"><i class="fas fa-check-circle"
+                    style="color: var(--secondary-color); font-size: 3rem;"></i><br>Conclusión</h2>
+
+            <div
+                style="text-align: left; width: 80%; background: #f8f9fa; padding: 2rem; border-radius: 8px; border-top: 5px solid var(--primary-color); box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <p style="font-size: 1.6rem; margin-bottom: 1.5rem;">El proceso civil venezolano:</p>
+                <ul style="font-size: 1.4rem;">
+                    <li>Es una <strong>relación jurídica compleja</strong> entre el Estado y los particulares.</li>
+                    <li>Combina la <strong>escritura formal</strong> con elementos modernos de
+                        <strong>oralidad</strong>.</li>
+                    <li>Está estrictamente regido por <strong>principios constitucionales</strong> (debido proceso).
+                    </li>
+                    <li>Su fin último no es el formalismo, sino la búsqueda de la <strong>justicia, la verdad y la
+                            tutela judicial efectiva</strong>.</li>
+                </ul>
+            </div>
+            <h3 style="margin-top: 2rem; font-family: 'Lato', sans-serif;">¡Gracias por su atención!</h3>
+        </div>
+
+        <!-- Controles de Navegación -->
+        <div class="controls">
+            <button id="prevBtn"><i class="fas fa-chevron-left"></i> Anterior</button>
+            <span id="counter">1 / 20</span>
+            <button id="nextBtn">Siguiente <i class="fas fa-chevron-right"></i></button>
+        </div>
+
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const counter = document.getElementById('counter');
+        let currentSlide = 0;
+
+        // Función para mostrar la diapositiva actual
+        function showSlide(index) {
+            // Validar límites
+            if (index < 0) currentSlide = 0;
+            if (index >= slides.length) currentSlide = slides.length - 1;
+
+            // Ocultar todas las diapositivas
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Mostrar la seleccionada
+            slides[currentSlide].classList.add('active');
+
+            // Actualizar contador
+            counter.innerText = `${currentSlide + 1} / ${slides.length}`;
+
+            // Actualizar estado de botones
+            prevBtn.style.opacity = currentSlide === 0 ? '0.5' : '1';
+            prevBtn.style.cursor = currentSlide === 0 ? 'not-allowed' : 'pointer';
+
+            nextBtn.style.opacity = currentSlide === slides.length - 1 ? '0.5' : '1';
+            nextBtn.style.cursor = currentSlide === slides.length - 1 ? 'not-allowed' : 'pointer';
+        }
+
+        // Eventos de botones
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        // Eventos de teclado (Flechas)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            }
+        });
+
+        // Inicializar presentación
+        showSlide(currentSlide);
+    </script>
+</body>
+
+</html>

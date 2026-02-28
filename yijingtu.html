@@ -5,8 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>易經圖 · I Ching Oracle</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="remedies.css">
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="remedies.css?v=2">
+    <link rel="stylesheet" href="tabbed-layout.css?v=2">
+    <link rel="stylesheet" href="responsive.css?v=2">
+    <link rel="stylesheet" href="chinese-astrology.css?v=5.1">
+    <link rel="stylesheet" href="bazi-enhanced.css?v=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -155,6 +159,42 @@
         <div class="timer-display" id="meditation-timer" aria-live="polite">0:30</div>
     </div>
 
+    <!-- Blocking Loading Overlay with I Ching & Laozi Quotes -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <!-- Animated Spinner -->
+            <div class="loading-spinner-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-spinner-inner"></div>
+                <div class="loading-spinner-center"></div>
+            </div>
+            
+            <!-- Prominent Quote Display -->
+            <div class="quote-container" id="quoteContainer">
+                <div class="quote-chinese" id="quoteChinese"></div>
+                <div class="quote-text" id="quoteText"></div>
+                <div class="quote-source" id="quoteSource"></div>
+            </div>
+            
+            <!-- Process Status -->
+            <div class="process-status">
+                <div class="process-step" id="processStep">Initializing...</div>
+                <div class="progress-container">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            
+            <!-- Debug Console (Less Prominent) -->
+            <div class="debug-container">
+                <div class="debug-header">
+                    <span class="debug-title">System Log</span>
+                    <span class="debug-status" id="debugStatus">● Processing</span>
+                </div>
+                <div class="debug-messages" id="debugMessages"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header role="banner">
         <div class="header-content">
@@ -236,8 +276,72 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Mobile Header Controls -->
+            <div class="mobile-header-controls">
+                <button class="hamburger-trigger mobile-only" onclick="App.toggleMobileMenu()" aria-label="Open menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <button class="bazi-toggle-btn" onclick="App.toggleBaziWizard()" aria-label="BaZi Configuration">
+                    <svg class="icon">
+                        <use href="#icon-palace" />
+                    </svg>
+                </button>
+                <button class="acc-btn" onclick="App.toggleMobileMenu()" aria-label="Settings">
+                    <svg class="icon">
+                        <use href="#icon-theme" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </header>
+
+    <!-- Mobile Hamburger Menu -->
+    <div id="mobile-menu" class="hamburger-menu" role="dialog" aria-modal="true" aria-label="Settings menu">
+        <button class="hamburger-close" onclick="App.toggleMobileMenu()" aria-label="Close menu">&times;</button>
+        <h3 data-i18n="settings">Settings</h3>
+
+        <div class="mobile-menu-section">
+            <h4 data-i18n="language">Language</h4>
+            <div class="lang-selector">
+                <button class="lang-btn" data-lang="en"
+                    onclick="App.setLanguage('en'); App.toggleMobileMenu();">EN</button>
+                <button class="lang-btn" data-lang="es"
+                    onclick="App.setLanguage('es'); App.toggleMobileMenu();">ES</button>
+                <button class="lang-btn" data-lang="it"
+                    onclick="App.setLanguage('it'); App.toggleMobileMenu();">IT</button>
+                <button class="lang-btn" data-lang="zh"
+                    onclick="App.setLanguage('zh'); App.toggleMobileMenu();">中文</button>
+            </div>
+        </div>
+
+        <div class="mobile-menu-section">
+            <h4 data-i18n="accessibility">Accessibility</h4>
+            <div class="accessibility-controls">
+                <button class="acc-btn" onclick="App.adjustFontSize(-1)">A-</button>
+                <button class="acc-btn" onclick="App.adjustFontSize(1)">A+</button>
+                <button class="acc-btn" onclick="App.toggleHighContrast()">
+                    <svg class="icon">
+                        <use href="#icon-yinyang" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile-menu-section">
+            <h4 data-i18n="memory">Memory</h4>
+            <select id="contextMinutesMobile" onchange="App.updateContextMinutes(this.value); App.toggleMobileMenu();"
+                aria-label="Memory duration">
+                <option value="0" data-i18n="memoryOff">Off</option>
+                <option value="10" selected data-i18n="memory10min">10 min</option>
+                <option value="30" data-i18n="memory30min">30 min</option>
+                <option value="60" data-i18n="memory1hour">1 hour</option>
+                <option value="180" data-i18n="memory3hours">3 hours</option>
+            </select>
+        </div>
+    </div>
 
     <!-- BaZi Configuration Wizard (Modal) -->
     <div id="bazi-wizard" class="bazi-wizard-overlay" role="dialog" aria-modal="true" aria-label="BaZi Configuration">
@@ -318,6 +422,8 @@
         <nav class="main-tabs" role="tablist" aria-label="Main navigation">
             <button class="nav-tab active" onclick="App.switchMainTab('oracle')" id="tab-btn-oracle" data-i18n="oracle"
                 role="tab" aria-selected="true" aria-controls="tab-oracle">Oracle</button>
+            <button class="nav-tab" onclick="App.switchMainTab('analysis')" id="tab-btn-analysis" 
+                role="tab" aria-selected="false" aria-controls="tab-analysis">🔮 Analysis</button>
             <button class="nav-tab" onclick="App.switchMainTab('journal')" id="tab-btn-journal" data-i18n="journal"
                 role="tab" aria-selected="false" aria-controls="tab-journal">Journal</button>
         </nav>
@@ -375,6 +481,13 @@
                                     </svg>
                                     PDF
                                 </button>
+                                <button class="btn-export btn-export-primary" onclick="App.exportReading('pdf-full')"
+                                    title="Export Full Document with All Technical Details">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-pdf" />
+                                    </svg>
+                                    Full PDF
+                                </button>
                             </div>
                         </div>
                         <!-- Diagrams Export Panel -->
@@ -405,7 +518,116 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Graphical Summary Dashboard -->
+                    <div id="graphicalSummary" class="graphical-summary" aria-label="Visual summary"></div>
                     <section id="resultsContent" aria-label="Reading results"></section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tab - Technical Data & Astrology -->
+        <div id="tab-analysis" class="tab-content-panel" role="tabpanel" aria-labelledby="tab-btn-analysis">
+            <div class="analysis-tab-container">
+                <header class="analysis-tab-header">
+                    <h2>🔮 <span data-i18n="analysisTitle">Analysis</span> <span class="zh">分析</span></h2>
+                    <p class="analysis-subtitle" data-i18n="analysisSubtitle">Pre-Analysis · Moment Influence · Chinese Astrology</p>
+                </header>
+                
+                <!-- Sub-tabs Navigation -->
+                <nav class="analysis-sub-tabs" role="tablist" aria-label="Analysis sections">
+                    <button class="analysis-sub-tab active" onclick="App.switchAnalysisTab('preanalysis')" id="analysis-sub-tab-preanalysis" role="tab" aria-selected="true">
+                        📊 <span data-i18n="preAnalysisTab">Pre-Analysis</span>
+                    </button>
+                    <button class="analysis-sub-tab" onclick="App.switchAnalysisTab('moment')" id="analysis-sub-tab-moment" role="tab" aria-selected="false">
+                        ⚡ <span data-i18n="momentInfluenceTab">Moment Influence</span>
+                    </button>
+                    <button class="analysis-sub-tab" onclick="App.switchAnalysisTab('astrology')" id="analysis-sub-tab-astrology" role="tab" aria-selected="false">
+                        ☯ <span data-i18n="astrologyTab">Astrology</span>
+                    </button>
+                </nav>
+                
+                <!-- Sub-tab: Pre-Analysis (Technical Data) -->
+                <div id="analysis-panel-preanalysis" class="analysis-sub-panel active" role="tabpanel">
+                    <section class="analysis-section">
+                        <h3>📊 <span data-i18n="preAnalysisTab">Pre-Analysis</span> <span class="zh">預分析</span></h3>
+                        <p class="section-description" data-i18n="preAnalysisDesc">Technical divination data sent to AI for interpretation</p>
+                        <div id="preAnalysisContent">
+                            <div class="placeholder-small">
+                                <p data-i18n="castReading">Cast a reading to see technical analysis data</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Sub-tab: Moment Influence -->
+                <div id="analysis-panel-moment" class="analysis-sub-panel" role="tabpanel">
+                    <section class="analysis-section">
+                        <h3>⚡ <span data-i18n="momentInfluenceTab">Moment Influence</span> (Current Sky / BaZi) <span class="zh">天時八字</span></h3>
+                        <p class="section-description" data-i18n="momentInfluenceDesc">Current celestial influences at the moment of casting</p>
+                        
+                        <!-- BaZi Configuration Panel -->
+                        <div class="bazi-config-panel" id="baziConfigPanel">
+                            <h4>📍 <span data-i18n="locationTimeCorrection">Location & Time Correction</span> <span class="zh">真太阳时校正</span></h4>
+                            <p class="config-description" data-i18n="trueSolarTimeNote">Enter location for accurate lunar mansion and solar time correction</p>
+                            
+                            <div class="bazi-inputs-grid">
+                                <div class="bazi-input-group">
+                                    <label for="baziLatitude" data-i18n="latitude">Latitude</label>
+                                    <input type="number" id="baziLatitude" step="0.01" placeholder="e.g., 39.90" />
+                                </div>
+                                <div class="bazi-input-group">
+                                    <label for="baziLongitude" data-i18n="longitude">Longitude</label>
+                                    <input type="number" id="baziLongitude" step="0.01" placeholder="e.g., 116.40" />
+                                </div>
+                                <div class="bazi-input-group">
+                                    <label for="baziDate" data-i18n="dateLabel">Date</label>
+                                    <input type="date" id="baziDate" />
+                                </div>
+                                <div class="bazi-input-group">
+                                    <label for="baziTime" data-i18n="birthTimeLabel">Time</label>
+                                    <input type="time" id="baziTime" />
+                                </div>
+                            </div>
+                            
+                            <div class="bazi-actions">
+                                <button class="btn-detect-location" onclick="App.detectBaziLocation()">
+                                    📍 <span data-i18n="detectLocation">Detect My Location</span>
+                                </button>
+                                <button class="btn-apply-bazi" onclick="App.applyBaziConfig()">
+                                    <span data-i18n="applyRecalculate">Apply & Recalculate</span>
+                                </button>
+                            </div>
+                            
+                            <div class="bazi-correction-note">
+                                <p data-i18n="trueSolarTimeNote"><strong>真太阳时 (True Solar Time):</strong> Traditional Chinese astrology uses local apparent solar time, 
+                                not standard clock time. Longitude correction adjusts for your position east or west of the standard meridian.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="momentInfluenceContent">
+                            <div class="placeholder-small">
+                                <p data-i18n="castMoment">Cast a reading to see the current celestial influences</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Sub-tab: Astrology -->
+                <div id="analysis-panel-astrology" class="analysis-sub-panel" role="tabpanel">
+                    <section class="analysis-section">
+                        <h3>☯ <span data-i18n="astrologyTab">Complete Chinese Astrology</span> <span class="zh">完整占星分析</span></h3>
+                        <p class="section-description" data-i18n="astrologyDesc">BaZi · Bagua · He Tu · Luo Shu · 28 Lunar Mansions · Tai Sui</p>
+                        <div id="analysisAstrologyLoading" class="analysis-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p data-i18n="calculatingAstro">Calculating celestial influences from API...</p>
+                        </div>
+                        <div id="analysisAstrologyContent">
+                            <div class="astrology-placeholder-compact">
+                                <p data-i18n="castAstrology">Cast a reading to generate complete Chinese astrology analysis</p>
+                                <p class="sub-text" data-i18n="mayTake">This may take 10-30 seconds...</p>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -450,13 +672,25 @@
         </div>
     </main>
 
-    <script src="data.js"></script>
+    <!-- Library Modules (General Purpose) -->
+    <script src="lib/fdl/fdl-core.js"></script>
+    <script src="lib/bagua/bagua-core.js"></script>
+    <script src="lib/fdl/fdl-renderer.js"></script>
+    <script src="lib/fdl/fdl-integration.js"></script>
+    <script src="lib/index.js"></script>
+    
+    <!-- Application Modules (Ad-hoc Usage) -->
+    <script src="data.js?v=2"></script>
+    <script src="chinese_metaphysics_literature.js"></script>
+    <script src="chinese-astrology-client.js?v=5.1"></script>
     <script src="astrology.js"></script>
     <script src="casting.js"></script>
     <script src="sigil_tools.js"></script>
-    <script src="translation-service.js"></script>
-    <script src="ui.js"></script>
-    <script src="app.js"></script>
+    <script src="translation-service.js?v=2"></script>
+    <script src="translation-workflow-manager.js"></script>
+    <script src="feng-shui-dgl-spec.js"></script>
+    <script src="ui.js?v=5"></script>
+    <script src="app.js?v=7"></script>
 </body>
 
 </html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDL Canvas Renderer Test</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #d4af37;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .talisman-card {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            min-width: 420px;
+        }
+        canvas {
+            border: 2px solid #8B0000;
+            background-color: #F5E6CA;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+        h3 {
+            color: #333;
+            margin: 10px 0;
+            font-family: "Kaiti", "STKaiti", "Noto Serif SC", serif;
+        }
+        .meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>FDL / Canvas Renderer Test</h1>
+    <div class="container" id="canvasContainer"></div>
+
+<script>
+/**
+ * RAW DATA FROM YOUR XHRPOST
+ */
+const API_RESPONSE_DATA = {
+    "fuluContentList": [
+        {
+            "id": "fulu_004",
+            "remedyType": "fulu",
+            "talismanNameZh": "開心秘忘符",
+            "hexagramNumber": 49,
+            "type": "character_composite",
+            "sigilInstructions": [
+                { "type": "circle", "cx": 200, "cy": 200, "r": 150, "width": 2 },
+                { "type": "circle", "cx": 200, "cy": 200, "r": 100, "width": 1 },
+                { "type": "text", "text": "開", "x": 200, "y": 200, "size": 80, "quadrant": "center" }
+            ],
+            "layoutInstructions": {
+                "labels": [
+                    { "text": "開", "position": "center", "y": 110, "size": 80, "isSeal": true },
+                    { "text": "心", "position": "center", "y": 170, "size": 80, "isSeal": true },
+                    { "text": "通", "position": "center", "y": 230, "size": 80, "isSeal": true },
+                    { "text": "真", "position": "center", "y": 290, "size": 80, "isSeal": true }
+                ]
+            }
+        },
+        {
+            "id": "fs_002",
+            "remedyType": "fengshui",
+            "talismanNameZh": "葬書五行氣脈法",
+            "hexagramNumber": 49,
+            "type": "qi_retention",
+            "sigilInstructions": [
+                { 
+                    "type": "polygon", "width": 2, 
+                    "points": [[200, 50], [306, 100], [350, 200], [306, 300], [200, 350], [94, 300], [50, 200], [94, 100]] 
+                },
+                { "type": "circle", "cx": 200, "cy": 200, "r": 50, "width": 1 },
+                { "type": "text", "text": "氣", "x": 200, "y": 200, "size": 40, "quadrant": "center" },
+                { "type": "text", "text": "☰", "x": 200, "y": 70, "size": 24, "quadrant": "top" },
+                { "type": "text", "text": "☷", "x": 200, "y": 330, "size": 24, "quadrant": "bottom" },
+                { "type": "text", "text": "☵", "x": 70, "y": 200, "size": 24, "quadrant": "left" },
+                { "type": "text", "text": "☲", "x": 330, "y": 200, "size": 24, "quadrant": "right" }
+            ],
+            "layoutInstructions": {
+                "labels": [
+                    { "text": "Landform", "position": "right", "element": "wood" },
+                    { "text": "Water", "position": "bottom", "element": "fire" },
+                    { "text": "Elemental", "position": "center", "element": "earth" },
+                    { "text": "金", "position": "left", "element": "metal" },
+                    { "text": "水", "position": "top", "element": "water" },
+                    { "text": "葬", "position": "center", "y": 110, "size": 80, "isSeal": true },
+                    { "text": "書", "position": "center", "y": 170, "size": 80, "isSeal": true },
+                    { "text": "五", "position": "center", "y": 230, "size": 80, "isSeal": true },
+                    { "text": "行", "position": "center", "y": 290, "size": 80, "isSeal": true }
+                ]
+            }
+        }
+    ]
+};
+
+/**
+ * CANVAS RENDERER LOGIC - Fixed Version
+ */
+class DaoistRenderer {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.logicalSize = 400;
+        this.displaySize = 400;
+        this.scale = this.displaySize / this.logicalSize;
+    }
+
+    renderAll(dataList) {
+        dataList.forEach(item => this.createCard(item));
+    }
+
+    createCard(item) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'talisman-card';
+
+        const title = document.createElement('h3');
+        title.innerText = `${item.talismanNameZh} (${item.remedyType})`;
+        
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerText = `ID: ${item.id} | Hexagram: ${item.hexagramNumber}`;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = this.displaySize;
+        canvas.height = this.displaySize;
+        canvas.id = `canvas_${item.id}`;
+        
+        wrapper.appendChild(title);
+        wrapper.appendChild(meta);
+        wrapper.appendChild(canvas);
+        this.container.appendChild(wrapper);
+
+        this.drawOnCanvas(canvas, item);
+    }
+
+    drawOnCanvas(canvas, item) {
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        
+        // 1. Background
+        ctx.fillStyle = item.remedyType === 'fulu' ? '#F5E6CA' : '#FFF8E1';
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. Set Drawing Defaults
+        ctx.strokeStyle = '#8B0000';
+        ctx.fillStyle = '#8B0000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Scaling functions
+        const finalScale = w / 400;
+        const tX = (x) => x * finalScale;
+        const tY = (y) => y * finalScale;
+        const tS = (s) => s * finalScale;
+
+        // 3. Render Sigil Instructions
+        if (item.sigilInstructions) {
+            item.sigilInstructions.forEach(cmd => {
+                this.executeCommand(ctx, cmd, tX, tY, tS);
+            });
+        }
+
+        // 4. Render Layout Labels
+        if (item.layoutInstructions && item.layoutInstructions.labels) {
+            this.drawLabels(ctx, item.layoutInstructions.labels, tX, tY, tS);
+        }
+    }
+
+    executeCommand(ctx, cmd, tX, tY, tS) {
+        ctx.save();
+        ctx.strokeStyle = cmd.color || '#8B0000';
+        ctx.fillStyle = cmd.color || '#8B0000';
+        ctx.lineWidth = tS(cmd.width || 2);
+
+        // Get position (handle quadrant or direct x/y)
+        let x = cmd.x !== undefined ? cmd.x : (cmd.cx !== undefined ? cmd.cx : 0);
+        let y = cmd.y !== undefined ? cmd.y : (cmd.cy !== undefined ? cmd.cy : 0);
+
+        if (cmd.quadrant) {
+            const qPos = this.getQuadrantPos(cmd.quadrant);
+            x = qPos.x + (cmd.x !== undefined ? cmd.x : 0);
+            y = qPos.y + (cmd.y !== undefined ? cmd.y : 0);
+        }
+
+        ctx.beginPath();
+
+        switch (cmd.type) {
+            case 'circle':
+                ctx.arc(tX(x), tY(y), tS(cmd.r || 50), 0, Math.PI * 2);
+                ctx.stroke();
+                break;
+
+            case 'polygon':
+                if (cmd.points && cmd.points.length >= 3) {
+                    ctx.moveTo(tX(cmd.points[0][0]), tY(cmd.points[0][1]));
+                    for (let i = 1; i < cmd.points.length; i++) {
+                        ctx.lineTo(tX(cmd.points[i][0]), tY(cmd.points[i][1]));
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+                break;
+
+            case 'text':
+                const fontSize = tS(cmd.size || 20);
+                ctx.font = `900 ${fontSize}px "Noto Serif SC", "Kaiti", serif`;
+                ctx.fillText(cmd.text, tX(x), tY(y));
+                break;
+        }
+
+        ctx.restore();
+    }
+
+    drawLabels(ctx, labels, tX, tY, tS) {
+        labels.forEach(label => {
+            ctx.save();
+
+            let x = 200;
+            let y = 200;
+
+            if (label.position) {
+                const qPos = this.getQuadrantPos(label.position);
+                x = qPos.x;
+                y = qPos.y;
+            }
+
+            if (label.y !== undefined) {
+                y = label.y;
+            }
+
+            const isSeal = label.isSeal === true;
+            const size = tS(label.size || (isSeal ? 60 : 14));
+
+            if (isSeal) {
+                ctx.fillStyle = '#8B0000';
+                ctx.shadowBlur = tS(8);
+                ctx.shadowColor = '#8B0000';
+                ctx.font = `900 ${size}px "Noto Serif SC", "Kaiti", serif`;
+            } else {
+                ctx.fillStyle = this.getElementColor(label.element) || '#333';
+                ctx.shadowBlur = 0;
+                ctx.font = `${size}px sans-serif`;
+            }
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label.text, tX(x), tY(y));
+
+            ctx.restore();
+        });
+    }
+
+    getQuadrantPos(quadrant) {
+        const positions = {
+            'center': { x: 200, y: 200 },
+            'top': { x: 200, y: 60 },
+            'top-right': { x: 320, y: 80 },
+            'right': { x: 340, y: 200 },
+            'bottom-right': { x: 320, y: 320 },
+            'bottom': { x: 200, y: 340 },
+            'bottom-left': { x: 80, y: 320 },
+            'left': { x: 60, y: 200 },
+            'top-left': { x: 80, y: 80 }
+        };
+        return positions[quadrant] || { x: 200, y: 200 };
+    }
+
+    getElementColor(element) {
+        const colors = {
+            'wood': '#228B22',
+            'fire': '#DC143C',
+            'earth': '#DAA520',
+            'metal': '#808080',
+            'water': '#1E90FF'
+        };
+        return colors[element] || '#333';
+    }
+}
+
+// Initialize and Run
+const renderer = new DaoistRenderer('canvasContainer');
+renderer.renderAll(API_RESPONSE_DATA.fuluContentList);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+--- feng-shui-dgl-spec.js
++++ feng-shui-dgl-spec.js
+@@ -322,7 +322,7 @@
+             // Find directions mentioned
+             for (const [dir, trigram] of Object.entries(directionMap)) {
+-                if (lower.includes(dir)) {
++                // Use word boundary to avoid partial matches (e.g. "news" matching "new")
++                // Also allow matching simple abbreviations like " SE "
++                const regex = new RegExp(`\\b${dir}\\b`, 'i');
++                if (regex.test(lower)) {
+                     // Determine action
+                     let action = { type: 'enhance', color: '#d4af37' };
+                     for (const [actionKey, actionValue] of Object.entries(actionMap)) {

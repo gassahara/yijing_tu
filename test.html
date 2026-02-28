@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daoist Fulu Renderer (Canvas)</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #d4af37;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .talisman-card {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        canvas {
+            border: 2px solid #8B0000;
+            background-color: #F5E6CA; /* Rice paper color */
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+        h3 {
+            color: #333;
+            margin: 10px 0;
+            font-family: "Kaiti", "STKaiti", serif; 
+        }
+        .meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>FDL / Canvas Renderer Output</h1>
+    <div class="container" id="canvasContainer"></div>
+
+<script>
+/**
+ * RAW DATA FROM YOUR XHRPOST
+ */
+const API_RESPONSE_DATA = {
+    "fuluContentList": [
+        {
+            "id": "fulu_004",
+            "remedyType": "fulu",
+            "talismanNameZh": "開心秘忘符",
+            "hexagramNumber": 49,
+            "type": "character_composite",
+            "sigilInstructions": [
+                { "type": "circle", "cx": 200, "cy": 200, "r": 150, "width": 2 },
+                { "type": "circle", "cx": 200, "cy": 200, "r": 100, "width": 1 },
+                { "type": "text", "text": "開", "x": 200, "y": 200, "size": 80, "quadrant": "center" }
+            ],
+            "layoutInstructions": {
+                "labels": [
+                    { "text": "開", "position": "center", "y": 110, "size": 80, "isSeal": true },
+                    { "text": "心", "position": "center", "y": 170, "size": 80, "isSeal": true },
+                    { "text": "通", "position": "center", "y": 230, "size": 80, "isSeal": true },
+                    { "text": "真", "position": "center", "y": 290, "size": 80, "isSeal": true }
+                ]
+            }
+        },
+        {
+            "id": "fs_002",
+            "remedyType": "fengshui",
+            "talismanNameZh": "葬書五行氣脈法",
+            "hexagramNumber": 49,
+            "type": "qi_retention",
+            "sigilInstructions": [
+                { 
+                    "type": "polygon", "width": 2, 
+                    "points": [[200, 50], [306, 100], [350, 200], [306, 300], [200, 350], [94, 300], [50, 200], [94, 100]] 
+                },
+                { "type": "circle", "cx": 200, "cy": 200, "r": 50, "width": 1 },
+                { "type": "text", "text": "氣", "x": 200, "y": 200, "size": 40, "quadrant": "center" },
+                { "type": "text", "text": "☰", "x": 200, "y": 70, "size": 24, "quadrant": "top" },
+                { "type": "text", "text": "☷", "x": 200, "y": 330, "size": 24, "quadrant": "bottom" },
+                { "type": "text", "text": "☵", "x": 70, "y": 200, "size": 24, "quadrant": "left" },
+                { "type": "text", "text": "☲", "x": 330, "y": 200, "size": 24, "quadrant": "right" }
+            ],
+            "layoutInstructions": {
+                "labels": [
+                    { "text": "Landform", "position": "right", "element": "wood" },
+                    { "text": "Water", "position": "bottom", "element": "fire" },
+                    { "text": "Elemental", "position": "center", "element": "earth" },
+                    { "text": "金", "position": "left", "element": "metal" },
+                    { "text": "水", "position": "top", "element": "water" },
+                    { "text": "葬", "position": "center", "y": 110, "size": 80, "isSeal": true },
+                    { "text": "書", "position": "center", "y": 170, "size": 80, "isSeal": true },
+                    { "text": "五", "position": "center", "y": 230, "size": 80, "isSeal": true },
+                    { "text": "行", "position": "center", "y": 290, "size": 80, "isSeal": true }
+                ]
+            }
+        }
+    ]
+};
+
+/**
+ * CANVAS RENDERER LOGIC
+ */
+class DaoistRenderer {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        // Logical coordinate system is 0-400 based on the input data
+        this.logicalSize = 400; 
+        this.displaySize = 400;
+        this.scale = this.displaySize / this.logicalSize;
+    }
+
+    renderAll(dataList) {
+        dataList.forEach(item => this.createCard(item));
+    }
+
+    createCard(item) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'talisman-card';
+
+        const title = document.createElement('h3');
+        title.innerText = `${item.talismanNameZh} (${item.remedyType})`;
+        
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerText = `ID: ${item.id} | Hexagram: ${item.hexagramNumber}`;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = this.displaySize;
+        canvas.height = this.displaySize;
+        
+        wrapper.appendChild(title);
+        wrapper.appendChild(meta);
+        wrapper.appendChild(canvas);
+        this.container.appendChild(wrapper);
+
+        this.drawOnCanvas(canvas, item);
+    }
+
+    drawOnCanvas(canvas, item) {
+        const ctx = canvas.getContext('2d');
+        
+        // 1. Background (Paper Texture)
+        ctx.fillStyle = item.remedyType === 'fulu' ? '#F5E6CA' : '#FFF8E1';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 2. Set Drawing Defaults
+        ctx.strokeStyle = '#8B0000'; // Cinnabar
+        ctx.fillStyle = '#8B0000';
+        ctx.lineWidth = 2;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // 3. Render Geometry (Sigil Instructions)
+        if (item.sigilInstructions) {
+            item.sigilInstructions.forEach(cmd => {
+                this.executeCommand(ctx, cmd);
+            });
+        }
+
+        // 4. Render Labels/Seals (Layout Instructions)
+        if (item.layoutInstructions && item.layoutInstructions.labels) {
+            // Filter: In the user data, sometimes seal chars in layout instructions
+            // overlap with geometry. We render them carefully.
+            item.layoutInstructions.labels.forEach(label => {
+                this.drawLabel(ctx, label);
+            });
+        }
+    }
+
+    executeCommand(ctx, cmd) {
+        ctx.beginPath();
+        
+        // Handle Colors
+        const color = cmd.color || (cmd.type === 'text' ? '#000' : '#8B0000');
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = cmd.width || 2;
+
+        switch (cmd.type) {
+            case 'circle':
+                ctx.arc(cmd.cx, cmd.cy, cmd.r, 0, Math.PI * 2);
+                if (cmd.fill) ctx.fill();
+                else ctx.stroke();
+                break;
+
+            case 'polygon':
+            case 'path':
+                if (cmd.points && cmd.points.length > 0) {
+                    ctx.moveTo(cmd.points[0][0], cmd.points[0][1]);
+                    for (let i = 1; i < cmd.points.length; i++) {
+                        ctx.lineTo(cmd.points[i][0], cmd.points[i][1]);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+                break;
+
+            case 'text':
+                // Check if this text duplicates a label (simple de-dupe)
+                if(cmd.text && cmd.text.length > 0) {
+                    ctx.font = `${cmd.size || 20}px "Kaiti", "STKaiti", serif`;
+                    ctx.fillText(cmd.text, cmd.x, cmd.y);
+                }
+                break;
+        }
+    }
+
+    drawLabel(ctx, label) {
+        // Special handling for the "Seal Characters" which are vertical
+        // The data provides explicit Y coordinates for these
+        
+        let x = 200; // Default center X
+        let y = label.y || 200; // Default center Y or explicit Y
+
+        // Handle positional keywords if X/Y not explicit
+        if (!label.y) {
+            if (label.position === 'top') y = 50;
+            if (label.position === 'bottom') y = 350;
+            if (label.position === 'left') { x = 50; y = 200; }
+            if (label.position === 'right') { x = 350; y = 200; }
+        }
+
+        ctx.save();
+        
+        // Seal characters (The vertical stack)
+        if (label.isSeal) {
+            ctx.fillStyle = '#8B0000'; // Cinnabar Red
+            ctx.font = `bold ${label.size || 60}px "Kaiti", "STKaiti", serif`;
+            // Add a slight glow for magical effect
+            ctx.shadowColor = "rgba(255, 0, 0, 0.2)";
+            ctx.shadowBlur = 5;
+        } else {
+            // Directional/Element labels (Black/Grey)
+            ctx.fillStyle = '#333';
+            ctx.font = '14px sans-serif';
+        }
+
+        ctx.fillText(label.text, x, y);
+        ctx.restore();
+    }
+}
+
+// Initialize and Run
+const renderer = new DaoistRenderer('canvasContainer');
+renderer.renderAll(API_RESPONSE_DATA.fuluContentList);
+
+</script>
+</body>
+</html>

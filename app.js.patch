@@ -1,0 +1,68 @@
+--- app.js
++++ app.js
+@@ -1187,6 +1187,27 @@
+                 // STEP 4: Bagua Medicine (Independent)
+                 this.fetchBaguaMedicine(cleanRequest, interpretation, signal);
++                
++                // STEP 5: Dedicated Advice Generation (Independent)
++                this.fetchDedicatedAdvice(baseRequest, signal);
+             }
+         } catch (e) {
+             if (e.name === 'AbortError') {
+@@ -1280,6 +1301,32 @@
+         }
+     }
+ 
++    // Helper: Fetch Dedicated Advice
++    static async fetchDedicatedAdvice(baseRequest, signal) {
++        try {
++            console.log('[AI:ADVICE] Fetching dedicated advice...');
++            
++            // We need the phase1 data (technical analysis) for the advice to be relevant
++            // If we are in this flow, we likely have access to the cached/stored interpretation
++            const phase1Mock = {
++                hexagramAnalysis: { number: this.currentReading.hex.number, names: { en: this.currentReading.hex.name_en } },
++                movingLines: { analysis: this.currentReading.lines.map((l,i) => l.isChanging ? {position: i+1} : null).filter(Boolean) },
++                // Pass the raw text context we have available
++                metadata: { queryFocus: this.currentQuestion }
++            };
++            
++            // We can reuse the 'advice' endpoint which calls generateAdviceSection
++            // It expects a request with 'question', 'hexagram', etc. (which baseRequest has)
++            // AND 'previousContext' which should be the technical analysis text.
++            
++            // Construct a rich context string from what we have
++            let contextStr = `Hexagram ${this.currentReading.hex.number}. `;
++            if (this.currentReading.equilibrium) contextStr += `Elements: ${JSON.stringify(this.currentReading.equilibrium.elements)}. `;
++            
++            // Add the existing interpretation text as context if available
++            if (this.currentReading.interpretation?.en?.celestial) contextStr += `Celestial: ${this.currentReading.interpretation.en.celestial}. `;
++            if (this.currentReading.interpretation?.en?.elements) contextStr += `Elements Analysis: ${this.currentReading.interpretation.en.elements}. `;
++            
++            const adviceReq = {
++                ...baseRequest,
++                previousContext: contextStr
++            };
++
++            const adviceData = await this.fetchSection('advice', adviceReq, 45000, signal);
++
++            if (adviceData && adviceData.advice && !signal.aborted) {
++                console.log('[AI:ADVICE] Advice received');
++                // Update the interpretation object
++                ['en', 'es', 'it', 'zh'].forEach(lang => {
++                    if (!this.currentReading.interpretation[lang]) this.currentReading.interpretation[lang] = {};
++                    this.currentReading.interpretation[lang].advice = adviceData.advice;
++                });
++                
++                // Update UI immediately if Advice section is visible
++                UI.renderAIInterpretation(this.currentReading.interpretation, this.lang);
++                this.updateStoredInterpretation();
++            }
++        } catch (e) {
++            if (e.name !== 'AbortError') console.warn('[AI:ADVICE] Failed:', e.message);
++        }
++    }
++
+     // Helper: Remedies verification
+     static async fetchRemediesVerification(remediesData, signal) {
+         try {

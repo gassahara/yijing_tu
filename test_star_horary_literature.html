@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Horary Chinese Horoscope Literature - Test</title>
+    <style>
+        body { font-family: Georgia, serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f5f0e8; color: #333; }
+        h1 { color: #8B0000; border-bottom: 2px solid #8B0000; padding-bottom: 10px; }
+        h2 { color: #4a4a4a; margin-top: 30px; }
+        h3 { color: #6b4423; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .star-box { display: inline-block; background: #8B0000; color: white; padding: 8px 15px; border-radius: 4px; margin: 5px; }
+        .formula { background: #f0e6d8; padding: 10px; border-left: 4px solid #8B0000; margin: 10px 0; font-family: monospace; }
+        .text-list { background: #faf8f5; padding: 15px; border-radius: 5px; }
+        .text-item { padding: 8px 0; border-bottom: 1px dashed #ccc; }
+        .text-item:last-child { border-bottom: none; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .comparison-table th { background: #8B0000; color: white; padding: 10px; text-align: left; }
+        .comparison-table td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .comparison-table tr:nth-child(even) { background: #faf8f5; }
+        .label { font-weight: bold; color: #6b4423; }
+        .chinese { font-family: "SimSun", "Songti SC", serif; font-size: 1.1em; }
+        .calc-result { background: #e8f4e8; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🌟 Star Horary Chinese Horoscope (Pa Gua/Ba Gua)</h1>
+    <h2>Ancient Literature Reference Database</h2>
+
+    <div class="card">
+        <h3>📚 Foundational Texts</h3>
+        <div id="foundational"></div>
+    </div>
+
+    <div class="card">
+        <h3>⚔️ San Shi (Three Styles) - Highest Horary Systems</h3>
+        <div id="sanshi"></div>
+    </div>
+
+    <div class="card">
+        <h3>⭐ Symbolic Stars (Shen Sha) in BaZi</h3>
+        <div id="shensha"></div>
+    </div>
+
+    <div class="card">
+        <h3>🏠 Environmental Horary (Di Li)</h3>
+        <div id="environmental"></div>
+    </div>
+
+    <div class="card">
+        <h3>📖 Ten Ancient Legitimate References</h3>
+        <div id="references"></div>
+    </div>
+
+    <div class="card">
+        <h3>🔮 Symbolic Star Calculator</h3>
+        <p>Select your Day Stem to calculate your symbolic stars:</p>
+        <select id="dayStem" onchange="calculateStars()">
+            <option value="">-- Select Day Stem --</option>
+            <option value="Jia">Jia (甲) - Yang Wood</option>
+            <option value="Yi">Yi (乙) - Yin Wood</option>
+            <option value="Bing">Bing (丙) - Yang Fire</option>
+            <option value="Ding">Ding (丁) - Yin Fire</option>
+            <option value="Wu">Wu (戊) - Yang Earth</option>
+            <option value="Ji">Ji (己) - Yin Earth</option>
+            <option value="Geng">Geng (庚) - Yang Metal</option>
+            <option value="Xin">Xin (辛) - Yin Metal</option>
+            <option value="Ren">Ren (壬) - Yang Water</option>
+            <option value="Gui">Gui (癸) - Yin Water</option>
+        </select>
+        <div id="starResult"></div>
+    </div>
+
+    <div class="card">
+        <h3>🌸 Peach Blossom Calculator</h3>
+        <p>Select your Zodiac Animal:</p>
+        <select id="zodiac" onchange="calculatePeachBlossom()">
+            <option value="">-- Select Zodiac --</option>
+            <option value="Rat">Rat (子)</option>
+            <option value="Ox">Ox (丑)</option>
+            <option value="Tiger">Tiger (寅)</option>
+            <option value="Rabbit">Rabbit (卯)</option>
+            <option value="Dragon">Dragon (辰)</option>
+            <option value="Snake">Snake (巳)</option>
+            <option value="Horse">Horse (午)</option>
+            <option value="Goat">Goat (未)</option>
+            <option value="Monkey">Monkey (申)</option>
+            <option value="Rooster">Rooster (酉)</option>
+            <option value="Dog">Dog (戌)</option>
+            <option value="Pig">Pig (亥)</option>
+        </select>
+        <div id="peachBlossomResult"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="chinese_metaphysics_literature.js"></script>
+    
+    <script>
+        // Display foundational texts
+        function displayFoundational() {
+            const container = document.getElementById('foundational');
+            const texts = CHINESE_METAPHYSICS_LITERATURE.foundationalTexts;
+            
+            let html = '';
+            for (const [key, text] of Object.entries(texts)) {
+                html += `
+                    <div class="text-item">
+                        <span class="label">${text.title.en}</span> 
+                        <span class="chinese">(${text.title.zh})</span><br>
+                        <small>Era: ${text.era}</small><br>
+                        <em>${text.significance}</em>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // Display San Shi systems
+        function displaySanShi() {
+            const container = document.getElementById('sanshi');
+            const systems = CHINESE_METAPHYSICS_LITERATURE.starHorarySystems;
+            
+            let html = '<table class="comparison-table">';
+            html += '<tr><th>System</th><th>Primary Text</th><th>Method</th></tr>';
+            
+            html += `<tr>
+                <td><strong>${systems.qi_men_dun_jia.name.en}</strong><br><span class="chinese">${systems.qi_men_dun_jia.name.zh}</span></td>
+                <td>${systems.qi_men_dun_jia.primaryText.title}</td>
+                <td>${systems.qi_men_dun_jia.methodology.grid}</td>
+            </tr>`;
+            
+            html += `<tr>
+                <td><strong>${systems.da_liu_ren.name.en}</strong><br><span class="chinese">${systems.da_liu_ren.name.zh}</span></td>
+                <td>${systems.da_liu_ren.primaryText.title}</td>
+                <td>${systems.da_liu_ren.methodology.board}</td>
+            </tr>`;
+            
+            html += `<tr>
+                <td><strong>${systems.zi_wei_dou_shu.name.en}</strong><br><span class="chinese">${systems.zi_wei_dou_shu.name.zh}</span></td>
+                <td>${systems.zi_wei_dou_shu.primaryText.title}</td>
+                <td>${systems.zi_wei_dou_shu.methodology.center}</td>
+            </tr>`;
+            
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        // Display Shen Sha
+        function displayShenSha() {
+            const container = document.getElementById('shensha');
+            const stars = CHINESE_METAPHYSICS_LITERATURE.baziSymbolicStars.keyStars;
+            
+            let html = '';
+            stars.forEach(star => {
+                html += `
+                    <div class="text-item">
+                        <strong>${star.translation}</strong> 
+                        <span class="chinese">(${star.name_zh})</span><br>
+                        <em>${star.meaning}</em><br>
+                        <small>Calculation: ${star.calculation}</small>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // Display Environmental Horary
+        function displayEnvironmental() {
+            const container = document.getElementById('environmental');
+            const env = CHINESE_METAPHYSICS_LITERATURE.environmentalHorary;
+            
+            let html = '<ul>';
+            html += `<li><strong>${env.flyingStar.name.en}</strong> - ${env.flyingStar.description}</li>`;
+            html += `<li><strong>${env.taiSui.name.en}</strong> - ${env.taiSui.description}</li>`;
+            html += `<li><strong>${env.sanSheng.name.en}</strong> - ${env.sanSheng.description}</li>`;
+            html += '</ul>';
+            
+            html += '<p><strong>The Three Victories (San Sheng):</strong></p>';
+            html += '<ul>';
+            env.sanSheng.factors.forEach(f => {
+                html += `<li><em>${f.name}</em>: ${f.description}</li>`;
+            });
+            html += '</ul>';
+            
+            container.innerHTML = html;
+        }
+
+        // Display Classical References
+        function displayReferences() {
+            const container = document.getElementById('references');
+            const refs = CHINESE_METAPHYSICS_LITERATURE.ancientReferences;
+            
+            let html = '<div class="text-list">';
+            refs.forEach(ref => {
+                html += `
+                    <div class="text-item">
+                        <strong>${ref.number}. ${ref.title.en}</strong> 
+                        <span class="chinese">(${ref.title.zh})</span><br>
+                        <small>Era: ${ref.era} | Focus: ${ref.focus.join(', ')}</small><br>
+                        <em>${ref.significance.substring(0, 120)}...</em>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Calculate symbolic stars
+        function calculateStars() {
+            const dayStem = document.getElementById('dayStem').value;
+            const resultDiv = document.getElementById('starResult');
+            
+            if (!dayStem) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+            
+            const noblePerson = STAR_HORARY_LITERATURE.helpers.getNoblePerson(dayStem);
+            const academicStar = STAR_HORARY_LITERATURE.helpers.getAcademicStar(dayStem);
+            
+            let html = '<div class="calc-result">';
+            html += `<h4>Results for ${dayStem} Day Master:</h4>`;
+            html += `<p><span class="star-box">Noble Person: ${noblePerson ? noblePerson.join(' & ') : 'N/A'}</span></p>`;
+            html += `<p><span class="star-box">Academic Star: ${academicStar || 'N/A'}</span></p>`;
+            html += '</div>';
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Calculate Peach Blossom
+        function calculatePeachBlossom() {
+            const zodiac = document.getElementById('zodiac').value;
+            const resultDiv = document.getElementById('peachBlossomResult');
+            
+            if (!zodiac) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+            
+            const peachBlossom = STAR_HORARY_LITERATURE.helpers.getPeachBlossom(zodiac);
+            
+            let html = '<div class="calc-result">';
+            html += `<h4>Peach Blossom for ${zodiac}:</h4>`;
+            html += `<p><span class="star-box">Peach Blossom Star: ${peachBlossom || 'N/A'}</span></p>`;
+            html += `<p><em>This represents your charisma, romance, and networking potential.</em></p>`;
+            html += '</div>';
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            displayFoundational();
+            displaySanShi();
+            displayShenSha();
+            displayEnvironmental();
+            displayReferences();
+        });
+    </script>
+</body>
+</html>

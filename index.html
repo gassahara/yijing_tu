@@ -1,168 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>易經圖 · I Ching Oracle</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tabbed-layout.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <!-- Meditation Overlay -->
-    <div id="meditation-overlay">
-        <div class="meditation-title" data-i18n="meditationTitle">冥想</div>
-        <div class="metallic-sphere"></div>
-        <div class="timer-display" id="meditation-timer">0:30</div>
-    </div>
-
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <div class="header-title">
-                <h1>☯️ I Ching Oracle 🌙</h1>
-                <p>易經 · Book of Changes · 28 Lunar Mansions · Life Palace · Five Elements</p>
+    <!-- Blocking Loading Overlay with I Ching & Laozi Quotes -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <!-- Animated Spinner -->
+            <div class="loading-spinner-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-spinner-inner"></div>
+                <div class="loading-spinner-center"></div>
             </div>
-            <div class="header-controls">
-                <div class="control-group">
-                    <label for="readingDate">🌙 Date (Lunar)</label>
-                    <input type="date" id="readingDate" onchange="App.updateReadingDate()">
-                </div>
-                <div class="control-group">
-                    <label for="readingTime">⏰ Birth Time</label>
-                    <input type="time" id="readingTime" onchange="App.updateReadingTime()">
-                </div>
-                <div class="control-group">
-                    <label for="contextMinutes">🧠 Memory</label>
-                    <select id="contextMinutes" onchange="App.updateContextMinutes(this.value)">
-                        <option value="0">Off</option>
-                        <option value="10" selected>10 min</option>
-                        <option value="30">30 min</option>
-                        <option value="60">1 hour</option>
-                        <option value="180">3 hours</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="elementTheme">🎨 Theme</label>
-                    <select id="elementTheme" onchange="App.applyTheme(this.value)">
-                        <option value="dark">🌑 Dark (Void)</option>
-                        <option value="balanced">☯️ Balanced</option>
-                        <option value="wood">🌳 Wood</option>
-                        <option value="fire">🔥 Fire</option>
-                        <option value="earth">🏔️ Earth</option>
-                        <option value="metal">⚡ Metal</option>
-                        <option value="water">💧 Water</option>
-                    </select>
-                </div>
-                <div class="control-group" style="grid-column: 1 / -1;">
-                    <div class="lang-selector">
-                        <button class="lang-btn active" data-lang="en" onclick="App.setLanguage('en')">EN</button>
-                        <button class="lang-btn" data-lang="es" onclick="App.setLanguage('es')">ES</button>
-                        <button class="lang-btn" data-lang="it" onclick="App.setLanguage('it')">IT</button>
-                        <button class="lang-btn" data-lang="zh" onclick="App.setLanguage('zh')">中文</button>
-                    </div>
+            
+            <!-- Prominent Quote Display -->
+            <div class="quote-container" id="quoteContainer">
+                <div class="quote-chinese" id="quoteChinese"></div>
+                <div class="quote-text" id="quoteText"></div>
+                <div class="quote-source" id="quoteSource"></div>
+            </div>
+            
+            <!-- Process Status -->
+            <div class="process-status">
+                <div class="process-step" id="processStep">Initializing...</div>
+                <div class="progress-container">
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
             </div>
-        </div>
-    </header>
-
-    <!-- Bagua Strip -->
-    <div class="bagua-strip-container">
-        <div class="bagua-strip">
-            <div class="bagua-strip-item" data-trigram="heaven" onclick="UI.highlightTrigram('heaven')">
-                <span class="bagua-strip-symbol">☰</span>
-                <span class="bagua-strip-name" data-i18n="trigramHeaven">Heaven</span>
-            </div>
-            <div class="bagua-strip-item" data-trigram="wind" onclick="UI.highlightTrigram('wind')">
-                <span class="bagua-strip-symbol">☴</span>
-                <span class="bagua-strip-name" data-i18n="trigramWind">Wind</span>
-            </div>
-            <div class="bagua-strip-item" data-trigram="fire" onclick="UI.highlightTrigram('fire')">
-                <span class="bagua-strip-symbol">☲</span>
-                <span class="bagua-strip-name" data-i18n="trigramFire">Fire</span>
-            </div>
-            <div class="bagua-strip-item" data-trigram="earth" onclick="UI.highlightTrigram('earth')">
-                <span class="bagua-strip-symbol">☷</span>
-                <span class="bagua-strip-name" data-i18n="trigramEarth">Earth</span>
-            </div>
-            <div class="bagua-strip-item" data-trigram="thunder" onclick="UI.highlightTrigram('thunder')">
-                <span class="bagua-strip-symbol">☳</span>
-                <span class="bagua-strip-name" data-i18n="trigramThunder">Thunder</span>
-            </div>
-            <div class="bagua-strip-item" data-trigram="water" onclick="UI.highlightTrigram('water')">
-                <span class="bagua-strip-symbol">☵</span>
-                <span class="bagua-strip-name" data-i18n="trigramWater">Water</span>
-            </div>
-            <div class="bagua-strip-item" data-trigram="mountain" onclick="UI.highlightTrigram('mountain')">
-                <span class="bagua-strip-symbol">☶</span>
-                <span class="bagua-strip-name" data-i18n="trigramMountain">Mountain</span>
-            </div>
-            <div class="bagua-strip-item" data-trigram="lake" onclick="UI.highlightTrigram('lake')">
-                <span class="bagua-strip-symbol">☱</span>
-                <span class="bagua-strip-name" data-i18n="trigramLake">Lake</span>
+            
+            <!-- Debug Console (Less Prominent) -->
+            <div class="debug-container">
+                <div class="debug-header">
+                    <span class="debug-title">System Log</span>
+                    <span class="debug-status" id="debugStatus">● Processing</span>
+                </div>
+                <div class="debug-messages" id="debugMessages"></div>
             </div>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="container">
-        <div class="main-tabs">
-            <div class="nav-tab active" onclick="App.switchMainTab('oracle')" id="tab-btn-oracle" data-i18n="oracle">Oracle</div>
-            <div class="nav-tab" onclick="App.switchMainTab('journal')" id="tab-btn-journal" data-i18n="journal">Journal</div>
-        </div>
-
-        <!-- Oracle Tab -->
-        <div id="tab-oracle" class="tab-content-panel active">
-            <div class="wizard-container">
-                <!-- Step 1: Question -->
-                <div id="step-1" class="wizard-step active">
-                    <div class="panel">
-                        <h2 class="step-title" data-i18n="step1Title">What is on your mind?</h2>
-                        <textarea id="questionInput" rows="3" placeholder="Enter your inquiry..."></textarea>
-                        <button class="btn-cast" onclick="App.startConsultation()" data-i18n="meditateCast">Meditate & Cast</button>
-                        <p class="hint-text" data-i18n="birthTimeNotice">Enter birth time for Life Palace calculation</p>
-                    </div>
-                </div>
-
-                <!-- Step 2: Meditation -->
-                <div id="step-2" class="wizard-step">
-                    <div class="meditation-container">
-                        <div class="focus-circle"></div>
-                        <p class="meditation-text" data-i18n="meditationText">Focus on your question...<br>The oracle will respond shortly.</p>
-                        <div class="timer-display" id="timerDisplay">0:30</div>
-                    </div>
-                </div>
-
-                <!-- Step 3: Results -->
-                <div id="step-3" class="wizard-step">
-                    <div id="resultsContent"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Journal Tab -->
-        <div id="tab-journal" class="tab-content-panel">
-            <div class="panel">
-                <h2 data-i18n="questionJournal">Question Journal</h2>
-                <ul id="questionList" class="question-list"></ul>
-                <div id="emptyQuestions" class="empty-state" data-i18n="noQuestions">No questions yet.</div>
-            </div>
-            <div class="panel">
-                <h2 data-i18n="readingHistory">Reading History</h2>
-                <div id="historyGrid" class="history-grid"></div>
-                <div id="emptyHistory" class="empty-state" data-i18n="noReadings">No readings yet.</div>
-            </div>
-        </div>
-    </div>
-
-    <script src="data.js"></script>
-    <script src="astrology.js"></script>
-    <script src="casting.js"></script>
-    <script src="ui.js"></script>
-    <script src="app.js"></script>
+    <!-- Redirect to main application -->
+    <script>
+        window.location.href = 'yijingtu.html';
+    </script>
 </body>
-
 </html>

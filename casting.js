@@ -1,7 +1,7 @@
 class IChingCaster {
     static async fetchHexagramData() {
         try {
-            const cached = Storage.get('iChingData_v3');
+            const cached = Storage.get('iChingData_v4');
             if (cached) {
                 return Object.values(JSON.parse(cached).hexagrams || {});
             }
@@ -10,7 +10,7 @@ class IChingCaster {
             if (!response.ok) throw new Error("Failed to fetch");
 
             const data = await response.json();
-            Storage.set('iChingData_v3', JSON.stringify(data));
+            Storage.set('iChingData_v4', JSON.stringify(data));
             return Object.values(data.hexagrams || {});
         } catch (e) {
             console.error("Could not load hexagram data:", e);
@@ -19,11 +19,19 @@ class IChingCaster {
     }
 
     static async castLines() {
-        // Fetch from quantum/random API
+        // Fetch from quantum/random API (Supabase backend handles NIST/Drand to avoid CORS)
         const response = await fetch(CONFIG.API_URL);
         if (!response.ok) throw new Error("Casting failed");
 
-        const { binaryString, timestamp } = await response.json();
+        const result = await response.json();
+        
+        // Handle new API response format (result.data.binaryString) or legacy format
+        const binaryString = result.data?.binaryString || result.binaryString;
+        const timestamp = result.data?.timestamp || result.timestamp;
+        
+        if (!binaryString) {
+            throw new Error("Invalid response: binaryString not found");
+        }
 
         // Generate 18 bits (6 lines × 3 coins)
         const rawBits = [];
@@ -47,8 +55,8 @@ class IChingCaster {
             });
         }
 
-        // Binary key is read from top to bottom (line 6 to line 1)
-        const binaryKey = [...lines].reverse().map(l => l.binary).join('');
+        // Binary key bottom-to-top (line 1 to line 6) matching DB convention
+        const binaryKey = lines.map(l => l.binary).join('');
 
         return {
             lines,
@@ -58,11 +66,44 @@ class IChingCaster {
         };
     }
 
+    // Known corrections for hexagrams with wrong binary in the DB
+    // Hex 61 (Inner Truth) is stored as 110011 (hex 28's binary) instead of 011110
+    // Hex 60 (Limitation) is stored as 010011 (hex 47's binary) instead of 011010
+    static DB_BINARY_FIXES = {
+        '011110': 61,  // Wind over Lake = Inner Truth (中孚)
+        '011010': 60   // Water over Lake = Limitation (節)
+    };
+
     static findHexagram(hexagrams, binaryKey) {
-        const hex = hexagrams.find(h => h.binary === binaryKey);
+        let hex = hexagrams.find(h => h.binary === binaryKey);
+
+        // If not found, check if it's a known DB binary mismatch
+        if (!hex && this.DB_BINARY_FIXES[binaryKey]) {
+            const correctNumber = this.DB_BINARY_FIXES[binaryKey];
+            hex = hexagrams.find(h => h.number === correctNumber);
+            if (hex) {
+                console.warn(`[findHexagram] Binary ${binaryKey} matched hex ${correctNumber} via DB correction (DB has wrong binary for this hexagram)`);
+            }
+        }
+
+        // Final fallback: match by trigram decomposition (lower=0:3, upper=3:6)
+        if (!hex) {
+            const lowerTri = binaryKey.substring(0, 3);
+            const upperTri = binaryKey.substring(3, 6);
+            hex = hexagrams.find(h => {
+                const hLower = h.binary?.substring(0, 3);
+                const hUpper = h.binary?.substring(3, 6);
+                // Check if any hexagram has matching trigrams (handles potential ordering issues)
+                return (hLower === lowerTri && hUpper === upperTri) ||
+                       (hLower === upperTri && hUpper === lowerTri);
+            });
+            if (hex) {
+                console.warn(`[findHexagram] Binary ${binaryKey} matched hex ${hex.number} via trigram fallback`);
+            }
+        }
+
         if (!hex) {
             console.error(`Hexagram not found for binary: ${binaryKey}`);
-            // Return a fallback or throw
             throw new Error(`Hexagram not found for binary: ${binaryKey}`);
         }
         return hex;

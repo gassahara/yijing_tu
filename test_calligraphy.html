@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daoist Calligraphy Generators Test</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #d4af37;
+            font-family: 'Noto Serif SC', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .canvas-card {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        canvas {
+            border: 1px solid #333;
+            background: #000;
+        }
+
+        h2 {
+            margin: 10px 0;
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin: 5px 0;
+            color: #888;
+            font-size: 0.9rem;
+        }
+    </style>
+    <!-- Load fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <h1>Daoist Calligraphy Generators</h1>
+
+    <div class="container">
+        <!-- 1. Fuwen (Inverted) -->
+        <div class="canvas-card">
+            <h2>Fuwen (倒字)</h2>
+            <p>Upside-down 'Imperial Order'</p>
+            <canvas id="canvas-fuwen" width="300" height="300"></canvas>
+        </div>
+
+        <!-- 2. Seal Script -->
+        <div class="canvas-card">
+            <h2>Seal Script (篆書)</h2>
+            <p>With Cinnabar Glow</p>
+            <canvas id="canvas-seal" width="300" height="300"></canvas>
+        </div>
+
+        <!-- 3. Worm Writing -->
+        <div class="canvas-card">
+            <h2>Worm Writing (蟲書)</h2>
+            <p>Procedural Sine-Warping</p>
+            <canvas id="canvas-worm" width="300" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Script loading -->
+    <script src="sigil_tools.js"></script>
+
+    <script>
+        const text = "勅令"; // "Order" / "Command"
+        const text2 = "道法"; // "Dao Method"
+
+        async function runTests() {
+            // 1. Fuwen
+            const c1 = document.getElementById('canvas-fuwen');
+            const ctx1 = c1.getContext('2d');
+            SigilTools.drawFuwen(ctx1, "勅令", 150, 100, 80, '#d4af37', 'flip-vertical');
+            SigilTools.drawFuwen(ctx1, "道法", 150, 220, 80, '#d4af37', 'flip-horizontal');
+
+            // 2. Seal Script
+            const c2 = document.getElementById('canvas-seal');
+            const ctx2 = c2.getContext('2d');
+            // Try to load font (will likely fall back in this test environment without the file)
+            await SigilTools.ensureSealFontLoaded();
+            SigilTools.drawSealScript(ctx2, "勅令", 150, 150, 100, '#d4af37');
+
+            // 3. Worm Writing
+            const c3 = document.getElementById('canvas-worm');
+            const ctx3 = c3.getContext('2d');
+            SigilTools.drawWormWriting(ctx3, "勅令", 150, 100, 90, '#d4af37', {
+                amplitude: 6,
+                frequency: 0.1,
+                headSize: 4
+            });
+            SigilTools.drawWormWriting(ctx3, "雷神", 150, 220, 90, '#d4af37', {
+                amplitude: 8,
+                frequency: 0.15,
+                headSize: 5,
+                phase: Math.PI
+            });
+        }
+
+        // Run after load
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+
+</html>
