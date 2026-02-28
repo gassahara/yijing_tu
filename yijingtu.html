@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>易經圖 · I Ching Oracle</title>
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="remedies.css?v=2">
+    <link rel="stylesheet" href="tabbed-layout.css?v=2">
+    <link rel="stylesheet" href="responsive.css?v=2">
+    <link rel="stylesheet" href="chinese-astrology.css?v=5.1">
+    <link rel="stylesheet" href="bazi-enhanced.css?v=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- SVG Icon Definitions -->
+    <svg style="display: none;">
+        <defs>
+            <!-- Yin-Yang Symbol (Taijitu) -->
+            <symbol id="icon-yinyang" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <path fill="currentColor" d="M12,2 A5,5 0 0,1 12,12 A5,5 0 0,0 12,22 A10,10 0 0,1 12,2 Z" />
+                <circle cx="12" cy="7" r="1.5" fill="currentColor" />
+                <circle cx="12" cy="17" r="1.5" fill="none" stroke="currentColor" stroke-width="1" />
+            </symbol>
+
+            <!-- Palace/Temple Symbol -->
+            <symbol id="icon-palace" viewBox="0 0 24 24">
+                <path fill="currentColor"
+                    d="M21 13h-1v-2h1V9l-10-5L1 9v4h1v2H1v2h22v-2h-1v-2h1v-2zM12 6.72L19.07 10H4.93L12 6.72zM5 13h2v2H5v-2zm4 0h2v2H9v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z" />
+            </symbol>
+
+            <!-- Moon Symbol -->
+            <symbol id="icon-moon" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </symbol>
+
+            <!-- Clock Symbol -->
+            <symbol id="icon-clock" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+                <path fill="currentColor" d="M12 6v6l4 2" />
+            </symbol>
+
+            <!-- Memory/Diamond Symbol -->
+            <symbol id="icon-memory" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12 2L2 12l10 10 10-10L12 2z" />
+            </symbol>
+
+            <!-- Theme/Circle Symbol -->
+            <symbol id="icon-theme" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+                <circle cx="12" cy="12" r="5" fill="currentColor" />
+            </symbol>
+
+            <!-- Circle/Dot Symbol -->
+            <symbol id="icon-circle" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="currentColor" />
+            </symbol>
+
+            <!-- Info Symbol -->
+            <symbol id="icon-info" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+                <path fill="currentColor" d="M11 7h2v2h-2V7zm0 4h2v6h-2v-6z" />
+            </symbol>
+
+            <!-- History Symbol -->
+            <symbol id="icon-history" viewBox="0 0 24 24">
+                <path fill="currentColor"
+                    d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
+            </symbol>
+
+            <!-- Trigram: Heaven (Qian) - Three solid lines -->
+            <symbol id="trigram-heaven" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+
+            <!-- Trigram: Lake (Dui) - Top broken, bottom two solid -->
+            <symbol id="trigram-lake" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+
+            <!-- Trigram: Fire (Li) - Middle solid, top and bottom broken -->
+            <symbol id="trigram-fire" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="10" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+
+            <!-- Trigram: Thunder (Zhen) - Bottom solid, top two broken -->
+            <symbol id="trigram-thunder" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+
+            <!-- Trigram: Wind (Xun) - Top two broken, bottom solid -->
+            <symbol id="trigram-wind" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="10" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+
+            <!-- Trigram: Water (Kan) - Middle broken, top and bottom solid -->
+            <symbol id="trigram-water" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+
+            <!-- Trigram: Mountain (Gen) - Top solid, bottom two broken -->
+            <symbol id="trigram-mountain" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="10" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+
+            <!-- Trigram: Earth (Kun) - Three broken lines -->
+            <symbol id="trigram-earth" viewBox="0 0 24 24">
+                <line x1="4" y1="6" x2="10" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="4" y1="18" x2="10" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+                <line x1="14" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </symbol>
+        </defs>
+    </svg>
+</head>
+
+<body>
+    <!-- Meditation Overlay -->
+    <div id="meditation-overlay" role="dialog" aria-modal="true" aria-label="Meditation session">
+        <div class="meditation-bg-accent" aria-hidden="true"></div>
+        <div class="meditation-title" data-i18n="meditationTitle">冥想</div>
+        <div class="meditation-visual-container">
+            <div class="meditation-ring ring-1" aria-hidden="true"></div>
+            <div class="meditation-ring ring-2" aria-hidden="true"></div>
+            <div class="meditation-ring ring-3" aria-hidden="true"></div>
+            <div class="metallic-sphere" aria-hidden="true"></div>
+        </div>
+        <div class="timer-display" id="meditation-timer" aria-live="polite">0:30</div>
+    </div>
+
+    <!-- Blocking Loading Overlay with I Ching & Laozi Quotes -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <!-- Animated Spinner -->
+            <div class="loading-spinner-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-spinner-inner"></div>
+                <div class="loading-spinner-center"></div>
+            </div>
+            
+            <!-- Prominent Quote Display -->
+            <div class="quote-container" id="quoteContainer">
+                <div class="quote-chinese" id="quoteChinese"></div>
+                <div class="quote-text" id="quoteText"></div>
+                <div class="quote-source" id="quoteSource"></div>
+            </div>
+            
+            <!-- Process Status -->
+            <div class="process-status">
+                <div class="process-step" id="processStep">Initializing...</div>
+                <div class="progress-container">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            
+            <!-- Debug Console (Less Prominent) -->
+            <div class="debug-container">
+                <div class="debug-header">
+                    <span class="debug-title">System Log</span>
+                    <span class="debug-status" id="debugStatus">● Processing</span>
+                </div>
+                <div class="debug-messages" id="debugMessages"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>
+                    <span class="icon" aria-hidden="true">
+                        <svg>
+                            <use href="#icon-yinyang" />
+                        </svg>
+                    </span>
+                    I Ching Oracle
+                    <span class="icon" aria-hidden="true">
+                        <svg>
+                            <use href="#icon-moon" />
+                        </svg>
+                    </span>
+                </h1>
+                <p>易經 · Book of Changes · 28 Lunar Mansions · Life Palace · Five Elements</p>
+            </div>
+            <div class="header-controls">
+                <div class="control-group">
+                    <button class="bazi-toggle-btn" onclick="App.toggleBaziWizard()" aria-label="BaZi Configuration">
+                        <span class="icon" aria-hidden="true">
+                            <svg>
+                                <use href="#icon-palace" />
+                            </svg>
+                        </span>
+                        <span data-i18n="baziSettings">BaZi Settings</span>
+                    </button>
+                </div>
+                <div class="control-group">
+                    <label for="contextMinutes" class="label-with-icon">
+                        <span class="icon" aria-hidden="true">
+                            <svg>
+                                <use href="#icon-memory" />
+                            </svg>
+                        </span>
+                        <span data-i18n="memoryLabel">Memory</span>
+                    </label>
+                    <select id="contextMinutes" onchange="App.updateContextMinutes(this.value)"
+                        aria-label="Memory duration">
+                        <option value="0" data-i18n="memoryOff">Off</option>
+                        <option value="10" selected data-i18n="memory10min">10 min</option>
+                        <option value="30" data-i18n="memory30min">30 min</option>
+                        <option value="60" data-i18n="memory1hour">1 hour</option>
+                        <option value="180" data-i18n="memory3hours">3 hours</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="label-with-icon">
+                        <span class="icon" aria-hidden="true"><svg>
+                                <use href="#icon-theme" />
+                            </svg></span>
+                        <span data-i18n="accessibilityLabel">Accessibility</span>
+                    </label>
+                    <div class="accessibility-controls">
+                        <button class="acc-btn" onclick="App.adjustFontSize(-1)" title="Decrease Text Size"
+                            aria-label="Decrease font size">A-</button>
+                        <button class="acc-btn" onclick="App.adjustFontSize(1)" title="Increase Text Size"
+                            aria-label="Increase font size">A+</button>
+                        <button class="acc-btn" id="contrastToggle" onclick="App.toggleHighContrast()"
+                            title="Toggle High Contrast" aria-label="Toggle high contrast">
+                            <svg class="icon">
+                                <use href="#icon-yinyang" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="control-group lang-selector-wrapper">
+                    <div class="lang-selector" role="group" aria-label="Language selection">
+                        <button class="lang-btn active" data-lang="en" onclick="App.setLanguage('en')"
+                            aria-pressed="true">EN</button>
+                        <button class="lang-btn" data-lang="es" onclick="App.setLanguage('es')"
+                            aria-pressed="false">ES</button>
+                        <button class="lang-btn" data-lang="it" onclick="App.setLanguage('it')"
+                            aria-pressed="false">IT</button>
+                        <button class="lang-btn" data-lang="zh" onclick="App.setLanguage('zh')"
+                            aria-pressed="false">中文</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Header Controls -->
+            <div class="mobile-header-controls">
+                <button class="hamburger-trigger mobile-only" onclick="App.toggleMobileMenu()" aria-label="Open menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <button class="bazi-toggle-btn" onclick="App.toggleBaziWizard()" aria-label="BaZi Configuration">
+                    <svg class="icon">
+                        <use href="#icon-palace" />
+                    </svg>
+                </button>
+                <button class="acc-btn" onclick="App.toggleMobileMenu()" aria-label="Settings">
+                    <svg class="icon">
+                        <use href="#icon-theme" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Hamburger Menu -->
+    <div id="mobile-menu" class="hamburger-menu" role="dialog" aria-modal="true" aria-label="Settings menu">
+        <button class="hamburger-close" onclick="App.toggleMobileMenu()" aria-label="Close menu">&times;</button>
+        <h3 data-i18n="settings">Settings</h3>
+
+        <div class="mobile-menu-section">
+            <h4 data-i18n="language">Language</h4>
+            <div class="lang-selector">
+                <button class="lang-btn" data-lang="en"
+                    onclick="App.setLanguage('en'); App.toggleMobileMenu();">EN</button>
+                <button class="lang-btn" data-lang="es"
+                    onclick="App.setLanguage('es'); App.toggleMobileMenu();">ES</button>
+                <button class="lang-btn" data-lang="it"
+                    onclick="App.setLanguage('it'); App.toggleMobileMenu();">IT</button>
+                <button class="lang-btn" data-lang="zh"
+                    onclick="App.setLanguage('zh'); App.toggleMobileMenu();">中文</button>
+            </div>
+        </div>
+
+        <div class="mobile-menu-section">
+            <h4 data-i18n="accessibility">Accessibility</h4>
+            <div class="accessibility-controls">
+                <button class="acc-btn" onclick="App.adjustFontSize(-1)">A-</button>
+                <button class="acc-btn" onclick="App.adjustFontSize(1)">A+</button>
+                <button class="acc-btn" onclick="App.toggleHighContrast()">
+                    <svg class="icon">
+                        <use href="#icon-yinyang" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile-menu-section">
+            <h4 data-i18n="memory">Memory</h4>
+            <select id="contextMinutesMobile" onchange="App.updateContextMinutes(this.value); App.toggleMobileMenu();"
+                aria-label="Memory duration">
+                <option value="0" data-i18n="memoryOff">Off</option>
+                <option value="10" selected data-i18n="memory10min">10 min</option>
+                <option value="30" data-i18n="memory30min">30 min</option>
+                <option value="60" data-i18n="memory1hour">1 hour</option>
+                <option value="180" data-i18n="memory3hours">3 hours</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- BaZi Configuration Wizard (Modal) -->
+    <div id="bazi-wizard" class="bazi-wizard-overlay" role="dialog" aria-modal="true" aria-label="BaZi Configuration">
+        <div class="bazi-wizard-content">
+            <button class="bazi-wizard-close" onclick="App.toggleBaziWizard()" aria-label="Close">&times;</button>
+            <h2 data-i18n="baziSettings">BaZi Settings</h2>
+            <div class="bazi-wizard-step">
+                <div class="bazi-control-group">
+                    <label for="readingDate" class="label-with-icon">
+                        <span class="icon" aria-hidden="true">
+                            <svg>
+                                <use href="#icon-moon" />
+                            </svg>
+                        </span>
+                        <span data-i18n="dateLabel">Date (Lunar)</span>
+                    </label>
+                    <input type="date" id="readingDate" onchange="App.updateReadingDate()"
+                        aria-label="Select reading date">
+                </div>
+                <div class="bazi-control-group">
+                    <label for="readingTime" class="label-with-icon">
+                        <span class="icon" aria-hidden="true">
+                            <svg>
+                                <use href="#icon-clock" />
+                            </svg>
+                        </span>
+                        <span data-i18n="birthTimeLabel">Birth Time</span>
+                    </label>
+                    <input type="time" id="readingTime" onchange="App.updateReadingTime()"
+                        aria-label="Select birth time">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="acc-btn" style="flex: 1;" onclick="App.setNow()" data-i18n="setNow">Now</button>
+                    <button class="btn-cast" style="flex: 2;" onclick="App.toggleBaziWizard()"
+                        data-i18n="saveSettings">Save & Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bagua Strip -->
+    <!-- Trigram Popup -->
+    <div id="trigramPopup" class="trigram-popup" role="dialog" aria-modal="false" aria-label="Trigram information">
+        <div class="trigram-popup-header">
+            <span class="trigram-popup-symbol" id="popupSymbol">
+                <svg class="icon-lg">
+                    <use href="#trigram-heaven" />
+                </svg>
+            </span>
+            <div>
+                <div class="trigram-popup-title" id="popupTitle">Heaven</div>
+                <div class="trigram-popup-chinese" id="popupChinese">乾 Qian</div>
+            </div>
+        </div>
+        <div class="trigram-popup-meaning" id="popupMeaning">创造力、刚强、父亲</div>
+        <span class="trigram-popup-element" id="popupElement">Metal</span>
+    </div>
+
+    <!-- API Loading Overlay -->
+    <div id="apiLoadingOverlay" class="api-loading-overlay" role="dialog" aria-modal="true" aria-label="Loading"
+        aria-hidden="true">
+        <div class="loading-content">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <div class="loading-text" id="loadingText">Consulting the Oracle...</div>
+            <div class="loading-subtext"><span class="loading-dots" aria-hidden="true"></span></div>
+        </div>
+    </div>
+
+    <!-- Wind Dust Container -->
+    <div id="windDustContainer" class="wind-dust-container" aria-hidden="true"></div>
+
+    <nav class="bagua-strip-container" aria-label="Eight Trigrams">
+        <div class="bagua-hex-strip" id="baguaHexStrip" role="list"></div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container">
+        <nav class="main-tabs" role="tablist" aria-label="Main navigation">
+            <button class="nav-tab active" onclick="App.switchMainTab('oracle')" id="tab-btn-oracle" data-i18n="oracle"
+                role="tab" aria-selected="true" aria-controls="tab-oracle">Oracle</button>
+            <button class="nav-tab" onclick="App.switchMainTab('analysis')" id="tab-btn-analysis" 
+                role="tab" aria-selected="false" aria-controls="tab-analysis">🔮 Analysis</button>
+            <button class="nav-tab" onclick="App.switchMainTab('journal')" id="tab-btn-journal" data-i18n="journal"
+                role="tab" aria-selected="false" aria-controls="tab-journal">Journal</button>
+        </nav>
+
+        <!-- Oracle Tab -->
+        <div id="tab-oracle" class="tab-content-panel active" role="tabpanel" aria-labelledby="tab-btn-oracle">
+            <div class="wizard-container">
+                <!-- Step 1: Question -->
+                <div id="step-1" class="wizard-step active">
+                    <section class="panel" aria-labelledby="step1-title">
+                        <h2 id="step1-title" class="step-title" data-i18n="step1Title">What is on your mind?</h2>
+                        <textarea id="questionInput" rows="3" placeholder="Enter your inquiry..."
+                            aria-label="Your question"></textarea>
+                        <button class="btn-cast" onclick="App.startConsultation()" data-i18n="meditateCast">Meditate &
+                            Cast</button>
+                        <p class="hint-text" data-i18n="birthTimeNotice">Enter birth time for Life Palace calculation
+                        </p>
+                    </section>
+                </div>
+
+                <!-- Step 2: Meditation -->
+                <div id="step-2" class="wizard-step">
+                    <section class="meditation-container" aria-label="Meditation in progress">
+                        <div class="focus-circle" aria-hidden="true"></div>
+                        <p class="meditation-text" data-i18n="meditationText">Focus on your question...<br>The oracle
+                            will respond shortly.</p>
+                        <div class="timer-display" id="timerDisplay" aria-live="polite">0:30</div>
+                    </section>
+                </div>
+
+                <!-- Step 3: Results -->
+                <div id="step-3" class="wizard-step">
+                    <nav id="resultsBookmarks" class="results-bookmarks" aria-label="Reading sections"></nav>
+                    <div class="export-panels">
+                        <!-- Main Export Panel -->
+                        <div class="export-panel">
+                            <span class="export-label">Export Reading</span>
+                            <div class="export-buttons">
+                                <button class="btn-export" onclick="App.exportReading('md')" title="Export as Markdown">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-document" />
+                                    </svg>
+                                    Markdown
+                                </button>
+                                <button class="btn-export" onclick="App.exportReading('html')" title="Export as HTML">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-globe" />
+                                    </svg>
+                                    HTML
+                                </button>
+                                <button class="btn-export btn-export-primary" onclick="App.exportReading('pdf')"
+                                    title="Export as PDF">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-pdf" />
+                                    </svg>
+                                    PDF
+                                </button>
+                                <button class="btn-export btn-export-primary" onclick="App.exportReading('pdf-full')"
+                                    title="Export Full Document with All Technical Details">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-pdf" />
+                                    </svg>
+                                    Full PDF
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Diagrams Export Panel -->
+                        <div class="export-panel">
+                            <span class="export-label">Export Diagrams</span>
+                            <div class="export-buttons">
+                                <button class="btn-export" onclick="App.exportDiagramSVG('hexagram')"
+                                    title="Export Hexagram SVG">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-hexagram" />
+                                    </svg>
+                                    Hexagram
+                                </button>
+                                <button class="btn-export" onclick="App.exportBaguaStrip('bagua')"
+                                    title="Export Bagua Strip">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-bagua" />
+                                    </svg>
+                                    Bagua
+                                </button>
+                                <button class="btn-export" onclick="App.exportElementsChart('elements')"
+                                    title="Export Elements Chart">
+                                    <svg class="icon" style="width: 16px; height: 16px;">
+                                        <use href="#icon-elements" />
+                                    </svg>
+                                    Elements
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Graphical Summary Dashboard -->
+                    <div id="graphicalSummary" class="graphical-summary" aria-label="Visual summary"></div>
+                    <section id="resultsContent" aria-label="Reading results"></section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tab - Technical Data & Astrology -->
+        <div id="tab-analysis" class="tab-content-panel" role="tabpanel" aria-labelledby="tab-btn-analysis">
+            <div class="analysis-tab-container">
+                <header class="analysis-tab-header">
+                    <h2>🔮 <span data-i18n="analysisTitle">Analysis</span> <span class="zh">分析</span></h2>
+                    <p class="analysis-subtitle" data-i18n="analysisSubtitle">Pre-Analysis · Moment Influence · Chinese Astrology</p>
+                </header>
+                
+                <!-- Sub-tabs Navigation -->
+                <nav class="analysis-sub-tabs" role="tablist" aria-label="Analysis sections">
+                    <button class="analysis-sub-tab active" onclick="App.switchAnalysisTab('preanalysis')" id="analysis-sub-tab-preanalysis" role="tab" aria-selected="true">
+                        📊 <span data-i18n="preAnalysisTab">Pre-Analysis</span>
+                    </button>
+                    <button class="analysis-sub-tab" onclick="App.switchAnalysisTab('moment')" id="analysis-sub-tab-moment" role="tab" aria-selected="false">
+                        ⚡ <span data-i18n="momentInfluenceTab">Moment Influence</span>
+                    </button>
+                    <button class="analysis-sub-tab" onclick="App.switchAnalysisTab('astrology')" id="analysis-sub-tab-astrology" role="tab" aria-selected="false">
+                        ☯ <span data-i18n="astrologyTab">Astrology</span>
+                    </button>
+                </nav>
+                
+                <!-- Sub-tab: Pre-Analysis (Technical Data) -->
+                <div id="analysis-panel-preanalysis" class="analysis-sub-panel active" role="tabpanel">
+                    <section class="analysis-section">
+                        <h3>📊 <span data-i18n="preAnalysisTab">Pre-Analysis</span> <span class="zh">預分析</span></h3>
+                        <p class="section-description" data-i18n="preAnalysisDesc">Technical divination data sent to AI for interpretation</p>
+                        <div id="preAnalysisContent">
+                            <div class="placeholder-small">
+                                <p data-i18n="castReading">Cast a reading to see technical analysis data</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Sub-tab: Moment Influence -->
+                <div id="analysis-panel-moment" class="analysis-sub-panel" role="tabpanel">
+                    <section class="analysis-section">
+                        <h3>⚡ <span data-i18n="momentInfluenceTab">Moment Influence</span> (Current Sky / BaZi) <span class="zh">天時八字</span></h3>
+                        <p class="section-description" data-i18n="momentInfluenceDesc">Current celestial influences at the moment of casting</p>
+                        
+                        <!-- BaZi Configuration Panel -->
+                        <div class="bazi-config-panel" id="baziConfigPanel">
+                            <h4>📍 <span data-i18n="locationTimeCorrection">Location & Time Correction</span> <span class="zh">真太阳时校正</span></h4>
+                            <p class="config-description" data-i18n="trueSolarTimeNote">Enter location for accurate lunar mansion and solar time correction</p>
+                            
+                            <div class="bazi-inputs-grid">
+                                <div class="bazi-input-group">
+                                    <label for="baziLatitude" data-i18n="latitude">Latitude</label>
+                                    <input type="number" id="baziLatitude" step="0.01" placeholder="e.g., 39.90" />
+                                </div>
+                                <div class="bazi-input-group">
+                                    <label for="baziLongitude" data-i18n="longitude">Longitude</label>
+                                    <input type="number" id="baziLongitude" step="0.01" placeholder="e.g., 116.40" />
+                                </div>
+                                <div class="bazi-input-group">
+                                    <label for="baziDate" data-i18n="dateLabel">Date</label>
+                                    <input type="date" id="baziDate" />
+                                </div>
+                                <div class="bazi-input-group">
+                                    <label for="baziTime" data-i18n="birthTimeLabel">Time</label>
+                                    <input type="time" id="baziTime" />
+                                </div>
+                            </div>
+                            
+                            <div class="bazi-actions">
+                                <button class="btn-detect-location" onclick="App.detectBaziLocation()">
+                                    📍 <span data-i18n="detectLocation">Detect My Location</span>
+                                </button>
+                                <button class="btn-apply-bazi" onclick="App.applyBaziConfig()">
+                                    <span data-i18n="applyRecalculate">Apply & Recalculate</span>
+                                </button>
+                            </div>
+                            
+                            <div class="bazi-correction-note">
+                                <p data-i18n="trueSolarTimeNote"><strong>真太阳时 (True Solar Time):</strong> Traditional Chinese astrology uses local apparent solar time, 
+                                not standard clock time. Longitude correction adjusts for your position east or west of the standard meridian.</p>
+                            </div>
+                        </div>
+                        
+                        <div id="momentInfluenceContent">
+                            <div class="placeholder-small">
+                                <p data-i18n="castMoment">Cast a reading to see the current celestial influences</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Sub-tab: Astrology -->
+                <div id="analysis-panel-astrology" class="analysis-sub-panel" role="tabpanel">
+                    <section class="analysis-section">
+                        <h3>☯ <span data-i18n="astrologyTab">Complete Chinese Astrology</span> <span class="zh">完整占星分析</span></h3>
+                        <p class="section-description" data-i18n="astrologyDesc">BaZi · Bagua · He Tu · Luo Shu · 28 Lunar Mansions · Tai Sui</p>
+                        <div id="analysisAstrologyLoading" class="analysis-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p data-i18n="calculatingAstro">Calculating celestial influences from API...</p>
+                        </div>
+                        <div id="analysisAstrologyContent">
+                            <div class="astrology-placeholder-compact">
+                                <p data-i18n="castAstrology">Cast a reading to generate complete Chinese astrology analysis</p>
+                                <p class="sub-text" data-i18n="mayTake">This may take 10-30 seconds...</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Journal Tab -->
+        <div id="tab-journal" class="tab-content-panel" role="tabpanel" aria-labelledby="tab-btn-journal">
+            <!-- Memory Management Buttons -->
+            <section class="panel memory-controls-panel" aria-labelledby="memory-controls-title">
+                <h2 id="memory-controls-title" data-i18n="memoryControls">Memory Controls</h2>
+                <div class="memory-buttons-row">
+                    <button class="btn-memory" onclick="App.clearHistory()" data-i18n="clearHistory"
+                        aria-label="Clear all history and questions">
+                        <svg class="icon" aria-hidden="true" style="width: 16px; height: 16px;">
+                            <use href="#icon-history" />
+                        </svg>
+                        Clear History
+                    </button>
+                    <button class="btn-memory btn-memory-clear" onclick="App.clearMemory()" data-i18n="clearMemory"
+                        aria-label="Clear memory - reset time window">
+                        <svg class="icon" aria-hidden="true" style="width: 16px; height: 16px;">
+                            <use href="#icon-memory" />
+                        </svg>
+                        Clear Memory
+                    </button>
+                </div>
+                <p class="memory-hint" data-i18n="memoryHint">
+                    Clear History removes all saved questions and readings. Clear Memory resets the time window so only
+                    new readings are considered for context.
+                </p>
+                <div id="memoryStatus" class="memory-status" data-i18n="memoryActive" style="display: none;"></div>
+            </section>
+            <section class="panel" aria-labelledby="journal-title">
+                <h2 id="journal-title" data-i18n="questionJournal">Question Journal</h2>
+                <ul id="questionList" class="question-list" role="list"></ul>
+                <div id="emptyQuestions" class="empty-state" data-i18n="noQuestions">No questions yet.</div>
+            </section>
+            <section class="panel" aria-labelledby="history-title">
+                <h2 id="history-title" data-i18n="readingHistory">Reading History</h2>
+                <div id="historyGrid" class="history-grid" role="list"></div>
+                <div id="emptyHistory" class="empty-state" data-i18n="noReadings">No readings yet.</div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Library Modules (General Purpose) -->
+    <script src="lib/fdl/fdl-core.js"></script>
+    <script src="lib/bagua/bagua-core.js"></script>
+    <script src="lib/fdl/fdl-renderer.js"></script>
+    <script src="lib/fdl/fdl-integration.js"></script>
+    <script src="lib/index.js"></script>
+    
+    <!-- Application Modules (Ad-hoc Usage) -->
+    <script src="data.js?v=2"></script>
+    <script src="chinese_metaphysics_literature.js"></script>
+    <script src="chinese-astrology-client.js?v=5.1"></script>
+    <script src="astrology.js"></script>
+    <script src="casting.js"></script>
+    <script src="sigil_tools.js"></script>
+    <script src="translation-service.js?v=2"></script>
+    <script src="translation-workflow-manager.js"></script>
+    <script src="feng-shui-dgl-spec.js"></script>
+    <script src="ui.js?v=5"></script>
+    <script src="app.js?v=7"></script>
+</body>
+
+</html>

@@ -1,0 +1,384 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ENHANCED BAZI STYLES WITH ACTIVE COMPONENT HIGHLIGHTING
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Graphical Summary Container */
+.graphical-summary {
+    margin: 0 0 20px 0;
+    background: #0a0a15;
+    border-radius: 10px;
+    border: 1px solid #d4af3744;
+    overflow: hidden;
+}
+
+.bazi-enhanced-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bazi-diagram-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.bazi-enhanced-canvas {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    aspect-ratio: 1;
+    background: #1a1a2e;
+    border-radius: 8px;
+    border: 1px solid #d4af3733;
+}
+
+.bazi-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    font-size: 12px;
+    color: #a0a0b0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    box-shadow: 0 0 4px currentColor;
+}
+
+.bazi-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.bazi-detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bazi-detail-section h4 {
+    color: #d4af37;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    margin: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #d4af3733;
+}
+
+.bazi-detail-card {
+    background: #0a0a15;
+    border: 1px solid #333340;
+    border-radius: 6px;
+    padding: 12px;
+    transition: border-color 0.2s;
+}
+
+.bazi-detail-card:hover {
+    border-color: #d4af3755;
+}
+
+.bazi-detail-card.hetu-card {
+    border-left: 3px solid #4CAF50;
+}
+
+.bazi-detail-card.luoshu-card {
+    border-left: 3px solid #2196F3;
+}
+
+.bazi-detail-card.xiantian-card {
+    border-left: 3px solid #FF9800;
+}
+
+.bazi-detail-card.houtian-card {
+    border-left: 3px solid #9C27B0;
+}
+
+.card-header {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: #d4af37;
+    margin-bottom: 8px;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.detail-row .label {
+    color: #a0a0b0;
+}
+
+.detail-row .value {
+    color: #e0e0f0;
+    font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   GRAPHICAL SUMMARY DASHBOARD STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.graphical-summary-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 15px;
+}
+
+.graphical-summary-container h4 {
+    color: #d4af37;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    margin: 0 0 12px 0;
+}
+
+.summary-hexagram-section,
+.summary-bagua-section,
+.summary-elements-section {
+    background: #0a0a15;
+    border: 1px solid #333340;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.summary-hexagram-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.hex-visual-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    background: #1a1a2e;
+    border-radius: 6px;
+}
+
+.line-mini {
+    width: 50px;
+    height: 8px;
+    background: #a0a0b0;
+    border-radius: 2px;
+    position: relative;
+}
+
+.line-mini.yin {
+    background: transparent;
+}
+
+.line-mini.yin::before,
+.line-mini.yin::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 8px;
+    background: #a0a0b0;
+    border-radius: 2px;
+}
+
+.line-mini.yin::before { left: 0; }
+.line-mini.yin::after { right: 0; }
+
+.line-mini.changing {
+    box-shadow: 0 0 6px #d4af37;
+    background: #d4af37;
+}
+
+.line-mini.yin.changing::before,
+.line-mini.yin.changing::after {
+    background: #d4af37;
+    box-shadow: 0 0 6px #d4af37;
+}
+
+.hex-info-mini {
+    flex: 1;
+}
+
+.trigram-pair {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.trigram-badge {
+    background: #1a1a2e;
+    color: #d4af37;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    border: 1px solid #d4af3744;
+}
+
+.trigram-badge.upper {
+    background: #d4af3722;
+}
+
+.trigram-badge.lower {
+    background: #8b691422;
+}
+
+.trigram-connector {
+    color: #666670;
+    font-size: 11px;
+    font-style: italic;
+}
+
+.hex-number {
+    color: #a0a0b0;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.summary-bagua-container {
+    background: #1a1a2e;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+#summaryBaguaCanvas {
+    width: 100%;
+    height: 160px;
+}
+
+.active-trigrams {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.active-label {
+    color: #a0a0b0;
+}
+
+.active-badges {
+    display: flex;
+    gap: 5px;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.badge.houtian {
+    background: #9C27B022;
+    color: #BA68C8;
+    border: 1px solid #9C27B044;
+}
+
+.badge.xiantian {
+    background: #FF980022;
+    color: #FFB74D;
+    border: 1px solid #FF980044;
+}
+
+.yin-yang-mini {
+    padding: 10px;
+}
+
+.balance-bar-mini {
+    height: 8px;
+    background: #2a2a40;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.yang-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4a90d9, #d4af37);
+    transition: width 0.3s ease;
+}
+
+.balance-labels {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: #a0a0b0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DUAL BAGUA DIAGRAM STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.dual-bagua-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.dual-bagua-canvas {
+    width: 100%;
+    aspect-ratio: 2/1;
+    background: #1a1a2e;
+    border-radius: 8px;
+    border: 1px solid #d4af3733;
+}
+
+.bagua-labels {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.bagua-label {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: #d4af37;
+    text-align: center;
+}
+
+.bagua-label .zh {
+    display: block;
+    font-size: 12px;
+    color: #a0a0b0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 600px) {
+    .graphical-summary-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .bazi-details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .bazi-legend {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .summary-hexagram-display {
+        flex-direction: column;
+        text-align: center;
+    }
+}

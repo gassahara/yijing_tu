@@ -1,0 +1,2029 @@
+/**
+ * Chinese Astrology CSS v4.3
+ * Enhanced with Feng Shui auspicious colors and improved readability
+ */
+
+:root {
+    /* Feng Shui Auspicious Colors */
+    --fs-wood: #228B22;
+    --fs-wood-light: #90EE90;
+    --fs-wood-dark: #006400;
+    
+    --fs-fire: #DC143C;
+    --fs-fire-light: #FF6B6B;
+    --fs-fire-dark: #8B0000;
+    
+    --fs-earth: #D2691E;
+    --fs-earth-light: #DEB887;
+    --fs-earth-dark: #8B4513;
+    
+    --fs-metal: #FFD700;
+    --fs-metal-light: #FFF8DC;
+    --fs-metal-dark: #B8860B;
+    --fs-metal-text: #4a4a00;
+    
+    --fs-water: #4169E1;
+    --fs-water-light: #87CEEB;
+    --fs-water-dark: #00008B;
+    
+    /* Imperial/Auspicious Accents */
+    --imperial-red: #8B0000;
+    --imperial-gold: #d4af37;
+    --imperial-gold-light: #F4E8C1;
+    --imperial-purple: #4a148c;
+    
+    /* Background gradients */
+    --bg-dark: #1a1a2e;
+    --bg-panel: linear-gradient(135deg, #f5f0e8 0%, #e8e0d0 100%);
+    --bg-wood: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    --bg-fire: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    --bg-earth: linear-gradient(135deg, #f5f5dc 0%, #e8d5b7 100%);
+    --bg-metal: linear-gradient(135deg, #fff8dc 0%, #f0e68c 100%);
+    --bg-water: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
+
+.astrology-wrapper {
+    font-family: 'Noto Serif SC', 'Crimson Pro', Georgia, serif;
+    color: #333;
+    line-height: 1.6;
+}
+
+.section {
+    background: var(--bg-panel);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    border: 2px solid #d4af37;
+    position: relative;
+    overflow: hidden;
+}
+
+.section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--imperial-red), var(--imperial-gold), var(--imperial-red));
+}
+
+.section h3 {
+    color: var(--imperial-red);
+    font-size: 1.6em;
+    margin: 0 0 25px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--imperial-gold);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section h3 .zh {
+    font-size: 0.75em;
+    color: var(--imperial-gold);
+    font-weight: 400;
+}
+
+.section h4 {
+    color: #4a4a4a;
+    margin: 20px 0 12px 0;
+    font-size: 1.2em;
+}
+
+/* ========================================
+   AYANAMSA SECTION
+   ======================================== */
+
+.ayanamsa {
+    background: var(--bg-water);
+    border-color: var(--fs-water);
+}
+
+.ayanamsa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-card {
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--fs-water);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.info-card .label {
+    display: block;
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-card .value {
+    display: block;
+    font-size: 1.4em;
+    font-weight: 600;
+    color: var(--fs-water-dark);
+}
+
+.info-card.highlight {
+    border-left-color: var(--imperial-gold);
+    background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(255,255,255,0.9) 100%);
+}
+
+.info-card.highlight .value {
+    color: var(--imperial-red);
+    font-size: 1.6em;
+}
+
+/* ========================================
+   BAZI SECTIONS
+   ======================================== */
+
+.bazi.current {
+    background: linear-gradient(135deg, #FFF8DC 0%, #F0E68C 100%);
+    border-color: var(--imperial-gold);
+}
+
+.bazi.birth {
+    background: linear-gradient(135deg, #E6F3FF 0%, #B3D9FF 100%);
+    border-color: var(--fs-water);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.section-header h3 {
+    margin: 0;
+    border: none;
+}
+
+.time-badge, .birth-badge {
+    background: linear-gradient(135deg, var(--imperial-red) 0%, #a00000 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 0.95em;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(139,0,0,0.3);
+}
+
+.birth-badge {
+    background: linear-gradient(135deg, var(--fs-water) 0%, var(--fs-water-dark) 100%);
+}
+
+/* Two Column Layout */
+.bazi-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 30px;
+}
+
+@media (max-width: 900px) {
+    .bazi-grid { grid-template-columns: 1fr; }
+}
+
+/* Pillars Table */
+.pillars-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.pillars-table th {
+    background: linear-gradient(135deg, var(--imperial-red) 0%, #6b0000 100%);
+    color: white;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.pillars-table th .sub {
+    display: block;
+    font-size: 0.75em;
+    opacity: 0.8;
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+.pillars-table td {
+    padding: 18px 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.pillars-table tr:hover { 
+    background: rgba(212,175,55,0.08);
+}
+
+.pillars-table tr.highlight.match { 
+    background: linear-gradient(90deg, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0.1) 100%);
+    animation: pulse-gold 3s infinite;
+}
+
+@keyframes pulse-gold {
+    0%, 100% { box-shadow: inset 4px 0 0 0 var(--imperial-gold); }
+    50% { box-shadow: inset 8px 0 0 0 var(--imperial-gold); }
+}
+
+.pillar-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.pillar-label .pillar-zh {
+    display: block;
+    font-size: 1.3em;
+    color: var(--imperial-red);
+}
+
+.pillar-label .pillar-en {
+    font-size: 0.85em;
+    color: #888;
+}
+
+.stem .hz, .branch .hz { 
+    display: block; 
+    font-size: 2.2em; 
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.stem .py, .branch .py { 
+    font-size: 0.9em; 
+    color: #666;
+}
+
+.stem .polarity {
+    display: inline-block;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 4px;
+}
+
+.stem .polarity.yang {
+    background: var(--fs-metal-light);
+    color: var(--fs-metal-text);
+}
+
+.stem .polarity.yin {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.stem .tg { 
+    display: block; 
+    font-size: 0.8em; 
+    background: linear-gradient(135deg, rgba(139,0,0,0.1) 0%, rgba(139,0,0,0.05) 100%);
+    color: var(--imperial-red);
+    padding: 4px 10px; 
+    border-radius: 15px; 
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+.branch .zodiac { 
+    display: block; 
+    font-size: 0.8em; 
+    color: #888;
+    margin-top: 4px;
+}
+
+.hidden .hs { 
+    display: inline-block; 
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    padding: 4px 10px; 
+    border-radius: 6px; 
+    margin: 3px; 
+    font-size: 0.9em;
+    border: 1px solid #ddd;
+}
+
+/* Element color coding */
+[data-element="Wood"] .hz { color: var(--fs-wood); text-shadow: 0 0 20px rgba(34,139,34,0.3); }
+[data-element="Fire"] .hz { color: var(--fs-fire); text-shadow: 0 0 20px rgba(220,20,60,0.3); }
+[data-element="Earth"] .hz { color: var(--fs-earth); text-shadow: 0 0 20px rgba(210,105,30,0.3); }
+[data-element="Metal"] .hz { color: #B8860B; text-shadow: 0 0 20px rgba(184,134,11,0.3); }
+[data-element="Water"] .hz { color: var(--fs-water); text-shadow: 0 0 20px rgba(65,105,225,0.3); }
+
+/* Day Master Panel */
+.daymaster-panel { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+}
+
+.dm-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    border-left: 5px solid #ccc;
+}
+
+.dm-card[data-element="Wood"] { border-left-color: var(--fs-wood); }
+.dm-card[data-element="Fire"] { border-left-color: var(--fs-fire); }
+.dm-card[data-element="Earth"] { border-left-color: var(--fs-earth); }
+.dm-card[data-element="Metal"] { border-left-color: var(--fs-metal-dark); }
+.dm-card[data-element="Water"] { border-left-color: var(--fs-water); }
+
+.dm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.dm-header h4 {
+    margin: 0;
+    color: #333;
+}
+
+.dm-header .zh {
+    color: var(--imperial-gold);
+    font-weight: 400;
+}
+
+.element-tag {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.element-tag.wood { background: var(--fs-wood-light); color: var(--fs-wood-dark); }
+.element-tag.fire { background: var(--fs-fire-light); color: var(--fs-fire-dark); }
+.element-tag.earth { background: var(--fs-earth-light); color: var(--fs-earth-dark); }
+.element-tag.metal { background: var(--fs-metal-light); color: var(--fs-metal-text); }
+.element-tag.water { background: var(--fs-water-light); color: var(--fs-water-dark); }
+
+.dm-display { 
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+    margin-bottom: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    border-radius: 12px;
+}
+
+.dm-hz { 
+    font-size: 4em; 
+    font-weight: bold;
+    color: var(--imperial-red);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.dm-name { 
+    font-size: 1.4em; 
+    font-weight: 600;
+    color: #333;
+}
+
+.dm-polarity {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 4px;
+}
+
+.dm-polarity.yang { color: var(--fs-metal-dark); }
+.dm-polarity.yin { color: #666; }
+
+.strength-bar { 
+    margin-top: 20px; 
+}
+
+.st-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.st-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.st-label .zh {
+    color: var(--imperial-gold);
+}
+
+.st-result {
+    padding: 6px 14px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.st-result.strong { background: #d4edda; color: #155724; }
+.st-result.weak { background: #f8d7da; color: #721c24; }
+.st-result.balanced { background: #fff3cd; color: #856404; }
+.st-result.moderately-strong { background: #d1ecf1; color: #0c5460; }
+
+.st-meter { 
+    height: 14px; 
+    background: #e0e0e0; 
+    border-radius: 7px; 
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.st-fill { 
+    height: 100%; 
+    background: linear-gradient(90deg, var(--imperial-red), var(--imperial-gold));
+    border-radius: 7px;
+    transition: width 0.8s ease-out;
+    box-shadow: 0 0 10px rgba(212,175,55,0.5);
+}
+
+.yong-shen { 
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(212,175,55,0.1);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ys-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.ys-element {
+    padding: 6px 14px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.ys-element.wood { background: var(--fs-wood-light); color: var(--fs-wood-dark); }
+.ys-element.fire { background: var(--fs-fire-light); color: var(--fs-fire-dark); }
+.ys-element.earth { background: var(--fs-earth-light); color: var(--fs-earth-dark); }
+.ys-element.metal { background: var(--fs-metal-light); color: var(--fs-metal-text); }
+.ys-element.water { background: var(--fs-water-light); color: var(--fs-water-dark); }
+
+/* Stars Panel */
+.stars-panel { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.stars-panel h4 { 
+    margin: 0 0 15px 0; 
+    color: var(--imperial-red);
+    font-size: 1.1em;
+}
+
+.stars-panel h4 .zh {
+    color: var(--imperial-gold);
+    font-weight: 400;
+}
+
+.stars-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.star-item { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 12px 15px; 
+    background: #f9f9f9; 
+    border-radius: 10px; 
+    border-left: 4px solid #ccc;
+    transition: all 0.3s;
+}
+
+.star-item:hover {
+    transform: translateX(5px);
+}
+
+.star-item.present { 
+    border-left-color: var(--fs-wood); 
+    background: linear-gradient(90deg, rgba(34,139,34,0.1) 0%, rgba(34,139,34,0.02) 100%);
+}
+
+.star-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.star-zh { 
+    font-weight: bold; 
+    font-size: 1.2em;
+    color: var(--imperial-red);
+}
+
+.star-name {
+    color: #555;
+}
+
+.star-loc { 
+    font-size: 0.85em; 
+    color: var(--fs-wood);
+    font-weight: 500;
+    padding: 4px 10px;
+    background: rgba(34,139,34,0.1);
+    border-radius: 12px;
+}
+
+.star-absent {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+/* ========================================
+   BAGUA DISPLAY - UI.JS INTEGRATION
+   ======================================== */
+
+.bagua-section-wrapper {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid var(--imperial-gold);
+    border-radius: 20px;
+    padding: 35px;
+    margin: 30px 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.bagua-section-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--fs-fire), var(--imperial-gold), var(--fs-water));
+}
+
+.bagua-section-title {
+    text-align: center;
+    font-size: 1.9em;
+    color: var(--imperial-gold);
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.bagua-section-title .zh {
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+    margin-left: 10px;
+}
+
+.bagua-section-subtitle {
+    text-align: center;
+    color: rgba(255,255,255,0.6);
+    font-size: 1.1em;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.bagua-arrangements-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+@media (max-width: 1000px) {
+    .bagua-arrangements-wrapper { grid-template-columns: 1fr; }
+}
+
+.bagua-arrangement {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 20px;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.bagua-arrangement.xiantian {
+    border-color: rgba(255,215,0,0.4);
+    background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+.bagua-arrangement.houtian {
+    border-color: rgba(220,20,60,0.4);
+    background: linear-gradient(135deg, rgba(220,20,60,0.1) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+.arrangement-title {
+    text-align: center;
+    font-size: 1.4em;
+    color: var(--imperial-gold);
+    margin: 0 0 5px 0;
+}
+
+.arrangement-title .zh {
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+    margin-left: 8px;
+}
+
+.arrangement-desc {
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9em;
+    margin-bottom: 25px;
+}
+
+.trigrams-display {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.arr-trigram {
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 18px;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.arr-trigram.upper {
+    border-color: var(--fs-fire);
+    background: linear-gradient(135deg, rgba(220,20,60,0.12) 0%, rgba(0,0,0,0.2) 100%);
+}
+
+.arr-trigram.lower {
+    border-color: var(--fs-water);
+    background: linear-gradient(135deg, rgba(65,105,225,0.12) 0%, rgba(0,0,0,0.2) 100%);
+}
+
+.arr-trigram.metal { border-color: #FFD700; background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(0,0,0,0.2) 100%); }
+.arr-trigram.wood { border-color: #228B22; background: linear-gradient(135deg, rgba(34,139,34,0.1) 0%, rgba(0,0,0,0.2) 100%); }
+.arr-trigram.water { border-color: #4169E1; background: linear-gradient(135deg, rgba(65,105,225,0.1) 0%, rgba(0,0,0,0.2) 100%); }
+.arr-trigram.fire { border-color: #DC143C; background: linear-gradient(135deg, rgba(220,20,60,0.1) 0%, rgba(0,0,0,0.2) 100%); }
+.arr-trigram.earth { border-color: #D2691E; background: linear-gradient(135deg, rgba(210,105,30,0.1) 0%, rgba(0,0,0,0.2) 100%); }
+
+.trig-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.trig-position {
+    font-size: 0.75em;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.trig-element-badge {
+    font-size: 0.75em;
+    padding: 4px 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+}
+
+.trig-body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 12px;
+}
+
+.trig-lines-svg {
+    width: 60px;
+    height: 54px;
+    color: var(--imperial-gold);
+}
+
+.trig-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.trig-zh {
+    font-size: 2.2em;
+    color: var(--imperial-gold);
+    line-height: 1;
+}
+
+.trig-name {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: white;
+    margin-top: 4px;
+}
+
+.trig-meaning {
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.7);
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.trig-meaning .meaning-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9em;
+}
+
+.trig-meaning .meaning-value {
+    color: rgba(255,255,255,0.9);
+    font-style: italic;
+}
+
+.arr-trigram-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 5px 0;
+}
+
+.divider-line-h {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    max-width: 80px;
+}
+
+.divider-text {
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+    font-size: 0.85em;
+    text-transform: lowercase;
+}
+
+/* ========================================
+   ENHANCED BAGUA SECTION - REORGANIZED
+   ======================================== */
+
+.bagua-enhanced {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-color: var(--imperial-gold);
+    color: white;
+    padding: 40px;
+}
+
+.bagua-enhanced::before {
+    background: linear-gradient(90deg, var(--fs-fire), var(--imperial-gold), var(--fs-water));
+}
+
+.bagua-main-header {
+    text-align: center;
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid rgba(212,175,55,0.3);
+}
+
+.bagua-main-header h3 {
+    color: var(--imperial-gold);
+    font-size: 2em;
+    margin: 0 0 10px 0;
+    border: none;
+}
+
+.bagua-main-header h3 .zh {
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+}
+
+.bagua-subtitle {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.1em;
+}
+
+/* Selected Hexagram Trigrams Display */
+.selected-hexagram-trigrams {
+    background: linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(139,0,0,0.1) 100%);
+    border: 2px solid var(--imperial-gold);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 35px;
+}
+
+.trigrams-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.3em;
+    color: var(--imperial-gold);
+}
+
+.trigrams-title .title-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.trigrams-title .title-zh {
+    margin-left: 15px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85em;
+}
+
+.trigrams-pair-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.trig-display {
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 25px;
+    min-width: 200px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.trig-display:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.trig-display.upper-trigram {
+    border-color: var(--fs-fire);
+}
+
+.trig-display.lower-trigram {
+    border-color: var(--fs-water);
+}
+
+.trig-label {
+    margin-bottom: 15px;
+}
+
+.trig-label .label-en {
+    display: block;
+    font-size: 0.8em;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+}
+
+.trig-label .label-zh {
+    display: block;
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.7);
+}
+
+.trig-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.trig-content .trig-symbol {
+    font-size: 3.5em;
+}
+
+.trig-content .trig-names {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.trig-content .name-zh {
+    font-size: 2em;
+    color: var(--imperial-gold);
+}
+
+.trig-content .name-en {
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.trig-content .trig-element {
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.trigrams-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.trigrams-divider .divider-line {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(180deg, transparent, var(--imperial-gold), transparent);
+}
+
+.trigrams-divider .divider-text {
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+}
+
+/* Two Arrangements Container */
+.arrangements-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 35px;
+}
+
+@media (max-width: 1100px) {
+    .arrangements-container { grid-template-columns: 1fr; }
+}
+
+.arrangement-panel {
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    padding: 30px;
+    border: 2px solid rgba(212,175,55,0.2);
+}
+
+.arrangement-panel.xiantian {
+    border-color: rgba(255,215,0,0.3);
+}
+
+.arrangement-panel.houtian {
+    border-color: rgba(220,20,60,0.3);
+}
+
+.arrangement-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.arrangement-header .header-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(212,175,55,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    border: 2px solid var(--imperial-gold);
+}
+
+.arrangement-header h4 {
+    color: var(--imperial-gold);
+    margin: 0;
+    font-size: 1.4em;
+}
+
+.arrangement-header h4 .zh {
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+}
+
+.arrangement-desc {
+    display: block;
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.5);
+    margin-top: 5px;
+}
+
+.arrangement-content {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.bagua-svg {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+}
+
+/* Selected Trigrams Info Cards */
+.selected-trigrams-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.trig-info-card {
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+.trig-info-card.upper {
+    border-color: var(--fs-fire);
+}
+
+.trig-info-card.lower {
+    border-color: var(--fs-water);
+}
+
+.trig-info-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: rgba(255,255,255,0.05);
+}
+
+.trig-info-card .position-label {
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.7);
+}
+
+.trig-info-card .direction-badge {
+    padding: 4px 12px;
+    background: var(--imperial-gold);
+    color: var(--imperial-red);
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.trig-info-card .card-body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.trig-info-card .symbol-large {
+    font-size: 3em;
+}
+
+.trig-info-card .names {
+    flex: 1;
+}
+
+.trig-info-card .names .zh {
+    display: block;
+    font-size: 1.5em;
+    color: var(--imperial-gold);
+}
+
+.trig-info-card .names .en {
+    display: block;
+    font-size: 1.1em;
+    color: rgba(255,255,255,0.9);
+}
+
+.trig-info-card .nature,
+.trig-info-card .season {
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.6);
+    font-style: italic;
+}
+
+.arrangement-meaning {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(212,175,55,0.1);
+    border-radius: 10px;
+    border-left: 3px solid var(--imperial-gold);
+    font-size: 0.9em;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.8);
+}
+
+.arrangement-meaning strong {
+    color: var(--imperial-gold);
+}
+
+/* Combined Hexagram Panel */
+.combined-hexagram-panel {
+    background: rgba(212,175,55,0.1);
+    border: 2px solid var(--imperial-gold);
+    border-radius: 20px;
+    padding: 35px;
+    text-align: center;
+}
+
+.hexagram-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.hexagram-title .hx-number {
+    width: 60px;
+    height: 60px;
+    background: var(--imperial-gold);
+    color: var(--imperial-red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.hexagram-title .hx-name-zh {
+    font-size: 2.2em;
+    color: var(--imperial-gold);
+}
+
+.hexagram-title .hx-name-en {
+    font-size: 1.4em;
+    color: rgba(255,255,255,0.9);
+}
+
+.hexagram-lines-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 300px;
+    margin: 0 auto 25px;
+}
+
+.hx-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+}
+
+.hx-line.yang {
+    color: var(--fs-fire-light);
+}
+
+.hx-line.yin {
+    color: rgba(255,255,255,0.5);
+}
+
+.hx-line .line-visual {
+    font-size: 1.4em;
+    letter-spacing: 2px;
+}
+
+.hx-line .line-position {
+    font-size: 0.8em;
+    color: rgba(255,255,255,0.4);
+    min-width: 50px;
+    text-align: right;
+}
+
+.gua-ci-quote {
+    font-size: 1.2em;
+    font-style: italic;
+    color: rgba(255,255,255,0.9);
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    border-left: 4px solid var(--imperial-gold);
+    text-align: left;
+}
+
+/* ========================================
+   HE TU SECTION
+   ======================================== */
+
+.hetu-enhanced {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+    border-color: var(--fs-water);
+    color: white;
+}
+
+.hetu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.hetu-header h3 {
+    color: var(--fs-water-light);
+    margin: 0;
+    border: none;
+}
+
+.hetu-header h3 .zh {
+    color: rgba(255,255,255,0.6);
+}
+
+.hetu-subtitle {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9em;
+}
+
+.hetu-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    align-items: center;
+}
+
+@media (max-width: 900px) {
+    .hetu-container { grid-template-columns: 1fr; }
+}
+
+.hetu-diagram {
+    display: flex;
+    justify-content: center;
+}
+
+.hetu-svg {
+    max-width: 380px;
+    width: 100%;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.5));
+}
+
+.hetu-data {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.hetu-numbers-card, .hetu-flow-card {
+    background: rgba(255,255,255,0.1);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid rgba(135,206,235,0.3);
+}
+
+.hetu-numbers-card h4, .hetu-flow-card h4 {
+    color: var(--fs-water-light);
+    margin: 0 0 20px 0;
+    font-size: 1.1em;
+}
+
+.hetu-numbers-card h4 .zh, .hetu-flow-card h4 .zh {
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+}
+
+.numbers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.num-item {
+    background: rgba(0,0,0,0.3);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.num-item .label {
+    display: block;
+    font-size: 0.8em;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.num-item .value {
+    display: block;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: var(--fs-water-light);
+}
+
+.num-item.highlight {
+    background: linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.05) 100%);
+    border: 1px solid var(--imperial-gold);
+}
+
+.num-item.highlight .value {
+    color: var(--imperial-gold);
+}
+
+.flow-sequence {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.flow-item {
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.flow-item.wood { background: var(--fs-wood); color: white; }
+.flow-item.fire { background: var(--fs-fire); color: white; }
+.flow-item.earth { background: var(--fs-earth); color: white; }
+.flow-item.metal { background: var(--fs-metal); color: var(--fs-metal-text); }
+.flow-item.water { background: var(--fs-water); color: white; }
+
+.flow-arrow {
+    font-size: 1.5em;
+    color: rgba(255,255,255,0.5);
+}
+
+.flow-analysis {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.flow-analysis .label {
+    color: rgba(255,255,255,0.6);
+    margin-right: 8px;
+}
+
+.flow-analysis .value {
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 15px;
+}
+
+/* ========================================
+   LUO SHU SECTION
+   ======================================== */
+
+.luoshu-enhanced {
+    background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);
+    border-color: var(--imperial-purple);
+    color: white;
+}
+
+.luoshu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.luoshu-header h3 {
+    color: #e0c3fc;
+    margin: 0;
+    border: none;
+}
+
+.luoshu-header h3 .zh {
+    color: rgba(255,255,255,0.6);
+}
+
+.luoshu-subtitle {
+    color: rgba(255,255,255,0.5);
+}
+
+.luoshu-container {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .luoshu-container { grid-template-columns: 1fr; }
+}
+
+.magic-square-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.magic-square {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background: linear-gradient(135deg, #0f0520 0%, #1a0a2e 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 0 30px rgba(212,175,55,0.1);
+    border: 2px solid rgba(212,175,55,0.3);
+}
+
+.sq-row {
+    display: flex;
+    gap: 10px;
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.cell:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(212,175,55,0.5);
+}
+
+.cell b {
+    font-size: 2.2em;
+    font-weight: bold;
+}
+
+.cell span {
+    font-size: 0.75em;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+.cell.wood { background: var(--fs-wood); border-color: var(--fs-wood-light); }
+.cell.fire { background: var(--fs-fire); border-color: var(--fs-fire-light); }
+.cell.earth { background: var(--fs-earth); border-color: var(--fs-earth-light); }
+.cell.metal { background: var(--fs-metal); border-color: var(--fs-metal-light); color: var(--fs-metal-text); }
+.cell.water { background: var(--fs-water); border-color: var(--fs-water-light); }
+
+.cell.center {
+    box-shadow: 0 0 20px rgba(212,175,55,0.5);
+    border-color: var(--imperial-gold);
+}
+
+.luoshu-note {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.6);
+    font-style: italic;
+}
+
+.luoshu-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.minggua-card {
+    padding: 25px;
+    border-radius: 16px;
+    border: 2px solid;
+    text-align: center;
+}
+
+.minggua-card h4 {
+    color: white;
+    margin: 0 0 20px 0;
+}
+
+.minggua-card h4 .zh {
+    opacity: 0.8;
+}
+
+.gua-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+
+.gua-number {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5em;
+    font-weight: bold;
+    border: 3px solid rgba(255,255,255,0.5);
+}
+
+.gua-details {
+    text-align: left;
+}
+
+.gua-trigram {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.gua-element {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.gua-binary {
+    font-family: 'Courier New', monospace;
+    opacity: 0.7;
+}
+
+.fav-dirs-card {
+    background: rgba(255,255,255,0.1);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(212,175,55,0.3);
+}
+
+.fav-dirs-card h4 {
+    color: #e0c3fc;
+    margin: 0 0 20px 0;
+}
+
+.fav-dirs-card h4 .zh {
+    opacity: 0.7;
+}
+
+.dirs-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.dir-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    border-left: 4px solid;
+}
+
+.dir-item .dir-icon {
+    font-size: 1.5em;
+}
+
+.dir-info {
+    flex: 1;
+}
+
+.dir-name {
+    display: block;
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 4px;
+}
+
+.dir-name .zh {
+    opacity: 0.8;
+}
+
+.dir-value {
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.dir-item.shengqi { border-left-color: #4CAF50; }
+.dir-item.tianyi { border-left-color: #2196F3; }
+.dir-item.yannian { border-left-color: #FF9800; }
+.dir-item.fuwei { border-left-color: #9E9E9E; }
+
+/* ========================================
+   LUNAR MANSION
+   ======================================== */
+
+.lunar-enhanced {
+    background: var(--bg-dark);
+    border-color: var(--imperial-gold);
+    padding: 0;
+    overflow: hidden;
+}
+
+.lunar-header-bar {
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lunar-header-bar h3 {
+    color: white;
+    margin: 0;
+    border: none;
+}
+
+.lunar-header-bar h3 .zh {
+    opacity: 0.8;
+}
+
+.lunar-number {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: rgba(255,255,255,0.9);
+}
+
+.lunar-card {
+    padding: 30px;
+}
+
+.lunar-main {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.lunar-symbol {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.lunar-identity {
+    flex: 1;
+}
+
+.lunar-name .hz {
+    font-size: 2em;
+    color: var(--imperial-gold);
+    margin-right: 15px;
+}
+
+.lunar-name .en {
+    font-size: 1.4em;
+    color: white;
+    font-weight: 600;
+}
+
+.lunar-group {
+    margin-top: 8px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95em;
+}
+
+.lunar-animal {
+    font-size: 3em;
+}
+
+.lunar-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.detail-item {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detail-item .label {
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+}
+
+.detail-item .value {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: white;
+}
+
+.detail-item .value.wood { color: var(--fs-wood-light); }
+.detail-item .value.fire { color: var(--fs-fire-light); }
+.detail-item .value.earth { color: var(--fs-earth-light); }
+.detail-item .value.metal { color: var(--fs-metal); }
+.detail-item .value.water { color: var(--fs-water-light); }
+
+/* ========================================
+   TAI SUI
+   ======================================== */
+
+.taisui-enhanced {
+    background: linear-gradient(135deg, #2c0b0e 0%, #4a1515 100%);
+    border-color: var(--fs-fire);
+    color: white;
+}
+
+.taisui-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.taisui-header h3 {
+    color: var(--fs-fire-light);
+    margin: 0;
+    border: none;
+}
+
+.taisui-header h3 .zh {
+    color: rgba(255,255,255,0.7);
+}
+
+.taisui-year {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95em;
+}
+
+.taisui-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+@media (max-width: 768px) {
+    .taisui-grid { grid-template-columns: 1fr; }
+}
+
+.taisui-position {
+    text-align: center;
+}
+
+.position-main {
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 30px;
+    border: 2px solid var(--fs-fire);
+}
+
+.branch-large {
+    font-size: 6em;
+    color: var(--fs-fire);
+    text-shadow: 0 0 30px rgba(220,20,60,0.5);
+    line-height: 1;
+}
+
+.branch-details {
+    margin-top: 20px;
+}
+
+.branch-name {
+    font-size: 1.4em;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.branch-direction {
+    font-size: 1.1em;
+    color: rgba(255,255,255,0.7);
+}
+
+.taisui-warnings {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.warning-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    border-left: 4px solid var(--fs-fire);
+}
+
+.warning-card.suipo {
+    border-left-color: var(--fs-metal);
+}
+
+.warning-icon {
+    font-size: 1.5em;
+}
+
+.warning-content b {
+    display: block;
+    color: var(--fs-fire-light);
+    margin-bottom: 5px;
+}
+
+.warning-content span {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95em;
+}
+
+.annual-note {
+    padding: 15px;
+    background: rgba(212,175,55,0.15);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.annual-note .note-label {
+    color: var(--imperial-gold);
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.annual-note .note-text {
+    color: rgba(255,255,255,0.8);
+}
+
+/* ========================================
+   ERROR & LOADING
+   ======================================== */
+
+.error {
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(135deg, #fee 0%, #fcc 100%);
+    color: #c00;
+    border-radius: 12px;
+    border: 2px solid #fcc;
+}
+
+.loading {
+    padding: 60px;
+    text-align: center;
+    color: var(--imperial-gold);
+    font-size: 1.3em;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.highlighted-trigram {
+    animation: pulse-trigram 2s infinite;
+}
+
+@keyframes pulse-trigram {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+}
+
+.pulse-glow {
+    animation: pulse-glow-anim 2s infinite;
+}
+
+@keyframes pulse-glow-anim {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+/* ========================================
+   ASTROLOGY TAB STYLES
+   ======================================== */
+
+.astrology-tab-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.astrology-tab-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 30px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 16px;
+    border: 2px solid var(--imperial-gold);
+}
+
+.astrology-tab-header h2 {
+    color: var(--imperial-gold);
+    margin: 0 0 10px 0;
+    font-size: 2em;
+}
+
+.astrology-tab-header h2 .zh {
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+    margin-left: 10px;
+}
+
+.astrology-subtitle {
+    color: rgba(255,255,255,0.6);
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.astrology-content {
+    min-height: 400px;
+}
+
+.astrology-placeholder {
+    text-align: center;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(139,0,0,0.05) 100%);
+    border-radius: 16px;
+    border: 2px dashed rgba(139,0,0,0.3);
+}
+
+.placeholder-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+.astrology-placeholder h3 {
+    color: var(--imperial-red);
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+.astrology-placeholder p {
+    color: #666;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+}
+
+.astrology-features {
+    list-style: none;
+    padding: 0;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.astrology-features li {
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid var(--imperial-red);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.astrology-features li strong {
+    color: var(--imperial-red);
+}
+
+.astrology-loading {
+    text-align: center;
+    padding: 60px;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(212,175,55,0.2);
+    border-top-color: var(--imperial-gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+.sub-text {
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.5);
+    margin-top: 10px;
+}
+
+/* Hide inline astrology when in tab view */
+#chineseAstrologyComplete {
+    margin-top: 20px;
+}
+
+#chineseAstrologyComplete:empty {
+    display: none !important;
+}

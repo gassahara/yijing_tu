@@ -1,0 +1,1135 @@
+
+/* Remedies Section - Fulu & Fuzhou */
+.remedies-section {
+    background: linear-gradient(135deg, #1e1b10 0%, #2a2515 100%);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 32px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (min-width: 700px) {
+    .remedies-section { 
+        padding: 28px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+@media (min-width: 900px) {
+    .remedies-section { 
+        padding: 32px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+@media (min-width: 1200px) {
+    .remedies-section { 
+        padding: 40px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+@media (min-width: 1440px) {
+    .remedies-section { 
+        padding: 48px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+.remedies-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%239C92AC' fill-opacity='0.1' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.remedies-header-wrapper {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.remedies-header-wrapper h2 {
+    color: var(--gold);
+    font-family: var(--font-zh);
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.remedies-subtitle {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 1rem;
+}
+
+.remedies-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    width: 100%;
+}
+
+/* Always 1-column layout for remedy items */
+@media (min-width: 1024px) {
+    .remedies-content {
+        gap: 40px;
+    }
+}
+
+@media (min-width: 1440px) {
+    .remedies-content {
+        gap: 48px;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+}
+
+/* ============================================================
+   REMEDY CARD WRAPPER
+   ============================================================ */
+.remedy-item-wrapper {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+@media (min-width: 700px) {
+    .remedy-item-wrapper { padding: 28px; }
+}
+@media (min-width: 900px) {
+    .remedy-item-wrapper { padding: 32px; }
+}
+
+/* ============================================================
+   REMEDY TYPE HEADER
+   ============================================================ */
+.remedy-type-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 12px;
+}
+
+.remedy-type-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--text-main);
+}
+
+.remedy-icon-circle {
+    width: 40px;
+    height: 40px;
+    background: var(--gold);
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   RELEVANCE BOX
+   ============================================================ */
+.remedy-relevance-box {
+    background: rgba(212, 175, 55, 0.08);
+    border-left: 4px solid var(--gold);
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    border-radius: 4px;
+}
+
+.relevance-label {
+    font-size: 0.8rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.remedy-relevance-box p {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* ============================================================
+   LAYOUT GRID: Canvas + Info Side
+   Always 1-column layout for better readability
+   ============================================================ */
+.remedy-layout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    flex: 1;
+}
+
+/* Larger screens: bigger containers but keep 1 column */
+@media (min-width: 700px) {
+    .remedy-layout-grid {
+        gap: 32px;
+    }
+    
+    .remedy-item-wrapper {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .remedy-layout-grid {
+        gap: 40px;
+    }
+    
+    .remedy-item-wrapper {
+        padding: 40px;
+    }
+}
+
+@media (min-width: 1440px) {
+    .remedy-layout-grid {
+        gap: 48px;
+    }
+    
+    .remedy-item-wrapper {
+        padding: 48px;
+        width: 100%;
+        max-width: none;
+    }
+}
+
+/* ============================================================
+   CANVAS CONTAINER — full width responsive
+   ============================================================ */
+.remedy-visual-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    width: 100%;
+    gap: 16px;
+}
+
+.fulu-canvas-container {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #0d0d0d;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+    border: 3px solid rgba(212, 175, 55, 0.35);
+    position: relative;
+}
+
+#fuluCanvas,
+.fulu-canvas-container canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ============================================================
+   FULU IMAGE CONTAINER — separate from canvas with zoom
+   ============================================================ */
+.fulu-image-container {
+    width: 100%;
+    margin: 0 0 16px 0;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+    border: 3px solid rgba(212, 175, 55, 0.35);
+    background: #0d0d0d;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fulu-image-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8);
+}
+
+.fulu-reference-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    background: #0d0d0d;
+}
+
+.image-zoom-hint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: var(--gold);
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.fulu-image-container:hover .image-zoom-hint {
+    opacity: 1;
+}
+
+/* ============================================================
+   IMAGE MODAL — for viewing images at full size
+   ============================================================ */
+.image-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(4px);
+}
+
+.image-modal-content {
+    position: relative;
+    max-width: 95vw;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+}
+
+.image-modal-content img {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.image-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 2.5rem;
+    cursor: pointer;
+    padding: 8px;
+    line-height: 1;
+    transition: color 0.2s ease;
+    z-index: 2;
+}
+
+.image-modal-close:hover {
+    color: var(--gold-bright, #fbbf24);
+}
+
+.image-modal-title {
+    color: var(--gold);
+    font-size: 1.1rem;
+    margin-top: 16px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* ============================================================
+   REMEDY INFO SIDE — name, description, instructions, source
+   ============================================================ */
+.remedy-info-side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    flex: 1;
+    min-width: 0; /* Prevent flex item overflow */
+}
+
+.remedy-name-title {
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 12px;
+}
+
+.remedy-name-title .zh {
+    font-family: var(--font-zh);
+    font-size: 2rem;
+    color: var(--gold);
+    font-weight: 900;
+    text-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+}
+
+.remedy-name-title .pinyin {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-left: 10px;
+}
+
+.remedy-name-title .en {
+    font-size: 1.25rem;
+    color: var(--text-main);
+    margin-top: 4px;
+    display: block;
+    font-weight: 600;
+}
+
+.remedy-description-text {
+    font-size: 1.15rem;
+    line-height: 1.85;
+    color: #f1f5f9;
+}
+
+.remedy-description-text p {
+    margin: 0 0 8px 0;
+}
+
+/* ============================================================
+   INSTRUCTIONS BOX — prominent, readable
+   ============================================================ */
+.remedy-instructions-box {
+    background: rgba(212, 175, 55, 0.06);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-left: 4px solid rgba(212, 175, 55, 0.5);
+    padding: 18px 20px;
+    border-radius: 8px;
+}
+
+.remedy-instructions-box strong {
+    color: var(--gold);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.remedy-instructions-box p {
+    margin: 0;
+    color: #e2e8f0;
+    font-size: 0.98rem;
+    line-height: 1.75;
+}
+
+/* ============================================================
+   APPLICATION & ALCHEMICAL CONTEXT BLOCKS
+   ============================================================ */
+.remedy-detail-block {
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--gold);
+    padding: 14px 18px;
+    border-radius: 4px;
+}
+
+.remedy-detail-block strong {
+    color: var(--gold);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.remedy-detail-block p {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    line-height: 1.65;
+}
+
+/* ============================================================
+   SOURCE FOOTER
+   ============================================================ */
+.remedy-source-footer {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.verif-tag {
+    color: var(--wood);
+    font-weight: 600;
+}
+
+/* ============================================================
+   FUZHOU / CHARM CONTAINER — Incantation Section
+   ============================================================ */
+.remedy-charm-container {
+    margin-top: 28px;
+    border-top: 2px solid rgba(168, 85, 247, 0.3);
+    padding-top: 24px;
+}
+
+.charm-header-label {
+    color: #c084fc;
+    font-weight: 800;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.fuzhou-title-label {
+    font-family: var(--font-zh);
+    font-size: 0.95rem;
+    color: rgba(192, 132, 252, 0.8);
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   INCANTATION SCROLL — the actual fuzhou text display
+   ============================================================ */
+.incantation-scroll {
+    width: 100%;
+    background: rgba(168, 85, 247, 0.06);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 10px;
+    padding: 24px;
+    position: relative;
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.incantation-scroll::before {
+    content: '咒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8rem;
+    opacity: 0.03;
+    color: #a855f7;
+    pointer-events: none;
+    font-family: var(--font-zh);
+}
+
+/* Charm Section Blocks */
+.charm-section-block {
+    position: relative;
+    z-index: 1;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(168, 85, 247, 0.15);
+}
+
+.charm-section-title {
+    color: rgba(192, 132, 252, 0.8);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+/* Section label (Chinese, Pinyin, Translation) shown above each block */
+.incantation-scroll .interp-subtitle {
+    color: rgba(192, 132, 252, 0.6);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* Chinese characters — large, prominent, glowing */
+.fuzhou-zh {
+    font-family: var(--font-zh);
+    font-size: 1.5rem;
+    color: #e9d5ff;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+    font-weight: 900;
+    line-height: 1.8;
+    text-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+}
+
+/* Pinyin — italic, readable */
+.fuzhou-pinyin {
+    font-size: 0.98rem;
+    color: #a5b4c8;
+    font-style: italic;
+    margin-bottom: 16px;
+    letter-spacing: 0.03em;
+    line-height: 1.6;
+}
+
+/* Translation — clear, high contrast */
+.fuzhou-trans {
+    font-size: 1.02rem;
+    color: #e2e8f0;
+    line-height: 1.7;
+    text-align: left;
+}
+
+/* ============================================================
+   SECTION ACCENT COLORS (Talisman / Fengshui / Medicine)
+   ============================================================ */
+.talisman-section { border-color: rgba(212, 175, 55, 0.3); }
+.talisman-section .remedy-icon-circle { background: var(--gold); }
+.talisman-section .remedy-relevance-box { border-left-color: var(--gold); }
+
+.fengshui-section { border-color: rgba(34, 197, 94, 0.3); }
+.fengshui-section .remedy-icon-circle { background: var(--wood); }
+.fengshui-section .remedy-relevance-box { border-left-color: var(--wood); }
+
+.medicine-section { border-color: rgba(59, 130, 246, 0.3); }
+.medicine-section .remedy-icon-circle { background: var(--water); }
+.medicine-section .remedy-relevance-box { border-left-color: var(--water); }
+
+.celestial-section { border-color: rgba(96, 165, 250, 0.3); }
+.celestial-section .remedy-icon-circle { background: var(--water); }
+.celestial-section .remedy-relevance-box { border-left-color: var(--water); }
+
+.elements-section { border-color: rgba(74, 222, 128, 0.3); }
+.elements-section .remedy-icon-circle { background: var(--wood); }
+.elements-section .remedy-relevance-box { border-left-color: var(--wood); }
+
+.core-section { border-color: rgba(251, 191, 36, 0.3); }
+.core-section .remedy-icon-circle { background: var(--gold); }
+.core-section .remedy-relevance-box { border-left-color: var(--gold); }
+
+/* ============================================================
+   LEGACY CARD STRUCTURE (talisman-card / charm-card)
+   ============================================================ */
+.talisman-card, .charm-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.talisman-card:hover, .charm-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--gold);
+}
+
+.talisman-card { border-top: 4px solid #facc15; }
+.charm-card { border-top: 4px solid #a855f7; }
+
+.talisman-header, .charm-header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.talisman-icon, .charm-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gold);
+    color: #000;
+    border-radius: 50%;
+    font-family: var(--font-zh);
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+
+.talisman-header h3, .charm-header h3 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1.2rem;
+}
+
+.talisman-body, .charm-body {
+    padding: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+/* ============================================================
+   LEGACY TEXT STYLES
+   ============================================================ */
+.talisman-instruction {
+    font-family: var(--font-zh);
+    font-size: 1.25rem;
+    color: #facc15;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    text-align: center;
+    background: rgba(255, 215, 0, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px dashed rgba(255, 215, 0, 0.3);
+}
+
+.charm-text {
+    font-family: var(--font-zh);
+    font-size: 1.15rem;
+    color: #e2e8f0;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    text-align: justify;
+}
+
+.talisman-source, .charm-source {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: right;
+    font-style: italic;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 12px;
+}
+
+.talisman-name {
+    text-align: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.talisman-name-zh {
+    font-family: var(--font-zh);
+    font-size: 2.5rem;
+    color: var(--gold);
+    font-weight: 900;
+    display: block;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    margin-bottom: 4px;
+}
+
+.talisman-name-pinyin {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.talisman-name-en {
+    font-size: 1.2rem;
+    color: var(--text-main);
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+/* ============================================================
+   CHARM SECTION BLOCKS
+   ============================================================ */
+.charm-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.charm-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.charm-label {
+    font-size: 0.8rem;
+    color: rgba(192, 132, 252, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.charm-text.chinese-text {
+    font-family: var(--font-zh);
+    font-size: 1.5rem;
+    color: #e9d5ff;
+    letter-spacing: 0.15em;
+    font-weight: 900;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+.charm-text.pinyin-text {
+    font-size: 1rem;
+    color: #a5b4c8;
+    font-style: italic;
+    letter-spacing: 0.03em;
+}
+
+.charm-text.translation-text {
+    font-size: 1rem;
+    color: #e2e8f0;
+}
+
+/* ============================================================
+   MISC
+   ============================================================ */
+.char-with-unicode {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.zh-char {
+    font-family: var(--font-zh);
+    font-size: 1.2em;
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.unicode-label {
+    font-size: 0.7em;
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+.verification-badge {
+    display: inline-block;
+    margin-left: 12px;
+    padding: 4px 10px;
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.talisman-historical-image {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+}
+
+/* Loading / Error States */
+.loading-placeholder {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--gold);
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.verifying-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--wood);
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.verif-tag.verifying {
+    color: var(--wood);
+    opacity: 0.8;
+}
+
+.verif-tag.verified {
+    color: var(--wood);
+    font-weight: 700;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* ============================================================
+   BAGUA MEDICINE DIAGRAM
+   ============================================================ */
+.bagua-medicine-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .bagua-medicine-layout {
+        grid-template-columns: minmax(280px, 1fr) 2fr;
+    }
+}
+
+.bagua-diagram-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.bagua-medicine-canvas {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 8px;
+}
+
+.bagua-diagram-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.legend-item .legend-color {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid;
+}
+
+.legend-item.favorable .legend-color {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: #4CAF50;
+}
+
+.legend-item.unfavorable .legend-color {
+    background: rgba(244, 67, 54, 0.3);
+    border-color: #F44336;
+}
+
+/* Feng Shui directions display */
+.feng-directions {
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.feng-favorable {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.feng-favorable strong {
+    color: var(--gold);
+}
+
+.feng-unfavorable {
+    color: #F44336;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.feng-unfavorable strong {
+    color: var(--gold);
+}
+
+.feng-guidance {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Bagua Medicine blocks */
+.bagua-med-block {
+    margin-bottom: 20px;
+}
+
+.bagua-med-title {
+    color: var(--gold);
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.medicine-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.medicine-item:last-child {
+    border-bottom: none;
+}
+
+.medicine-item strong {
+    color: var(--water);
+}
+
+
+/* ============================================================
+   XIANTIAN (EARLY HEAVEN) SECTION
+   ============================================================ */
+.xiantian-section-wrapper {
+    background: linear-gradient(135deg, #1a0a1a 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 32px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.xiantian-header {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.xiantian-header h2 {
+    color: #FF9800;
+    font-family: var(--font-zh);
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+}
+
+.xiantian-subtitle {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 1rem;
+}
+
+.xiantian-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .xiantian-layout {
+        grid-template-columns: minmax(280px, 1fr) 2fr;
+    }
+}
+
+.xiantian-diagram-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(10, 10, 26, 0.6);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.xiantian-canvas {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 8px;
+}
+
+.xiantian-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.xiantian-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.xiantian-legend-item .legend-color {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #FF9800;
+}
+
+.xiantian-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.xiantian-section {
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid #FF9800;
+    padding: 16px 20px;
+    border-radius: 8px;
+}
+
+.xiantian-section h4 {
+    color: #FF9800;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.xiantian-section p {
+    color: var(--text-main);
+    line-height: 1.7;
+    font-size: 1rem;
+}
