@@ -325,7 +325,7 @@
 [data-element="Metal"] .hz { color: #B8860B; text-shadow: 0 0 20px rgba(184,134,11,0.3); }
 [data-element="Water"] .hz { color: var(--fs-water); text-shadow: 0 0 20px rgba(65,105,225,0.3); }
 
-/* Day Master Panel */
+/* master of day Panel */
 .daymaster-panel { 
     display: flex; 
     flex-direction: column; 

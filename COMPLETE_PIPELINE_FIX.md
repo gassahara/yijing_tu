@@ -207,7 +207,7 @@ if (section.includes('celestial') || section.includes('bazi') || section.include
 
 ### Before (Broken)
 ```
-UI shows: Day Master 甲 (Jia Wood), Strong, Yong Shen Earth
+UI shows: master of day 甲 (Jia Wood), Strong, Yong Shen Earth
      ↓
 baseRequest.buildSectionRequest() [partial data]
      ↓
@@ -215,12 +215,12 @@ optimizeJSONForAPI() [strips more data]
      ↓
 AI receives: { strength: "Strong", day: { stem: "Jia" } }
      ↓
-AI says: "Day Master strength is unknown"
+AI says: "master of day strength is unknown"
 ```
 
 ### After (Fixed)
 ```
-UI shows: Day Master 甲 (Jia Wood), Strong, Yong Shen Earth
+UI shows: master of day 甲 (Jia Wood), Strong, Yong Shen Earth
      ↓
 baseRequest.buildSectionRequest() [complete data with all pillars]
      ↓
@@ -228,7 +228,7 @@ optimizeJSONForAPI(compactBazi: false) [preserves data]
      ↓
 AI receives: { dayMaster: {stem: "Jia", element: "Wood"}, strength: {...}, year: {...}, month: {...}, day: {...}, hour: {...} }
      ↓
-AI says: "Strong Wood Day Master (Jia 甲) supported by Earth Yong Shen..."
+AI says: "Strong Wood master of day (Jia 甲) supported by Earth Yong Shen..."
 ```
 
 ---
@@ -259,7 +259,7 @@ With complete data, the AI should now generate:
 ```
 Guía Celestial 天時八字
 
-The sky reveals a Strong Wood Day Master (Jia 甲) born in the month 
+The sky reveals a Strong Wood master of day (Jia 甲) born in the month 
 of Geng-Yin (Metal-Wood), with the following four-pillar configuration:
 
 Year Pillar (Annual Influence): Bing-Wu (Fire-Fire) 丙午
@@ -282,5 +282,5 @@ cultivation rather than aggressive expansion...
 - ✅ Elemental analysis uses real BaZi elements with generating/controlling cycles
 - ✅ Seasonal influences (Month pillar) correctly factored
 - ✅ Hidden stems (branch contents) now available for deep analysis
-- ✅ Day Master polarity (Yang/Yin) included
+- ✅ master of day polarity (Yang/Yin) included
 - ✅ Favorable/Unfavorable elements properly passed

@@ -34,7 +34,7 @@ UI.formatTrigramBadge(trigramObject, 'es');
 ### BaZi Badges
 - **Stem badges** - Gold background with Chinese character
 - **Branch badges** - Blue background with Chinese character
-- **Day Master badge** - Combined display with element
+- **master of day badge** - Combined display with element
 
 Usage:
 ```javascript
@@ -86,7 +86,7 @@ UI.formatYinYangBadge(false, 'es'); // Yin
 
 ### Astrology Summary Display
 Astrology context now renders with proper badges:
-- Day Master with element badge
+- master of day with element badge
 - Lunar Mansion with animal emoji
 - Tai Sui with yang badge
 - Life Gua as hexagram badge
@@ -94,7 +94,7 @@ Astrology context now renders with proper badges:
 ### Before vs After
 **Before**:
 ```
-Day Master: 乙 Yi (Wood) • Lunar Mansion: 房 Fang (Rabbit)
+master of day: 乙 Yi (Wood) • Lunar Mansion: 房 Fang (Rabbit)
 ```
 
 **After**:
@@ -185,7 +185,7 @@ es: {
 - [ ] Element badges display correctly in all languages
 - [ ] Five Elements bars show proper colors and badges
 - [ ] Dominant/deficient elements have visual indicators
-- [ ] Celestial section shows badges for Day Master, Mansion, etc.
+- [ ] Celestial section shows badges for master of day, Mansion, etc.
 - [ ] Trigram badges display with correct colors
 - [ ] Fulu section has proper styling and layout
 - [ ] Section cards have color-coded headers

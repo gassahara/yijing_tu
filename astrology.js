@@ -12,7 +12,7 @@ class Astrology {
         if (longitude !== null) {
             adjustedDate = this.calculateTrueSolarTime(date, longitude);
         }
-        
+
         const start = new Date(adjustedDate.getFullYear(), 0, 0);
         const diff = adjustedDate - start;
         const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -28,7 +28,7 @@ class Astrology {
                 break;
             }
         }
-        
+
         // Add location info if provided
         if (latitude !== null && longitude !== null) {
             return {
@@ -37,10 +37,10 @@ class Astrology {
                 calculationMethod: 'trueSolarTime'
             };
         }
-        
+
         return mansion;
     }
-    
+
     /**
      * Calculate True Solar Time (真太阳时) from standard time and longitude
      * @param {Date} standardDate - Standard clock time
@@ -51,7 +51,7 @@ class Astrology {
         const standardMeridian = 120; // Beijing time uses 120°E
         const longitudeDiff = longitude - standardMeridian;
         const minutesCorrection = longitudeDiff * 4; // 4 minutes per degree
-        
+
         return new Date(standardDate.getTime() + minutesCorrection * 60000);
     }
 
@@ -79,7 +79,7 @@ class Astrology {
         // 1. Year Pillar
         // BaZi year changes at Li Chun (approx Feb 4)
         const year = birthDate.getFullYear();
-        let liChun = new Date(year, 1, 4); 
+        let liChun = new Date(year, 1, 4);
         // Adjustment: Year starts from Jia-Zi (1924, 1984, 2044)
         // 1900 was Geng-Zi (Stem 6, Branch 0)
         let baziYear = year;
@@ -105,12 +105,12 @@ class Astrology {
             { m: 10, d: 7 }, // Nov: Li Dong (approx Nov 7) -> Hai month
             { m: 11, d: 7 }  // Dec: Da Xue (approx Dec 7) -> Zi month
         ];
-        
+
         let baziMonthIdx = birthDate.getMonth();
         if (birthDate.getDate() < monthStarts[baziMonthIdx].d) {
             baziMonthIdx = (baziMonthIdx + 11) % 12;
         }
-        
+
         // Month Branch: Feb is Yin (2), Jan is Chou (1), Dec is Zi (0)
         const monthBranchIdx = (baziMonthIdx + 1) % 12;
         // Month Stem calculation: (Year Stem * 2 + Month Branch) % 10
@@ -135,9 +135,9 @@ class Astrology {
             hour: { stem: HEAVENLY_STEMS[hourStemIdx], branch: EARTHLY_BRANCHES[hourBranchIdx] }
         };
 
-        // Day Master is the Day Stem
+        // master of day is the Day Stem
         const dayMaster = chart.day.stem;
-        
+
         // Calculate Ten Gods for each pillar
         const calculateTenGod = (targetStem, dm) => {
             const relations = {
@@ -147,7 +147,7 @@ class Astrology {
                 "Controlled": { same: "Indirect Wealth", diff: "Direct Wealth" },
                 "Controls": { same: "Seven Killings", diff: "Direct Officer" }
             };
-            
+
             let relation;
             if (targetStem.element === dm.element) relation = "Same";
             else if (FIVE_ELEMENTS[dm.element].produces === targetStem.element) relation = "Produced";
@@ -182,9 +182,9 @@ class Astrology {
     static analyzeStrength(chart) {
         const dm = chart.day.stem;
         const season = chart.month.branch;
-        
+
         let score = 0;
-        
+
         // 1. Season Support (The most important factor in Zi Ping)
         if (season.element === dm.element) score += 40; // Same element
         else if (FIVE_ELEMENTS[season.element].produces === dm.element) score += 30; // Season produces DM
@@ -216,7 +216,7 @@ class Astrology {
         let yongShen = "";
         if (result === "Strong") {
             // Need to weaken: find what DM overcomes or what overcomes DM
-            yongShen = FIVE_ELEMENTS[dm.element].overcomes; 
+            yongShen = FIVE_ELEMENTS[dm.element].overcomes;
         } else if (result === "Weak") {
             // Need to strengthen: find what produces DM or same element
             yongShen = dm.element;
@@ -257,20 +257,20 @@ class Astrology {
     static getXiantianAnalysis(chart) {
         const xiantianTrigrams = {
             Qian: { name: 'Qian', zh: '乾', dir: 'S', binary: '111', element: 'Heaven', spiritual: 'Pure Yang / Spirit (Shen)', number: 6 },
-            Dui:  { name: 'Dui', zh: '兌', dir: 'SE', binary: '011', element: 'Metal', spiritual: 'Soul (Hun) / Joy', number: 7 },
-            Li:   { name: 'Li', zh: '離', dir: 'E', binary: '101', element: 'Fire', spiritual: 'Intention (Yi) / Clarity', number: 9 },
+            Dui: { name: 'Dui', zh: '兌', dir: 'SE', binary: '011', element: 'Metal', spiritual: 'Soul (Hun) / Joy', number: 7 },
+            Li: { name: 'Li', zh: '離', dir: 'E', binary: '101', element: 'Fire', spiritual: 'Intention (Yi) / Clarity', number: 9 },
             Zhen: { name: 'Zhen', zh: '震', dir: 'NE', binary: '001', element: 'Wood', spiritual: 'Will (Zhi) / Arousing', number: 3 },
-            Kun:  { name: 'Kun', zh: '坤', dir: 'N', binary: '000', element: 'Earth', spiritual: 'Pure Yin / Body (Jing)', number: 2 },
-            Gen:  { name: 'Gen', zh: '艮', dir: 'NW', binary: '100', element: 'Earth', spiritual: 'Intuition (Po) / Stillness', number: 8 },
-            Kan:  { name: 'Kan', zh: '坎', dir: 'W', binary: '010', element: 'Water', spiritual: 'Vitality (Jing) / Danger', number: 1 },
-            Xun:  { name: 'Xun', zh: '巽', dir: 'SW', binary: '110', element: 'Wind', spiritual: 'Breath (Qi) / Gentle', number: 4 }
+            Kun: { name: 'Kun', zh: '坤', dir: 'N', binary: '000', element: 'Earth', spiritual: 'Pure Yin / Body (Jing)', number: 2 },
+            Gen: { name: 'Gen', zh: '艮', dir: 'NW', binary: '100', element: 'Earth', spiritual: 'Intuition (Po) / Stillness', number: 8 },
+            Kan: { name: 'Kan', zh: '坎', dir: 'W', binary: '010', element: 'Water', spiritual: 'Vitality (Jing) / Danger', number: 1 },
+            Xun: { name: 'Xun', zh: '巽', dir: 'SW', binary: '110', element: 'Wind', spiritual: 'Breath (Qi) / Gentle', number: 4 }
         };
 
         // Map stems/branches to Xiantian trigrams based on elemental resonance
         const getTrigramForPillar = (pillar) => {
             const element = pillar.stem.element;
             const polarity = pillar.stem.polarity;
-            
+
             // Yang elements map to Yang trigrams, Yin to Yin
             const mapping = {
                 'Wood': polarity === 'Yang' ? 'Zhen' : 'Xun',
@@ -279,7 +279,7 @@ class Astrology {
                 'Metal': polarity === 'Yang' ? 'Qian' : 'Dui',
                 'Water': polarity === 'Yang' ? 'Kan' : 'Kan' // Kan is middle yin
             };
-            
+
             return xiantianTrigrams[mapping[element]];
         };
 
@@ -414,7 +414,7 @@ class Astrology {
         const getHetuNumber = (pillar) => {
             const stemIdx = HEAVENLY_STEMS.findIndex(s => s.zh === pillar.stem.zh);
             const branchIdx = EARTHLY_BRANCHES.findIndex(b => b.zh === pillar.branch.zh);
-            
+
             // Simplified mapping: use (stem + branch) % 10 + 1
             let num = ((stemIdx + branchIdx) % 10) + 1;
             return num;
@@ -451,7 +451,7 @@ class Astrology {
     static analyzeHetuCycles(numbers, hetuNumbers) {
         const nums = Object.values(numbers);
         const elements = nums.map(n => hetuNumbers[n].element);
-        
+
         // Count element frequencies
         const elementCount = {};
         elements.forEach(e => { elementCount[e] = (elementCount[e] || 0) + 1; });
@@ -459,9 +459,9 @@ class Astrology {
         // Check for generation support
         const generationSupport = [];
         const elementPairs = [
-          [elements[0], elements[1]], // Year-Month
-          [elements[1], elements[2]], // Month-Day
-          [elements[2], elements[3]]  // Day-Hour
+            [elements[0], elements[1]], // Year-Month
+            [elements[1], elements[2]], // Month-Day
+            [elements[2], elements[3]]  // Day-Hour
         ];
 
         elementPairs.forEach(([from, to], idx) => {
@@ -487,7 +487,7 @@ class Astrology {
     static assessHetuBalance(elementCount) {
         const total = Object.values(elementCount).reduce((a, b) => a + b, 0);
         const max = Math.max(...Object.values(elementCount));
-        
+
         if (max / total > 0.6) return 'Imbalanced - one element dominant';
         if (max / total > 0.4) return 'Moderately balanced';
         return 'Well balanced';
@@ -507,12 +507,12 @@ class Astrology {
         };
 
         // Determine path type based on element flow
-        const elements = [path.foundation.element, path.development.element, 
-                         path.essence.element, path.expression.element];
-        
+        const elements = [path.foundation.element, path.development.element,
+        path.essence.element, path.expression.element];
+
         let pathType = 'Variable';
         const uniqueElements = new Set(elements).size;
-        
+
         if (uniqueElements === 1) pathType = 'Focused (单一)';
         else if (uniqueElements === 2) pathType = 'Dual (二元)';
         else if (uniqueElements === 4) pathType = 'Diverse (多元)';
@@ -523,7 +523,7 @@ class Astrology {
     static getElementalGenerationFlow(chart, hetuNumbers, pillarNumbers) {
         // Analyze how elements generate/support each other in the chart
         const dayMaster = chart.day.stem.element;
-        
+
         const flow = {
             dayMaster,
             supportedBy: [],
@@ -533,7 +533,7 @@ class Astrology {
 
         ['year', 'month', 'hour'].forEach(pillar => {
             const pElement = hetuNumbers[pillarNumbers[pillar]].element;
-            
+
             if (FIVE_ELEMENTS[pElement]?.produces === dayMaster) {
                 flow.supportedBy.push({ pillar, element: pElement });
             }
@@ -622,7 +622,7 @@ class Astrology {
     static calculateLuoshuPalaces(numbers, luoshuElements) {
         // Map each pillar to its palace position in the 9-grid
         const positions = {};
-        
+
         Object.entries(numbers).forEach(([pillar, num]) => {
             const info = luoshuElements[num];
             positions[pillar] = {
@@ -650,11 +650,11 @@ class Astrology {
         };
 
         const pairs = [['year', 'month'], ['month', 'day'], ['day', 'hour']];
-        
+
         pairs.forEach(([from, to]) => {
             const fromEl = pillarElements[from];
             const toEl = pillarElements[to];
-            
+
             if (overcomes[fromEl] === toEl) {
                 controlCycles.push({
                     type: 'controls',
@@ -682,7 +682,7 @@ class Astrology {
         // Simplified version using branch index
         const branchIdx = EARTHLY_BRANCHES.findIndex(b => b.zh === yearBranch.zh);
         const baseNum = (branchIdx % 9) + 1;
-        
+
         return {
             number: baseNum,
             element: ['Water', 'Earth', 'Wood', 'Wood', 'Earth', 'Metal', 'Metal', 'Earth', 'Fire'][baseNum - 1],
@@ -708,7 +708,7 @@ class Astrology {
 
     static getLuoshuFengshui(numbers, luoshuElements, mingGua) {
         const dayPalace = luoshuElements[numbers.day];
-        
+
         return {
             dayMasterPosition: {
                 palace: dayPalace.direction,
@@ -717,8 +717,8 @@ class Astrology {
             },
             mingGuaPosition: mingGua,
             favorableSectors: mingGua.favorableDirections,
-            annualAdvice: `Your day master resides in the ${dayPalace.direction} palace (${dayPalace.element} element). ` +
-                         `Favor the ${mingGua.favorableDirections.shengQi} direction for new ventures.`
+            annualAdvice: `Your master of day resides in the ${dayPalace.direction} palace (${dayPalace.element} element). ` +
+                `Favor the ${mingGua.favorableDirections.shengQi} direction for new ventures.`
         };
     }
 
@@ -735,7 +735,7 @@ class Astrology {
     static getDirectionalAdvice(numbers, luoshuElements) {
         const dayDir = luoshuElements[numbers.day].direction;
         const hourDir = luoshuElements[numbers.hour].direction;
-        
+
         return {
             favorable: [dayDir, luoshuElements[numbers.month].direction],
             personal: dayDir,
@@ -751,7 +751,7 @@ class Astrology {
 
     static getComprehensiveBaziAnalysis(date, time = "12:00") {
         const chart = this.getBaziChart(date, time);
-        
+
         return {
             chart,
             xiantian: this.getXiantianAnalysis(chart),
@@ -789,18 +789,18 @@ class Astrology {
 
     static generateRecommendations(xiantian, hetu, luoshu) {
         const recs = [];
-        
+
         // Based on Xiantian
         recs.push(`Spiritual focus: ${xiantian.neidanGuidance.focus}`);
         recs.push(`Cultivation: ${xiantian.congenitalNature.cultivationFocus}`);
-        
+
         // Based on Hetu
         recs.push(`Life path: ${hetu.lifePath.pathType} - embrace your elemental flow`);
-        
+
         // Based on Luoshu
         const favDir = luoshu.mingGua.favorableDirections.shengQi;
         recs.push(`Feng Shui: Face ${favDir} for important activities`);
-        
+
         return recs;
     }
 }

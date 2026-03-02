@@ -82,7 +82,7 @@ For every 15° of longitude difference = 1 hour correction
 
 #### Xian Tian (先天) - Pre-Heaven
 - Congenital nature, spiritual essence
-- Personal trigram based on Day Master
+- Personal trigram based on master of day
 - Elemental flow pattern
 
 #### Hou Tian (后天) - Post-Heaven  
@@ -108,7 +108,7 @@ For every 15° of longitude difference = 1 hour correction
 #### Personal Numbers
 - Year/Month/Day/Hour numbers
 - Life Number (sum reduced to 1-9)
-- Destiny Number (from Day Master)
+- Destiny Number (from master of day)
 
 #### Elemental Flow Analysis
 - Sequence through pillars

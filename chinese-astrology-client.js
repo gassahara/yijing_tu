@@ -5,12 +5,12 @@
 
 const CHINESE_ASTROLOGY_API = {
     baseUrl: "https://vflkhntzwfovnuyccxow.supabase.co/functions/v1/bazi-astrol",
-    
+
     async calculate(params) {
         try {
             const response = await fetch(`${this.baseUrl}/chinese-astrology`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
@@ -23,19 +23,19 @@ const CHINESE_ASTROLOGY_API = {
             return this.calculateLocal(params);
         }
     },
-    
+
     calculateLocal(params) {
         const date = new Date(params.date);
         const year = date.getFullYear();
         const stems = ['Jia', 'Yi', 'Bing', 'Ding', 'Wu', 'Ji', 'Geng', 'Xin', 'Ren', 'Gui'];
         const branches = ['Zi', 'Chou', 'Yin', 'Mao', 'Chen', 'Si', 'Wu', 'Wei', 'Shen', 'You', 'Xu', 'Hai'];
-        
+
         return {
             data: {
                 timestamp: new Date().toISOString(),
                 bazi: {
-                    year: { stem: { name: stems[(year-4)%10], zh: '甲', element: 'Wood', polarity: 'Yang' }, branch: { name: branches[(year-4)%12], zh: '寅', element: 'Wood', zodiac: 'Tiger' }, hiddenStems: ['甲'] },
-                    month: { stem: { name: stems[(year-2)%10], zh: '丙', element: 'Fire', polarity: 'Yang' }, branch: { name: branches[(year+2)%12], zh: '辰', element: 'Earth', zodiac: 'Dragon' }, hiddenStems: ['戊'] },
+                    year: { stem: { name: stems[(year - 4) % 10], zh: '甲', element: 'Wood', polarity: 'Yang' }, branch: { name: branches[(year - 4) % 12], zh: '寅', element: 'Wood', zodiac: 'Tiger' }, hiddenStems: ['甲'] },
+                    month: { stem: { name: stems[(year - 2) % 10], zh: '丙', element: 'Fire', polarity: 'Yang' }, branch: { name: branches[(year + 2) % 12], zh: '辰', element: 'Earth', zodiac: 'Dragon' }, hiddenStems: ['戊'] },
                     day: { stem: { name: 'Xin', zh: '辛', element: 'Metal', polarity: 'Yin' }, branch: { name: 'Wei', zh: '未', element: 'Earth', zodiac: 'Goat' }, hiddenStems: ['己'] },
                     hour: { stem: { name: 'Yi', zh: '乙', element: 'Wood', polarity: 'Yin' }, branch: { name: 'Wei', zh: '未', element: 'Earth', zodiac: 'Goat' }, hiddenStems: ['己'] },
                     dayMaster: { name: 'Xin', zh: '辛', element: 'Metal', polarity: 'Yin' },
@@ -45,7 +45,7 @@ const CHINESE_ASTROLOGY_API = {
                 bagua: {
                     xiantian: { personalTrigram: { name: 'Qian', zh: '乾', binary: '111', element: 'Metal', quality: 'Creative' }, elementFlow: 'Qi descends' },
                     houtian: { lifePalaceTrigram: { name: 'Li', zh: '離', binary: '101', element: 'Fire', direction_houtian: 'S' }, temporalInfluence: 'Summer' },
-                    hexiangua: { hexagramNumber: 1, hexagramName: 'Qian - Creative', lines: [1,1,1,1,1,1], upper: { name: 'Qian' }, lower: { name: 'Qian' } }
+                    hexiangua: { hexagramNumber: 1, hexagramName: 'Qian - Creative', lines: [1, 1, 1, 1, 1, 1], upper: { name: 'Qian' }, lower: { name: 'Qian' } }
                 },
                 hetu: { personalNumbers: { yearNumber: 3, monthNumber: 7, dayNumber: 9, hourNumber: 8, lifeNumber: 5, destinyNumber: 8 }, elementalFlow: { sequence: ['Wood', 'Fire', 'Earth', 'Metal', 'Water'], dominant: 'Earth', deficient: 'Water', recommendations: ['Cultivate'] }, constellations: [] },
                 luoshu: { mingGua: { number: 6, trigram: 'Qian', element: 'Metal' }, favorableDirections: { shengQi: 'W', tianYi: 'SW', yanNian: 'NW' } },
@@ -60,10 +60,10 @@ const CHINESE_ASTROLOGY_API = {
  * Enhanced Chinese Astrology Display with Feng Shui colors
  */
 const ChineseAstrologyDisplay = {
-    
+
     // Current language (set by render)
     lang: 'en',
-    
+
     // I18N helper - checks AstrologyI18N first (detailed astrology labels), then I18N from data.js
     t(key) {
         // Priority 1: AstrologyI18N (dedicated astrology translations for all languages)
@@ -83,7 +83,7 @@ const ChineseAstrologyDisplay = {
         }
         return key;
     },
-    
+
     /**
      * Main render function - routes to appropriate sections
      */
@@ -95,30 +95,30 @@ const ChineseAstrologyDisplay = {
             return;
         }
         const d = data.data;
-        
+
         // Build sections
         const sections = [];
-        
+
         if (d.ayanamsa) sections.push(this.renderAyanamsa(d.ayanamsa));
         if (d.bazi) sections.push(this.renderBaZiCurrent(d.bazi));
-        
+
         // Comparison section with birth chart
         if (d.comparison?.birthBazi) {
             sections.push(this.renderBaZiBirth(d.comparison.birthBazi, d.bazi));
         }
-        
+
         // Bagua - now with hexagram context
         if (d.bagua) {
             sections.push(this.renderBaguaEnhanced(d.bagua, hexagramTrigrams));
         }
-        
+
         if (d.hetu) sections.push(this.renderHeTu(d.hetu));
         if (d.luoshu) sections.push(this.renderLuoShu(d.luoshu));
         if (d.lunarMansion) sections.push(this.renderLunarMansion(d.lunarMansion));
         if (d.taiSui) sections.push(this.renderTaiSui(d.taiSui));
-        
+
         sections.forEach(s => container.appendChild(s));
-        
+
         // Scroll to bagua section if hexagram trigrams are provided
         if (hexagramTrigrams) {
             setTimeout(() => {
@@ -196,27 +196,27 @@ const ChineseAstrologyDisplay = {
      */
     renderPillarsTable(bazi, current = null) {
         const tenGods = {
-            'Friend': '比肩', 'Rob Wealth': '劫財', 'Eating God': '食神', 
+            'Friend': '比肩', 'Rob Wealth': '劫財', 'Eating God': '食神',
             'Hurting Officer': '傷官', 'Direct Wealth': '正財', 'Indirect Wealth': '偏財',
-            'Direct Officer': '正官', 'Seven Killings': '七殺', 'Direct Resource': '正印', 
+            'Direct Officer': '正官', 'Seven Killings': '七殺', 'Direct Resource': '正印',
             'Indirect Resource': '偏印'
         };
         const pillars = ['hour', 'day', 'month', 'year'];
-        const labels = { 
-            hour: `<span class="pillar-zh">時柱</span><span class="pillar-en">${this.t('hour')}</span>`, 
-            day: `<span class="pillar-zh">日柱</span><span class="pillar-en">${this.t('day')}</span>`, 
-            month: `<span class="pillar-zh">月柱</span><span class="pillar-en">${this.t('month')}</span>`, 
-            year: `<span class="pillar-zh">年柱</span><span class="pillar-en">${this.t('year')}</span>` 
+        const labels = {
+            hour: `<span class="pillar-zh">時柱</span><span class="pillar-en">${this.t('hour')}</span>`,
+            day: `<span class="pillar-zh">日柱</span><span class="pillar-en">${this.t('day')}</span>`,
+            month: `<span class="pillar-zh">月柱</span><span class="pillar-en">${this.t('month')}</span>`,
+            year: `<span class="pillar-zh">年柱</span><span class="pillar-en">${this.t('year')}</span>`
         };
-        
+
         let html = `<div class="pillars-table"><table><thead><tr><th>${this.t('pillar')}</th><th>${this.t('heavenlyStem')}<br><span class="sub">天干</span></th><th>${this.t('earthlyBranch')}<br><span class="sub">地支</span></th><th>${this.t('hiddenStems')}<br><span class="sub">藏干</span></th></tr></thead><tbody>`;
-        
+
         pillars.forEach(p => {
             const data = bazi[p];
             if (!data) return;
             const tg = data.tenGod?.zh || '';
             const tgZh = tenGods[tg] || '';
-            
+
             // Highlight matching pillars when comparing
             let highlight = '';
             if (current && current[p]) {
@@ -224,7 +224,7 @@ const ChineseAstrologyDisplay = {
                     highlight = 'class="highlight match"';
                 }
             }
-            
+
             html += `<tr ${highlight}>
                 <td class="pillar-label">${labels[p]}</td>
                 <td class="stem" data-element="${data.stem.element}">
@@ -241,18 +241,18 @@ const ChineseAstrologyDisplay = {
                 <td class="hidden">${(data.hiddenStems || []).map(h => `<span class="hs">${h}</span>`).join('')}</td>
             </tr>`;
         });
-        
+
         html += '</tbody></table></div>';
         return html;
     },
 
     /**
-     * Render Day Master panel with Shen Sha stars
+     * Render master of day panel with Shen Sha stars
      */
     renderDayMasterPanel(bazi, showStars = false) {
         const dm = bazi.dayMaster || {};
         const st = bazi.strength || {};
-        
+
         let starsHtml = '';
         if (showStars && bazi.shenSha) {
             starsHtml = `<div class="stars-panel"><h4>${this.t('symbolicStars')} <span class="zh">神煞</span></h4><div class="stars-grid">`;
@@ -264,7 +264,7 @@ const ChineseAstrologyDisplay = {
                 travellingHorse: { zh: '驛馬', name: this.t('travellingHorse') },
                 goatBlade: { zh: '羊刃', name: this.t('goatBlade') }
             };
-            
+
             starOrder.forEach(key => {
                 const v = bazi.shenSha[key];
                 if (!v) return;
@@ -280,7 +280,7 @@ const ChineseAstrologyDisplay = {
             });
             starsHtml += '</div></div>';
         }
-        
+
         return `<div class="daymaster-panel">
             <div class="dm-card" data-element="${dm.element}">
                 <div class="dm-header">
@@ -299,7 +299,7 @@ const ChineseAstrologyDisplay = {
                         <span class="st-label">${this.t('strength')} <span class="zh">強弱</span></span>
                         <span class="st-result ${st.result?.toLowerCase().replace(/\s+/g, '-')}">${st.result || 'Unknown'}</span>
                     </div>
-                    <div class="st-meter"><div class="st-fill" style="width:${Math.min(100, Math.max(0, 50+(st.score||0)))}%"></div></div>
+                    <div class="st-meter"><div class="st-fill" style="width:${Math.min(100, Math.max(0, 50 + (st.score || 0)))}%"></div></div>
                     <div class="yong-shen">
                         <span class="ys-label">${this.t('yongShen')} <span class="zh">用神</span>:</span>
                         <span class="ys-element ${st.yongShen?.toLowerCase()}">${st.yongShen || 'N/A'}</span>
@@ -317,25 +317,25 @@ const ChineseAstrologyDisplay = {
     renderBaguaEnhanced(bagua, hexagramTrigrams = null) {
         const div = document.createElement('div');
         div.className = 'section bagua-enhanced';
-        
+
         const xt = bagua.xiantian || {};
         const ht = bagua.houtian || {};
         const hx = bagua.hexiangua || {};
-        
+
         // Selected hexagram trigrams
         const upperName = hexagramTrigrams?.upper || hx.upper?.name;
         const lowerName = hexagramTrigrams?.lower || hx.lower?.name;
-        
+
         // Get trigram data for both arrangements
         const xtTrigrams = this.getXianTianTrigrams();
         const htTrigrams = this.getHouTianTrigrams();
-        
+
         // Find selected trigrams in each arrangement
         const upperXT = xtTrigrams.find(t => t.n === upperName);
         const lowerXT = xtTrigrams.find(t => t.n === lowerName);
         const upperHT = htTrigrams.find(t => t.n === upperName);
         const lowerHT = htTrigrams.find(t => t.n === lowerName);
-        
+
         div.innerHTML = `
             <div class="bagua-main-header">
                 <h3>☯ ${this.t('bagua')} <span class="zh">八卦</span></h3>
@@ -503,50 +503,50 @@ const ChineseAstrologyDisplay = {
                     <span class="hx-name-en">${hx.hexagramName?.split(' ').slice(1).join(' ') || this.t('hexagram') || 'Hexagram'}</span>
                 </div>
                 <div class="hexagram-lines-display">
-                    ${(hx.lines || [1,1,1,1,1,1]).slice().reverse().map((l, i) => 
-                        `<div class="hx-line ${l?'yang':'yin'} ${i<3?'lower':'upper'}">
-                            <span class="line-visual">${l?'━━━━━━━':'━━   ━━'}</span>
+                    ${(hx.lines || [1, 1, 1, 1, 1, 1]).slice().reverse().map((l, i) =>
+            `<div class="hx-line ${l ? 'yang' : 'yin'} ${i < 3 ? 'lower' : 'upper'}">
+                            <span class="line-visual">${l ? '━━━━━━━' : '━━   ━━'}</span>
                             <span class="line-position">${this.getOrdinal(i)}</span>
                         </div>`
-                    ).join('')}
+        ).join('')}
                 </div>
                 ${hx.guaCi ? `<div class="gua-ci-quote">${hx.guaCi}</div>` : ''}
             </div>`;
-        
+
         return div;
     },
-    
+
     getXianTianTrigrams() {
         return [
-            {n:'Qian', z:'乾', s:'☰', e:'Metal', nature:'Heaven', binary:'111'},
-            {n:'Dui', z:'兌', s:'☱', e:'Metal', nature:'Lake', binary:'011'},
-            {n:'Li', z:'離', s:'☲', e:'Fire', nature:'Fire', binary:'101'},
-            {n:'Zhen', z:'震', s:'☳', e:'Wood', nature:'Thunder', binary:'001'},
-            {n:'Xun', z:'巽', s:'☴', e:'Wood', nature:'Wind', binary:'110'},
-            {n:'Kan', z:'坎', s:'☵', e:'Water', nature:'Water', binary:'010'},
-            {n:'Gen', z:'艮', s:'☶', e:'Earth', nature:'Mountain', binary:'100'},
-            {n:'Kun', z:'坤', s:'☷', e:'Earth', nature:'Earth', binary:'000'}
+            { n: 'Qian', z: '乾', s: '☰', e: 'Metal', nature: 'Heaven', binary: '111' },
+            { n: 'Dui', z: '兌', s: '☱', e: 'Metal', nature: 'Lake', binary: '011' },
+            { n: 'Li', z: '離', s: '☲', e: 'Fire', nature: 'Fire', binary: '101' },
+            { n: 'Zhen', z: '震', s: '☳', e: 'Wood', nature: 'Thunder', binary: '001' },
+            { n: 'Xun', z: '巽', s: '☴', e: 'Wood', nature: 'Wind', binary: '110' },
+            { n: 'Kan', z: '坎', s: '☵', e: 'Water', nature: 'Water', binary: '010' },
+            { n: 'Gen', z: '艮', s: '☶', e: 'Earth', nature: 'Mountain', binary: '100' },
+            { n: 'Kun', z: '坤', s: '☷', e: 'Earth', nature: 'Earth', binary: '000' }
         ];
     },
-    
+
     getHouTianTrigrams() {
         return [
-            {n:'Li', z:'離', s:'☲', e:'Fire', nature:'Fire', binary:'101', season:'Summer'},
-            {n:'Kun', z:'坤', s:'☷', e:'Earth', nature:'Earth', binary:'000', season:'Late Summer'},
-            {n:'Dui', z:'兌', s:'☱', e:'Metal', nature:'Lake', binary:'011', season:'Autumn'},
-            {n:'Qian', z:'乾', s:'☰', e:'Metal', nature:'Heaven', binary:'111', season:'Autumn'},
-            {n:'Kan', z:'坎', s:'☵', e:'Water', nature:'Water', binary:'010', season:'Winter'},
-            {n:'Gen', z:'艮', s:'☶', e:'Earth', nature:'Mountain', binary:'100', season:'Winter'},
-            {n:'Zhen', z:'震', s:'☳', e:'Wood', nature:'Thunder', binary:'001', season:'Spring'},
-            {n:'Xun', z:'巽', s:'☴', e:'Wood', nature:'Wind', binary:'110', season:'Spring'}
+            { n: 'Li', z: '離', s: '☲', e: 'Fire', nature: 'Fire', binary: '101', season: 'Summer' },
+            { n: 'Kun', z: '坤', s: '☷', e: 'Earth', nature: 'Earth', binary: '000', season: 'Late Summer' },
+            { n: 'Dui', z: '兌', s: '☱', e: 'Metal', nature: 'Lake', binary: '011', season: 'Autumn' },
+            { n: 'Qian', z: '乾', s: '☰', e: 'Metal', nature: 'Heaven', binary: '111', season: 'Autumn' },
+            { n: 'Kan', z: '坎', s: '☵', e: 'Water', nature: 'Water', binary: '010', season: 'Winter' },
+            { n: 'Gen', z: '艮', s: '☶', e: 'Earth', nature: 'Mountain', binary: '100', season: 'Winter' },
+            { n: 'Zhen', z: '震', s: '☳', e: 'Wood', nature: 'Thunder', binary: '001', season: 'Spring' },
+            { n: 'Xun', z: '巽', s: '☴', e: 'Wood', nature: 'Wind', binary: '110', season: 'Spring' }
         ];
     },
-    
+
     getXianTianDirection(trigramName) {
         const dirs = { Qian: 'S', Dui: 'SE', Li: 'E', Zhen: 'NE', Xun: 'N', Kan: 'NW', Gen: 'W', Kun: 'SW' };
         return dirs[trigramName] || '';
     },
-    
+
     getHouTianDirection(trigramName) {
         const dirs = { Li: 'S', Kun: 'SW', Dui: 'W', Qian: 'NW', Kan: 'N', Gen: 'NE', Zhen: 'E', Xun: 'SE' };
         return dirs[trigramName] || '';
@@ -567,18 +567,18 @@ const ChineseAstrologyDisplay = {
             Gen: { x: 30, y: 150, deg: 270, dir: 'W' },     // ☶ Mountain - West
             Kun: { x: 60, y: 80, deg: 315, dir: 'SW' }      // ☷ Earth - Southwest
         };
-        
+
         const trigrams = [
-            {n:'Qian', z:'乾', s:'☰', e:'Metal', nature:'Heaven', binary:'111'},
-            {n:'Dui', z:'兌', s:'☱', e:'Metal', nature:'Lake', binary:'011'},
-            {n:'Li', z:'離', s:'☲', e:'Fire', nature:'Fire', binary:'101'},
-            {n:'Zhen', z:'震', s:'☳', e:'Wood', nature:'Thunder', binary:'001'},
-            {n:'Xun', z:'巽', s:'☴', e:'Wood', nature:'Wind', binary:'110'},
-            {n:'Kan', z:'坎', s:'☵', e:'Water', nature:'Water', binary:'010'},
-            {n:'Gen', z:'艮', s:'☶', e:'Earth', nature:'Mountain', binary:'100'},
-            {n:'Kun', z:'坤', s:'☷', e:'Earth', nature:'Earth', binary:'000'}
+            { n: 'Qian', z: '乾', s: '☰', e: 'Metal', nature: 'Heaven', binary: '111' },
+            { n: 'Dui', z: '兌', s: '☱', e: 'Metal', nature: 'Lake', binary: '011' },
+            { n: 'Li', z: '離', s: '☲', e: 'Fire', nature: 'Fire', binary: '101' },
+            { n: 'Zhen', z: '震', s: '☳', e: 'Wood', nature: 'Thunder', binary: '001' },
+            { n: 'Xun', z: '巽', s: '☴', e: 'Wood', nature: 'Wind', binary: '110' },
+            { n: 'Kan', z: '坎', s: '☵', e: 'Water', nature: 'Water', binary: '010' },
+            { n: 'Gen', z: '艮', s: '☶', e: 'Earth', nature: 'Mountain', binary: '100' },
+            { n: 'Kun', z: '坤', s: '☷', e: 'Earth', nature: 'Earth', binary: '000' }
         ];
-        
+
         // Auspicious Feng Shui colors
         const fengShuiColors = {
             Metal: { main: '#FFD700', light: '#FFF8DC', dark: '#B8860B', text: '#8B4513' },
@@ -587,50 +587,50 @@ const ChineseAstrologyDisplay = {
             Fire: { main: '#DC143C', light: '#FF6B6B', dark: '#8B0000', text: '#FFFFFF' },
             Earth: { main: '#D2691E', light: '#DEB887', dark: '#8B4513', text: '#FFFFFF' }
         };
-        
+
         let svg = '<svg viewBox="0 0 300 300" class="bagua-svg xiantian">';
-        
+
         // Background octagon with gradient
         svg += '<defs>';
         svg += '<radialGradient id="xtCenter" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#FFF8DC"/><stop offset="100%" style="stop-color:#F5DEB3"/></radialGradient>';
         svg += '</defs>';
-        
+
         // Outer octagon frame
         svg += '<polygon points="150,25 255,65 285,150 255,235 150,275 45,235 15,150 45,65" fill="#1a1a2e" stroke="#d4af37" stroke-width="3"/>';
         svg += '<polygon points="150,35 245,70 272,150 245,230 150,265 55,230 28,150 55,70" fill="url(#xtCenter)" stroke="#8B4513" stroke-width="2"/>';
-        
+
         // Center Yin-Yang with glow
         svg += '<circle cx="150" cy="150" r="40" fill="#1a1a2e" stroke="#d4af37" stroke-width="2"/>';
         svg += '<circle cx="150" cy="150" r="35" fill="#fff"/>';
         svg += '<text x="150" y="162" text-anchor="middle" font-size="36" fill="#1a1a2e">☯</text>';
-        
+
         // Trigrams
         trigrams.forEach(t => {
             const pos = positions[t.n];
             const colors = fengShuiColors[t.e];
             const isHighlighted = (t.n === highlightUpper || t.n === highlightLower);
-            
+
             // Glow effect for highlighted trigrams
             if (isHighlighted) {
                 svg += `<circle cx="${pos.x}" cy="${pos.y}" r="32" fill="none" stroke="#d4af37" stroke-width="4" class="pulse-glow"/>`;
             }
-            
+
             // Main circle with element color
             svg += `<circle cx="${pos.x}" cy="${pos.y}" r="28" fill="${colors.main}" stroke="${colors.dark}" stroke-width="${isHighlighted ? 4 : 2}" class="${isHighlighted ? 'highlighted-trigram' : ''}"/>`;
-            
+
             // Trigram symbol
-            svg += `<text x="${pos.x}" y="${pos.y-2}" text-anchor="middle" font-size="20" fill="${colors.text}" font-weight="bold">${t.s}</text>`;
-            
+            svg += `<text x="${pos.x}" y="${pos.y - 2}" text-anchor="middle" font-size="20" fill="${colors.text}" font-weight="bold">${t.s}</text>`;
+
             // Chinese name
-            svg += `<text x="${pos.x}" y="${pos.y+14}" text-anchor="middle" font-size="11" fill="${colors.text}">${t.z}</text>`;
-            
+            svg += `<text x="${pos.x}" y="${pos.y + 14}" text-anchor="middle" font-size="11" fill="${colors.text}">${t.z}</text>`;
+
             // Direction label
-            svg += `<text x="${pos.x}" y="${pos.y+24}" text-anchor="middle" font-size="8" fill="#666">${pos.dir}</text>`;
+            svg += `<text x="${pos.x}" y="${pos.y + 24}" text-anchor="middle" font-size="8" fill="#666">${pos.dir}</text>`;
         });
-        
+
         // Connecting lines showing sequence
         svg += '<path d="M 150,40 Q 200,75 240,80" fill="none" stroke="#d4af37" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>';
-        
+
         return svg + '</svg>';
     },
 
@@ -649,18 +649,18 @@ const ChineseAstrologyDisplay = {
             Zhen: { x: 30, y: 150, dir: 'E', season: 'Spring' },    // ☳ Thunder - East
             Xun: { x: 60, y: 80, dir: 'SE', season: 'Spring' }      // ☴ Wind - Southeast
         };
-        
+
         const trigrams = [
-            {n:'Li', z:'離', s:'☲', e:'Fire', nature:'Fire', binary:'101'},
-            {n:'Kun', z:'坤', s:'☷', e:'Earth', nature:'Earth', binary:'000'},
-            {n:'Dui', z:'兌', s:'☱', e:'Metal', nature:'Lake', binary:'011'},
-            {n:'Qian', z:'乾', s:'☰', e:'Metal', nature:'Heaven', binary:'111'},
-            {n:'Kan', z:'坎', s:'☵', e:'Water', nature:'Water', binary:'010'},
-            {n:'Gen', z:'艮', s:'☶', e:'Earth', nature:'Mountain', binary:'100'},
-            {n:'Zhen', z:'震', s:'☳', e:'Wood', nature:'Thunder', binary:'001'},
-            {n:'Xun', z:'巽', s:'☴', e:'Wood', nature:'Wind', binary:'110'}
+            { n: 'Li', z: '離', s: '☲', e: 'Fire', nature: 'Fire', binary: '101' },
+            { n: 'Kun', z: '坤', s: '☷', e: 'Earth', nature: 'Earth', binary: '000' },
+            { n: 'Dui', z: '兌', s: '☱', e: 'Metal', nature: 'Lake', binary: '011' },
+            { n: 'Qian', z: '乾', s: '☰', e: 'Metal', nature: 'Heaven', binary: '111' },
+            { n: 'Kan', z: '坎', s: '☵', e: 'Water', nature: 'Water', binary: '010' },
+            { n: 'Gen', z: '艮', s: '☶', e: 'Earth', nature: 'Mountain', binary: '100' },
+            { n: 'Zhen', z: '震', s: '☳', e: 'Wood', nature: 'Thunder', binary: '001' },
+            { n: 'Xun', z: '巽', s: '☴', e: 'Wood', nature: 'Wind', binary: '110' }
         ];
-        
+
         // Auspicious Feng Shui colors - enhanced
         const fengShuiColors = {
             Metal: { main: '#FFD700', light: '#FFF8DC', dark: '#B8860B', text: '#4a4a00' },
@@ -669,49 +669,49 @@ const ChineseAstrologyDisplay = {
             Fire: { main: '#FF4500', light: '#FF6B6B', dark: '#8B0000', text: '#fff' },
             Earth: { main: '#CD853F', light: '#DEB887', dark: '#8B4513', text: '#fff' }
         };
-        
+
         let svg = '<svg viewBox="0 0 300 300" class="bagua-svg houtian">';
-        
+
         // Background with seasonal gradient
         svg += '<defs>';
         svg += '<radialGradient id="htCenter" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#FFF5E6"/><stop offset="100%" style="stop-color:#FFE4B5"/></radialGradient>';
         svg += '</defs>';
-        
+
         // Outer frame
         svg += '<polygon points="150,25 255,65 285,150 255,235 150,275 45,235 15,150 45,65" fill="#16213e" stroke="#d4af37" stroke-width="3"/>';
         svg += '<polygon points="150,35 245,70 272,150 245,230 150,265 55,230 28,150 55,70" fill="url(#htCenter)" stroke="#CD853F" stroke-width="2"/>';
-        
+
         // Center with compass
         svg += '<circle cx="150" cy="150" r="40" fill="#16213e" stroke="#d4af37" stroke-width="2"/>';
         svg += '<circle cx="150" cy="150" r="35" fill="#fff"/>';
         svg += '<text x="150" y="140" text-anchor="middle" font-size="14" fill="#333" font-weight="bold">N</text>';
         svg += '<text x="150" y="170" text-anchor="middle" font-size="14" fill="#333" font-weight="bold">S</text>';
         svg += '<text x="150" y="155" text-anchor="middle" font-size="24" fill="#d4af37">☯</text>';
-        
+
         // Trigrams arranged by compass directions
         trigrams.forEach(t => {
             const pos = positions[t.n];
             const colors = fengShuiColors[t.e];
             const isHighlighted = (t.n === highlightUpper || t.n === highlightLower);
-            
+
             // Glow for highlighted
             if (isHighlighted) {
                 svg += `<circle cx="${pos.x}" cy="${pos.y}" r="32" fill="none" stroke="#d4af37" stroke-width="5" class="pulse-glow"/>`;
             }
-            
+
             // Main circle
             svg += `<circle cx="${pos.x}" cy="${pos.y}" r="28" fill="${colors.main}" stroke="${isHighlighted ? '#d4af37' : colors.dark}" stroke-width="${isHighlighted ? 4 : 2}" class="${isHighlighted ? 'highlighted-trigram' : ''}"/>`;
-            
+
             // Symbol
-            svg += `<text x="${pos.x}" y="${pos.y-2}" text-anchor="middle" font-size="20" fill="${colors.text}" font-weight="bold">${t.s}</text>`;
-            
+            svg += `<text x="${pos.x}" y="${pos.y - 2}" text-anchor="middle" font-size="20" fill="${colors.text}" font-weight="bold">${t.s}</text>`;
+
             // Name
-            svg += `<text x="${pos.x}" y="${pos.y+14}" text-anchor="middle" font-size="11" fill="${colors.text}">${t.z}</text>`;
-            
+            svg += `<text x="${pos.x}" y="${pos.y + 14}" text-anchor="middle" font-size="11" fill="${colors.text}">${t.z}</text>`;
+
             // Direction
-            svg += `<text x="${pos.x}" y="${pos.y+24}" text-anchor="middle" font-size="8" fill="#666">${pos.dir}</text>`;
+            svg += `<text x="${pos.x}" y="${pos.y + 24}" text-anchor="middle" font-size="8" fill="#666">${pos.dir}</text>`;
         });
-        
+
         return svg + '</svg>';
     },
 
@@ -722,7 +722,7 @@ const ChineseAstrologyDisplay = {
         const div = document.createElement('div');
         div.className = 'section hetu-enhanced';
         const pn = hetu.personalNumbers || {};
-        
+
         // Feng Shui element colors
         const elementColors = {
             Water: { bg: '#1E3A5F', text: '#87CEEB', accent: '#4169E1' },
@@ -731,7 +731,7 @@ const ChineseAstrologyDisplay = {
             Metal: { bg: '#4a4a00', text: '#FFD700', accent: '#B8860B' },
             Earth: { bg: '#8B4513', text: '#F5DEB3', accent: '#D2691E' }
         };
-        
+
         div.innerHTML = `
             <div class="hetu-header">
                 <h3>🌊 ${this.t('hetu')} <span class="zh">河图</span></h3>
@@ -786,9 +786,9 @@ const ChineseAstrologyDisplay = {
                     </div>
                     <div class="hetu-flow-card">
                         <h4>${this.t('elementalFlow')} <span class="zh">五行流通</span></h4>
-                        <div class="flow-sequence">${(hetu.elementalFlow?.sequence || []).map((e,i,a) =>
-                            `<span class="flow-item ${e.toLowerCase()}">${e} ${this.getElementZh(e)}</span>${i<a.length-1?'<span class="flow-arrow">→</span>':''}`
-                        ).join('')}</div>
+                        <div class="flow-sequence">${(hetu.elementalFlow?.sequence || []).map((e, i, a) =>
+            `<span class="flow-item ${e.toLowerCase()}">${e} ${this.getElementZh(e)}</span>${i < a.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
+        ).join('')}</div>
                         <div class="flow-analysis">
                             <div class="dominant"><span class="label">${this.t('dominant')}:</span><span class="value ${hetu.elementalFlow?.dominant?.toLowerCase()}">${hetu.elementalFlow?.dominant || 'N/A'}</span></div>
                             <div class="deficient"><span class="label">${this.t('deficient')}:</span><span class="value ${hetu.elementalFlow?.deficient?.toLowerCase()}">${hetu.elementalFlow?.deficient || 'N/A'}</span></div>
@@ -807,7 +807,7 @@ const ChineseAstrologyDisplay = {
         div.className = 'section luoshu-enhanced';
         const mg = luoshu.mingGua || {};
         const fd = luoshu.favorableDirections || {};
-        
+
         // Element color mapping
         const elementStyles = {
             Metal: { bg: 'linear-gradient(135deg, #FFD700 0%, #B8860B 100%)', text: '#4a4a00', border: '#DAA520' },
@@ -816,9 +816,9 @@ const ChineseAstrologyDisplay = {
             Fire: { bg: 'linear-gradient(135deg, #FF4500 0%, #8B0000 100%)', text: '#fff', border: '#DC143C' },
             Earth: { bg: 'linear-gradient(135deg, #D2691E 0%, #8B4513 100%)', text: '#fff', border: '#CD853F' }
         };
-        
+
         const style = elementStyles[mg.element] || elementStyles.Earth;
-        
+
         div.innerHTML = `
             <div class="luoshu-header">
                 <h3>🔢 ${this.t('luoshu')} <span class="zh">洛书</span></h3>
@@ -904,7 +904,7 @@ const ChineseAstrologyDisplay = {
         const div = document.createElement('div');
         div.className = 'section lunar-enhanced';
         const mn = m.mansion || {};
-        
+
         // Group colors
         const groupColors = {
             'Azure Dragon': { bg: '#1a472a', accent: '#228B22' },
@@ -912,9 +912,9 @@ const ChineseAstrologyDisplay = {
             'White Tiger': { bg: '#4a4a4a', accent: '#C0C0C0' },
             'Black Tortoise': { bg: '#191970', accent: '#4169E1' }
         };
-        
+
         const colors = groupColors[mn.group] || { bg: '#4a4a4a', accent: '#666' };
-        
+
         div.innerHTML = `
             <div class="lunar-header-bar" style="background: linear-gradient(90deg, ${colors.bg} 0%, ${colors.accent} 100%)">
                 <h3>🌙 ${this.t('lunarMansion')} <span class="zh">二十八宿</span></h3>
@@ -951,7 +951,7 @@ const ChineseAstrologyDisplay = {
         const div = document.createElement('div');
         div.className = 'section taisui-enhanced';
         const p = t.currentPosition || {};
-        
+
         div.innerHTML = `
             <div class="taisui-header">
                 <h3>👑 ${this.t('taiSui')} <span class="zh">太歲</span></h3>
@@ -994,9 +994,9 @@ const ChineseAstrologyDisplay = {
 
     // Helper methods
     getSymbol(binary) {
-        return {'111':'☰','011':'☱','101':'☲','001':'☳','110':'☴','010':'☵','100':'☶','000':'☷'}[binary] || '☯';
+        return { '111': '☰', '011': '☱', '101': '☲', '001': '☳', '110': '☴', '010': '☵', '100': '☶', '000': '☷' }[binary] || '☯';
     },
-    
+
     getElementZh(element) {
         const map = { 'Wood': '木', 'Fire': '火', 'Earth': '土', 'Metal': '金', 'Water': '水' };
         return map[element] || '';
@@ -1004,10 +1004,10 @@ const ChineseAstrologyDisplay = {
 
     getOrdinal(reverseIndex) {
         const ordinals = {
-            en: ['6th','5th','4th','3rd','2nd','1st'],
-            es: ['6ª','5ª','4ª','3ª','2ª','1ª'],
-            it: ['6ª','5ª','4ª','3ª','2ª','1ª'],
-            zh: ['六','五','四','三','二','初']
+            en: ['6th', '5th', '4th', '3rd', '2nd', '1st'],
+            es: ['6ª', '5ª', '4ª', '3ª', '2ª', '1ª'],
+            it: ['6ª', '5ª', '4ª', '3ª', '2ª', '1ª'],
+            zh: ['六', '五', '四', '三', '二', '初']
         };
         return (ordinals[this.lang] || ordinals.en)[reverseIndex] || '';
     },

@@ -13,7 +13,7 @@ I've completed a comprehensive review and fix of the entire interpretation pipel
 ### Data Flow (Before - Broken)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  UI shows: Day Master 甲 Wood, Strong, Yong Shen Earth       │
+│  UI shows: master of day 甲 Wood, Strong, Yong Shen Earth       │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -29,13 +29,13 @@ I've completed a comprehensive review and fix of the entire interpretation pipel
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  AI receives: {strength: "Strong", day: {...}}              │
-│  MISSING: All 4 pillars, Day Master object,                │
+│  MISSING: All 4 pillars, master of day object,                │
 │           Favorable/Unfavorable, Hidden stems              │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  AI generates: "fuerza del Maestro del Día es desconocida" │
-│  (Day Master strength is unknown)                          │
+│  (master of day strength is unknown)                          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -46,7 +46,7 @@ I've completed a comprehensive review and fix of the entire interpretation pipel
 ### Data Flow (After - Fixed)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  UI shows: Day Master 甲 Wood, Strong, Yong Shen Earth       │
+│  UI shows: master of day 甲 Wood, Strong, Yong Shen Earth       │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -71,7 +71,7 @@ I've completed a comprehensive review and fix of the entire interpretation pipel
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│  AI generates: "Strong Wood Day Master (Jia 甲) with       │
+│  AI generates: "Strong Wood master of day (Jia 甲) with       │
 │  Earth Yong Shen, supported by Year Bing-Wu..."            │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -92,7 +92,7 @@ Fixed:
 - `compactBaziForRemedies()` - remedies section
 
 Each now includes:
-- ✅ Day Master (stem, element, polarity)
+- ✅ master of day (stem, element, polarity)
 - ✅ Strength (result, yongShen, favorable, unfavorable)
 - ✅ Year Pillar (stem, branch with hidden stems)
 - ✅ Month Pillar (stem, branch with hidden stems)
@@ -202,7 +202,7 @@ Look for entries like:
 
 ### 5. Verify Interpretation
 The AI interpretation should now mention:
-- ✅ Actual Day Master (e.g., "Jia Wood")
+- ✅ Actual master of day (e.g., "Jia Wood")
 - ✅ Actual strength (e.g., "Strong")
 - ✅ Actual pillars (e.g., "Year Bing-Wu, Month Geng-Yin...")
 - ✅ Yong Shen element (e.g., "Earth")
@@ -229,7 +229,7 @@ del Maestro del Día es desconocida...
 Guía Celestial 天時八字
 Análisis Compuesto Clásico
 
-The sky reveals a Strong Wood Day Master (Jia 甲 Yang) born in 
+The sky reveals a Strong Wood master of day (Jia 甲 Yang) born in 
 the month of Geng-Yin (Metal-Wood), with the following 
 four-pillar configuration:
 
@@ -240,7 +240,7 @@ Hour (Future Potential): Bing-Yin 丙寅 (Fire-Wood)
 
 With Earth as Yong Shen and Strong strength, this chart favors 
 steady accumulation. The Fire in Year and Hour generates Wood, 
-supporting the Day Master...
+supporting the master of day...
 ```
 
 ---
@@ -273,7 +273,7 @@ Or manually revert these specific functions:
 
 - [ ] Browser console shows `[AI:BUILD:celestial-bazi]` logs
 - [ ] Logs show `hasCurrentBazi: true` with complete data
-- [ ] AI interpretation mentions actual Day Master element and stem
+- [ ] AI interpretation mentions actual master of day element and stem
 - [ ] AI interpretation mentions actual strength (Strong/Weak/etc)
 - [ ] AI interpretation references actual four pillars
 - [ ] No more "strength is unknown" in interpretation

@@ -106,26 +106,26 @@ class App {
 
     /**
      * Compact BaZi object while preserving essential data for AI analysis
-     * Includes all four pillars, day master, and strength information
+     * Includes all four pillars, master of day, and strength information
      */
     static compactBaziObject(bazi) {
         if (!bazi) return undefined;
-        
+
         // Helper to compact a pillar while keeping essential fields
         const compactPillar = (p) => p ? {
-            stem: { 
-                name: p.stem?.name, 
-                element: p.stem?.element, 
-                zh: p.stem?.zh 
+            stem: {
+                name: p.stem?.name,
+                element: p.stem?.element,
+                zh: p.stem?.zh
             },
-            branch: { 
-                name: p.branch?.name, 
-                element: p.branch?.element, 
+            branch: {
+                name: p.branch?.name,
+                element: p.branch?.element,
                 zh: p.branch?.zh,
                 hidden: p.branch?.hidden
             }
         } : undefined;
-        
+
         return {
             dayMaster: bazi.dayMaster ? {
                 stem: bazi.dayMaster.stem,
@@ -1429,7 +1429,7 @@ class App {
 
     /**
      * Format BaZi data for technical JSON output
-     * Includes all pillars, day master, and strength analysis
+     * Includes all pillars, master of day, and strength analysis
      */
     static formatBaziTechnical(bazi) {
         return {
@@ -1554,7 +1554,7 @@ class App {
         text += `${bazi.day?.stem?.zh || ''}${bazi.day?.branch?.zh || ''} `;
         text += `${bazi.hour?.stem?.zh || ''}${bazi.hour?.branch?.zh || ''}\n`;
         if (bazi.dayMaster) {
-            text += `${t.dayMaster || 'Day Master'}: ${bazi.dayMaster.zh} (${bazi.dayMaster.element} ${bazi.dayMaster.yinYang})\n`;
+            text += `${t.dayMaster || 'master of day'}: ${bazi.dayMaster.zh} (${bazi.dayMaster.element} ${bazi.dayMaster.yinYang})\n`;
         }
         return text;
     }
@@ -1569,7 +1569,7 @@ class App {
         text += `${bazi.day?.stem?.zh || ''}${bazi.day?.branch?.zh || ''} `;
         text += `${bazi.hour?.stem?.zh || ''}${bazi.hour?.branch?.zh || ''}\n`;
         if (bazi.dayMaster) {
-            text += `${t.dayMaster || 'Day Master'}: ${bazi.dayMaster.zh} (${bazi.dayMaster.element} ${bazi.dayMaster.yinYang}) - `;
+            text += `${t.dayMaster || 'master of day'}: ${bazi.dayMaster.zh} (${bazi.dayMaster.element} ${bazi.dayMaster.yinYang}) - `;
 
             const elementGuidance = {
                 'Wood': t.woodInfluence || 'Growth and expansion energy',
@@ -1637,10 +1637,10 @@ class App {
 
         let text = '';
 
-        // Day Master influence
+        // master of day influence
         if (bazi?.dayMaster) {
             const dm = bazi.dayMaster;
-            text += `- ${t.dayMaster || 'Day Master'} ${dm.zh || ''} (${dm.element} ${dm.yinYang}): `;
+            text += `- ${t.dayMaster || 'master of day'} ${dm.zh || ''} (${dm.element} ${dm.yinYang}): `;
 
             // Add element-specific guidance
             const elementGuidance = {
@@ -2009,7 +2009,7 @@ class App {
             const reading = {
                 question: this.extractPattern(block, /Question:\s*"([^"]+)"/),
                 hexagram: this.extractPattern(block, /Hexagram:\s*(\d+)/),
-                dayMaster: this.extractPattern(block, /Day Master:\s*([\w\s]+?)(?:\n|$)/),
+                dayMaster: this.extractPattern(block, /master of day:\s*([\w\s]+?)(?:\n|$)/),
                 strength: this.extractPattern(block, /Strength:\s*(\w+)/),
                 elements: this.extractElementSummary(block),
                 remedyCount: (block.match(/Remedy:/g) || []).length
@@ -2487,7 +2487,7 @@ class App {
         // Preserve remedies and baguaMedicine from 3-tab architecture
         const remedies = result.remedies;
         const baguaMedicine = result.baguaMedicine;
-        
+
         // 2a. Ensure all language keys and required fields exist
         this.ensureInterpretationStructure(result);
         console.log('[PIPELINE:FMT] Structure ensured for all languages');
@@ -2496,7 +2496,7 @@ class App {
         // Done BEFORE translation so the translator receives clean English input
         const processed = this.postProcessInterpretation(result);
         console.log('[PIPELINE:FMT] Post-processing complete');
-        
+
         // Restore preserved fields
         if (remedies) processed.remedies = remedies;
         if (baguaMedicine) processed.baguaMedicine = baguaMedicine;
@@ -2763,9 +2763,9 @@ class App {
     static async fetchTabsConcurrent(baseRequest) {
         console.log('[AI:TABS] Starting 3-tab concurrent fetch...');
         const t = I18N[this.lang] || I18N['en'];
-        
+
         const timeoutMs = 60000;
-        
+
         // Build common request data
         const tabRequest = {
             hexagram: baseRequest.hexagram,
@@ -2800,7 +2800,7 @@ class App {
                     if (this.loadingOverlay) this.loadingOverlay.failProcess('interpretation-tab', err.message);
                     return null;
                 }),
-                
+
                 // Tab 2: Remedies
                 this.fetchTab('remedies-tab', tabRequest, timeoutMs).then(result => {
                     console.log('[AI:TABS] Remedies tab received');
@@ -2811,7 +2811,7 @@ class App {
                     if (this.loadingOverlay) this.loadingOverlay.failProcess('remedies-tab', err.message);
                     return null;
                 }),
-                
+
                 // Tab 3: Feng Shui & Medicine
                 this.fetchTab('fengshui-medicine-tab', tabRequest, timeoutMs).then(result => {
                     console.log('[AI:TABS] Feng Shui/Medicine tab received');
@@ -2853,7 +2853,7 @@ class App {
                     quotedReferences: data.quotedReferences || []
                 };
             };
-            
+
             const interp = normalizeInterpretation(interpretationResult);
 
             // Build result in the format expected by the UI
@@ -2864,14 +2864,14 @@ class App {
                     celestial: interp.celestial,
                     elements: interp.elements,
                     advice: interp.advice,
-                    
+
                     // Quoted references
                     quotedReferences: interp.quotedReferences
                 },
-                
+
                 // Remedies - store under current language (dynamic source language support)
                 remedies: remediesResult ? { [this.lang]: { remedies: remediesResult.remedies || [] } } : null,
-                
+
                 // Feng Shui & Medicine - store under current language (dynamic source language support)
                 baguaMedicine: fengshuiMedicineResult ? {
                     [this.lang]: {
@@ -2880,7 +2880,7 @@ class App {
                     }
                 } : null
             };
-            
+
         } catch (error) {
             console.error('[AI:TABS] Concurrent fetch failed:', error);
             throw error;
@@ -2890,16 +2890,16 @@ class App {
     // Helper to fetch a single tab with retry logic
     static async fetchTab(tabName, requestData, timeoutMs, maxRetries = 2) {
         let lastError;
-        
+
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
             if (attempt > 0) {
                 console.log(`[AI:FETCH] Retry ${attempt}/${maxRetries} for ${tabName}...`);
                 await new Promise(r => setTimeout(r, 1000 * attempt)); // Exponential backoff
             }
-            
+
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-            
+
             try {
                 const response = await fetch(`${CONFIG.HEXAGRAM_FUNCTION_URL}/${tabName}`, {
                     method: 'POST',
@@ -2910,34 +2910,34 @@ class App {
                     body: JSON.stringify(requestData),
                     signal: controller.signal
                 });
-                
+
                 clearTimeout(timeoutId);
-                
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
-                
+
                 const result = await response.json();
-                
+
                 if (result.error) {
                     throw new Error(result.error.message || 'Unknown error');
                 }
-                
+
                 return result.data;
             } catch (error) {
                 clearTimeout(timeoutId);
                 lastError = error;
-                
+
                 // Don't retry on abort errors (user cancelled)
                 if (error.name === 'AbortError') {
                     throw error;
                 }
-                
+
                 console.warn(`[AI:FETCH] Attempt ${attempt + 1} failed for ${tabName}:`, error.message);
             }
         }
-        
+
         throw lastError;
     }
 
@@ -2948,7 +2948,7 @@ class App {
 
         // Build compact request (already optimized by buildSectionRequest)
         const sectionRequest = this.buildSectionRequest(section, baseRequest);
-        
+
         // DEBUG: Log BaZi data being sent for celestial sections
         if (section.includes('celestial') || section.includes('bazi') || section.includes('houtou')) {
             console.log(`[AI:BUILD:${section}] BaZi data sent:`, {
@@ -3448,7 +3448,7 @@ class App {
             case 'houtou-emperor':
             case 'houtou-master':
                 // CRITICAL: Include complete BaZi data for accurate celestial analysis
-                // All four pillars needed for proper Day Master strength calculation
+                // All four pillars needed for proper master of day strength calculation
                 const compactBaziForCelestial = (bazi) => {
                     if (!bazi) return undefined;
                     // Compact pillar data while keeping essential info
@@ -4064,76 +4064,74 @@ class App {
         const { historyAnalysis, askAgainSource, ...cleanRequest } = baseRequest;
 
         try {
-            // STEP 1: Remedy Selection (English base)
-            console.log('[AI:SECONDARY] Step 1: Selecting remedies...');
-            const selectRequest = {
-                ...cleanRequest,
-                // Ensure hexagram has name_zh to satisfy strict validation
-                hexagram: {
-                    ...cleanRequest.hexagram,
-                    name_zh: cleanRequest.hexagram?.name_zh || "Unknown"
-                },
-                // Include full interpretation for resonance scoring
-                interpretation: interpretation,
-                // Also provide colloquial snippets for smaller prompt context
-                interpretationContext: {
-                    celestialColloquial: interpretation[sourceLang]?.celestialColloquial || interpretation.celestial || '',
-                    elementsColloquial: interpretation[sourceLang]?.elementsColloquial || interpretation.elements || '',
-                    coreColloquial: interpretation[sourceLang]?.coreColloquial || interpretation.analysis || ''
-                }
-            };
+            // STEP 1: Remedy Selection — local DB hexagram lookup first, AI fallback
+            console.log('[AI:SECONDARY] Step 1: Selecting remedies (local DB first)...');
 
-            // Add recent remedies context for consistency
-            const recentRemedies = this.getRecentRemedies(60); // Look back 60 minutes
-            console.log('[AI:SECONDARY] Recent remedies context:', recentRemedies);
+            let selectData = null;
 
-            // Add to request
-            selectRequest.recentRemedies = recentRemedies;
-
-            const selectData = await this.fetchSection('remedies-select', selectRequest, 50000, signal);
-
-            if (selectData && !signal.aborted) {
-                console.log('[AI:SECONDARY] Remedies selected successfully, raw data:', selectData);
-                console.log('[AI:SECONDARY] selectData.remedies:', selectData?.remedies?.length || 0, 'items');
-                console.log('[AI:SECONDARY] selectData.en:', !!selectData?.en);
-
-                // Normalize flat structure { remedies: [...] } into lang-keyed structure
-                // so all downstream code (render, translate, cache) sees a consistent shape
-                if (selectData.remedies && !selectData.en) {
-                    const rawRemedies = selectData.remedies;
-                    const rawFuluList = selectData.fuluContentList || [];
-                    // Build fuluContentList from remedy visualData if not already present
-                    const fuluContentList = rawFuluList.length > 0 ? rawFuluList : rawRemedies.map(r => ({
-                        id: r.id,
-                        remedyType: r.type,
-                        image: r.images || r.visualData?.image,
-                        fdl: r.visualData?.fdl,
-                        instructions: r.instructions,
-                        usage: r.usage || []
-                    }));
-                    Object.keys(selectData).forEach(k => delete selectData[k]);
-                    selectData.en = { remedies: rawRemedies };
-                    selectData.fuluContentList = fuluContentList;
-                    console.log(`[AI:SECONDARY] Normalized remedies: ${rawRemedies.length} items, ${fuluContentList.length} fulu entries`);
-                }
-
-                // FALLBACK: If no remedies returned, generate generic ones from local DB
-                if (!selectData.en?.remedies?.length && typeof window !== 'undefined' && window.DAOIST_REMEDIES_DB) {
-                    console.log('[AI:SECONDARY] No remedies from API, generating fallback from local DB...');
-                    const fallbackRemedies = this.generateFallbackRemedies();
-                    if (fallbackRemedies.length > 0) {
-                        selectData.en = { remedies: fallbackRemedies };
-                        selectData.fuluContentList = fallbackRemedies.map(r => ({
+            // PRIMARY: Local DB lookup by hexagram number (strict match)
+            if (typeof window !== 'undefined' && window.DAOIST_REMEDIES_DB) {
+                const localRemedies = this.generateFallbackRemedies(true);
+                if (localRemedies.length > 0) {
+                    console.log(`[AI:SECONDARY] Local DB matched ${localRemedies.length} remedies by hexagram`);
+                    selectData = {
+                        en: { remedies: localRemedies },
+                        fuluContentList: localRemedies.map(r => ({
                             id: r.id,
                             remedyType: r.type,
                             image: r.images,
                             fdl: r.visualData?.fdl,
                             instructions: r.instructions,
                             usage: r.usage || []
+                        }))
+                    };
+                }
+            }
+
+            // FALLBACK: AI endpoint if local DB had no matches
+            if (!selectData) {
+                console.log('[AI:SECONDARY] No local DB matches, falling back to AI remedies-select...');
+                const selectRequest = {
+                    ...cleanRequest,
+                    hexagram: {
+                        ...cleanRequest.hexagram,
+                        name_zh: cleanRequest.hexagram?.name_zh || "Unknown"
+                    },
+                    interpretation: interpretation,
+                    interpretationContext: {
+                        celestialColloquial: interpretation[sourceLang]?.celestialColloquial || interpretation.celestial || '',
+                        elementsColloquial: interpretation[sourceLang]?.elementsColloquial || interpretation.elements || '',
+                        coreColloquial: interpretation[sourceLang]?.coreColloquial || interpretation.analysis || ''
+                    }
+                };
+
+                const recentRemedies = this.getRecentRemedies(60);
+                selectRequest.recentRemedies = recentRemedies;
+
+                const apiData = await this.fetchSection('remedies-select', selectRequest, 50000, signal);
+                if (apiData && !signal.aborted) {
+                    selectData = apiData;
+                    // Normalize flat structure into lang-keyed structure
+                    if (selectData.remedies && !selectData.en) {
+                        const rawRemedies = selectData.remedies;
+                        const rawFuluList = selectData.fuluContentList || [];
+                        const fuluContentList = rawFuluList.length > 0 ? rawFuluList : rawRemedies.map(r => ({
+                            id: r.id,
+                            remedyType: r.type,
+                            image: r.images || r.visualData?.image,
+                            fdl: r.visualData?.fdl,
+                            instructions: r.instructions,
+                            usage: r.usage || []
                         }));
-                        console.log(`[AI:SECONDARY] Generated ${fallbackRemedies.length} fallback remedies`);
+                        Object.keys(selectData).forEach(k => delete selectData[k]);
+                        selectData.en = { remedies: rawRemedies };
+                        selectData.fuluContentList = fuluContentList;
+                        console.log(`[AI:SECONDARY] Normalized API remedies: ${rawRemedies.length} items`);
                     }
                 }
+            }
+
+            if (selectData && !signal.aborted) {
 
                 // CLIENT-SIDE FIX: Merge images from local DB if missing in API response
                 if (typeof window !== 'undefined' && window.DAOIST_REMEDIES_DB) {
@@ -4278,7 +4276,7 @@ class App {
     static async fetchRemediesTranslation(selectData, signal) {
         const allLangs = ['es', 'it', 'zh'];
         const targetLangs = allLangs.filter(l => l !== this.lang);
-        
+
         // Find source language dynamically (not always 'en')
         const sourceLang = this.getSourceLang(selectData);
         if (targetLangs.length === 0 && sourceLang === 'en') return;
@@ -4953,7 +4951,7 @@ class App {
     static async translateToLanguage(readingId, result, targetLang, hexagramName) {
         // Find source language dynamically (not always 'en')
         const sourceLang = this.getSourceLang(result);
-        
+
         // Skip if target is source or already has unique translation
         if (targetLang === sourceLang) return result;
         if (result[targetLang]?.analysis && result[targetLang].analysis !== result[sourceLang]?.analysis) {
@@ -5653,9 +5651,10 @@ class App {
     }
 
     /**
-     * Generate fallback remedies from local DB when API returns empty
+     * Generate remedies from local DB by hexagram lookup.
+     * @param {boolean} strictHexMatch - If true, only return entries matching the hexagram number
      */
-    static generateFallbackRemedies() {
+    static generateFallbackRemedies(strictHexMatch = false) {
         if (!window.DAOIST_REMEDIES_DB) return [];
 
         const db = window.DAOIST_REMEDIES_DB;
@@ -5683,6 +5682,8 @@ class App {
                 if (entry.verified) score += 3;
                 return { entry, score };
             })
+                // In strict mode, only return entries that match the hexagram
+                .filter(({ score }) => !strictHexMatch || score >= 10)
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 2) // Take top 2 from each type
                 .map(({ entry }) => ({
@@ -6052,18 +6053,18 @@ class App {
                         </div>
                     </div>
 
-                    <!-- Day Master Info -->
+                    <!-- master of day Info -->
                     ${currentBazi.dayMaster ? `
                         <div class="day-master-card">
                             <div class="dm-header">
-                                <span class="dm-title">${t.dayMaster || 'Day Master'}</span>
+                                <span class="dm-title">${t.dayMaster || 'master of day'}</span>
                                 <span class="dm-value ${getElementClass(currentBazi.dayMaster.element)}">
                                     ${currentBazi.dayMaster.zh} ${currentBazi.dayMaster.name} 
                                     <span class="dm-element">(${currentBazi.dayMaster.element} ${currentBazi.dayMaster.yinYang})</span>
                                 </span>
                             </div>
                             <div class="dm-narrative">
-                                <p>The Day Master represents your core self in this moment. 
+                                <p>The master of day represents your core self in this moment. 
                                 <strong>${currentBazi.dayMaster.name} ${currentBazi.dayMaster.element}</strong> 
                                 (${currentBazi.dayMaster.yinYang}) indicates 
                                 ${currentBazi.dayMaster.element === 'Water' ? 'adaptability, flow, and wisdom' :
@@ -6082,7 +6083,7 @@ class App {
                             <p class="narrative-paragraph">
                                 <strong>Current Celestial Configuration:</strong> The sky reveals a 
                                 <span class="highlight ${getElementClass(currentBazi.day?.stem?.element)}">${currentBazi.day?.stem?.element || 'balanced'}</span> 
-                                Day Master (${currentBazi.day?.stem?.name || 'Unknown'}) 
+                                master of day (${currentBazi.day?.stem?.name || 'Unknown'}) 
                                 ${currentBazi.strength ? `with <strong>${typeof currentBazi.strength === 'object' ? (currentBazi.strength.result || JSON.stringify(currentBazi.strength)) : currentBazi.strength}</strong> strength` : ''}.
                                 ${currentBazi.favorableElements?.length ?
                     `Favorable elements are <span class="element-tag element-${typeof currentBazi.favorableElements[0] === 'string' ? currentBazi.favorableElements[0].toLowerCase() : 'unknown'}">${currentBazi.favorableElements.join(', ')}</span>.` : ''}

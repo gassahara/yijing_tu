@@ -13,7 +13,7 @@
 
 ### 2. Celestial Section Labels ✅
 **Problem**: Hardcoded English labels in celestial section:
-- "Day Master:" instead of "Maestro del Día"
+- "master of day:" instead of "Maestro del Día"
 - "Lunar Mansion:" instead of "Mansión Lunar"
 - "Tai Sui:" (not translated)
 - "Life Gua:" instead of "Gua de Vida"

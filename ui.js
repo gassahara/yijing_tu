@@ -2,7 +2,7 @@ class UI {
     // ============================================
     // FORMATTING UTILITIES - Proper Names & Badges
     // ============================================
-    
+
     /**
      * Format an element with badge styling
      * @param {string} element - Element name (wood, fire, earth, metal, water)
@@ -13,7 +13,7 @@ class UI {
     static formatElementBadge(element, lang = 'en', options = {}) {
         const { showZh = true, capitalize = true } = options;
         const t = I18N[lang] || I18N['en'];
-        
+
         const elementMap = {
             wood: { zh: '木', color: 'wood' },
             fire: { zh: '火', color: 'fire' },
@@ -21,18 +21,18 @@ class UI {
             metal: { zh: '金', color: 'metal' },
             water: { zh: '水', color: 'water' }
         };
-        
+
         const el = element?.toLowerCase() || '';
         const data = elementMap[el];
         if (!data) return element;
-        
+
         const name = t[el] || element;
         const displayName = capitalize ? name.charAt(0).toUpperCase() + name.slice(1) : name;
         const zhChar = showZh ? `<span class="zh">${data.zh}</span>` : '';
-        
+
         return `<span class="element-badge ${data.color}">${displayName}${zhChar}</span>`;
     }
-    
+
     /**
      * Format a trigram with badge styling
      * @param {Object} trigram - Trigram object with name, zh, element
@@ -45,23 +45,23 @@ class UI {
         const name = trigram['name_' + lang] || trigram.name || trigram.name_en;
         const zh = trigram.zh || '';
         const element = (trigram.element || '').toLowerCase();
-        
+
         const elementToTrigram = {
-            wood: 'wind', fire: 'fire', earth: 'earth', 
+            wood: 'wind', fire: 'fire', earth: 'earth',
             metal: 'heaven', water: 'water'
         };
-        
+
         // Map trigram names to their proper bagua names
         const nameMap = {
             'heaven': 'heaven', 'lake': 'lake', 'fire': 'fire', 'thunder': 'thunder',
             'wind': 'wind', 'water': 'water', 'mountain': 'mountain', 'earth': 'earth'
         };
-        
+
         const baguaName = nameMap[name.toLowerCase()] || elementToTrigram[element] || 'earth';
-        
+
         return `<span class="trigram-badge ${baguaName}"><span class="symbol">${zh}</span> ${name}</span>`;
     }
-    
+
     /**
      * Format a BaZi stem with badge styling
      * @param {Object} stem - Stem object with zh, name, element
@@ -73,10 +73,10 @@ class UI {
         const zh = stem.zh || '';
         const name = stem.name || '';
         const element = stem.element || '';
-        
+
         return `<span class="stem-badge" title="${name} ${element}">${zh}</span>`;
     }
-    
+
     /**
      * Format a BaZi branch with badge styling
      * @param {Object} branch - Branch object with zh, name, animal
@@ -87,13 +87,13 @@ class UI {
         if (!branch) return '';
         const zh = branch.zh || '';
         const animal = branch.animal || '';
-        
+
         return `<span class="branch-badge" title="${animal}">${zh}</span>`;
     }
-    
+
     /**
-     * Format Day Master display
-     * @param {Object} dayMaster - Day Master object with zh, name, element
+     * Format master of day display
+     * @param {Object} dayMaster - master of day object with zh, name, element
      * @param {string} lang - Language code
      * @returns {string} HTML string
      */
@@ -103,9 +103,9 @@ class UI {
         const zh = dayMaster.zh || '';
         const name = dayMaster.name || '';
         const element = dayMaster.element || '';
-        
+
         const elementClass = element.toLowerCase();
-        
+
         return `
             <span class="daymaster-badge">
                 <span class="stem">${zh}</span>
@@ -114,7 +114,7 @@ class UI {
             </span>
         `;
     }
-    
+
     /**
      * Format Lunar Mansion display
      * @param {Object} mansion - Mansion object
@@ -126,7 +126,7 @@ class UI {
         const name = mansion['name_' + lang] || mansion.name_en;
         const zh = mansion.zh || '';
         const animal = mansion.animal || '';
-        
+
         return `
             <span class="mansion-badge">
                 <span class="animal">${animal}</span>
@@ -134,7 +134,7 @@ class UI {
             </span>
         `;
     }
-    
+
     /**
      * Format hexagram name display
      * @param {Object} hex - Hexagram object
@@ -146,7 +146,7 @@ class UI {
         const name = hex['name_' + lang] || hex.name_en;
         const zh = hex.name_zh || '';
         const number = hex.number || '';
-        
+
         return `
             <span class="hexagram-badge">
                 <span class="number">#${number}</span>
@@ -155,7 +155,7 @@ class UI {
             </span>
         `;
     }
-    
+
     /**
      * Format Yin/Yang indicator
      * @param {boolean} isYang - True if Yang
@@ -167,10 +167,10 @@ class UI {
         const type = isYang ? 'yang' : 'yin';
         const label = isYang ? (t.yang || 'Yang') : (t.yin || 'Yin');
         const symbol = isYang ? '☰' : '☷';
-        
+
         return `<span class="yinyang-badge ${type}">${symbol} ${label}</span>`;
     }
-    
+
     /**
      * Format compact interpretation text into rich HTML
      * Expands compact format (CELESTIAL:..., ELEMENTS:..., etc.) into styled sections
@@ -182,7 +182,7 @@ class UI {
     static formatCompactInterp(text, sectionType, lang = 'en') {
         if (!text) return '';
         const t = I18N[lang] || I18N['en'];
-        
+
         // Remove section prefix if present (e.g., "CELESTIAL:" or "ELEMENTS:")
         const prefixes = ['CELESTIAL:', 'ELEMENTS:', 'ANALYSIS:', 'ADVICE:'];
         let cleanText = text;
@@ -192,32 +192,32 @@ class UI {
                 break;
             }
         }
-        
+
         // Split into paragraphs
         const paragraphs = cleanText.split(/\n+/).filter(p => p.trim());
-        
+
         if (paragraphs.length === 0) return cleanText;
-        
+
         // For advice section, format as numbered list
         if (sectionType === 'advice') {
             // Try to detect numbered items or split by sentences for advice
-            const items = cleanText.match(/\d+[.)]\s+[^\d]+(?=\d+[.)]|$)/g) || 
-                         cleanText.split(/\.\s+(?=[A-Z])/).filter(s => s.trim().length > 10);
-            
+            const items = cleanText.match(/\d+[.)]\s+[^\d]+(?=\d+[.)]|$)/g) ||
+                cleanText.split(/\.\s+(?=[A-Z])/).filter(s => s.trim().length > 10);
+
             if (items.length >= 3) {
                 return `<ol class="advice-list">
                     ${items.map((item, i) => `<li>${this.highlightProperNames(item.trim(), lang)}</li>`).join('')}
                 </ol>`;
             }
         }
-        
+
         // Format as paragraphs with proper styling
         return paragraphs.map(p => {
             const highlighted = this.highlightProperNames(p.trim(), lang);
             return `<p>${highlighted}</p>`;
         }).join('');
     }
-    
+
     /**
      * Process text to highlight proper names
      * @param {string} text - Input text
@@ -227,16 +227,16 @@ class UI {
     static highlightProperNames(text, lang = 'en') {
         if (!text) return '';
         const t = I18N[lang] || I18N['en'];
-        
+
         // Element names to highlight
         const elements = ['wood', 'fire', 'earth', 'metal', 'water'];
         const elementNames = elements.map(e => t[e]?.toLowerCase()).filter(Boolean);
-        
+
         // Create regex for element names
         if (elementNames.length > 0) {
             const elementRegex = new RegExp(`\\b(${elementNames.join('|')})\\b`, 'gi');
             text = text.replace(elementRegex, (match) => {
-                const elementKey = elements.find(e => 
+                const elementKey = elements.find(e =>
                     t[e]?.toLowerCase() === match.toLowerCase()
                 );
                 if (elementKey) {
@@ -245,7 +245,7 @@ class UI {
                 return match;
             });
         }
-        
+
         return text;
     }
 
@@ -1756,7 +1756,7 @@ class UI {
         // Helper to translate remedy content asynchronously (for legacy renderer)
         const translateRemedyContentLegacy = async (remedy, lang) => {
             if (lang === 'en' || !window.translationService) return remedy;
-            
+
             const fieldsToTranslate = ['relevance', 'description', 'instructions'];
             for (const field of fieldsToTranslate) {
                 if (remedy[field] && typeof remedy[field] === 'string') {
@@ -1784,11 +1784,11 @@ class UI {
             const typeLabel = isTalisman ? t.talisman : isFengShui ? t.fengshui : t.medicine;
             const icon = isTalisman ? '符' : isFengShui ? '風' : '丹';
             const accentClass = isTalisman ? 'talisman-section' : isFengShui ? 'fengshui-section' : 'medicine-section';
-            
+
             // Get translated remedy name
             const remedyName = this._resolveRemedyName(remedy, displayLang);
             const remedyNameZh = typeof remedy.name === 'object' ? (remedy.name.zh || '') : (remedy.nameZh || '');
-            
+
             // Kick off async translation for remedy content if not English
             if (displayLang !== 'en' && window.translationService) {
                 translateRemedyContentLegacy(remedy, displayLang).then(updatedRemedy => {
@@ -2102,7 +2102,7 @@ class UI {
     }
 
     // Remedy name translations for common remedies
-        static REMEDY_NAME_TRANSLATIONS = {
+    static REMEDY_NAME_TRANSLATIONS = {
         'Anti-Gossip Talisman': { es: 'Talismán Anti-Chismes', it: 'Talismano Anti-Pettegolezzi' },
         'Celestial Master Healing Talisman': { es: 'Talismán de Sanación del Maestro Celestial', it: 'Talismano di Guarigione del Maestro Celeste' },
         'Celestial Master\'s Five Thunders Talisman': { es: 'Talismán de los Cinco Truenos del Maestro Celestial', it: 'Talismano dei Cinque Tuoni del Maestro Celeste' },
@@ -2597,26 +2597,44 @@ class UI {
 
         trigramInfo.forEach(t => {
             if (highlightColors[t.name]) {
+                const color = highlightColors[t.name];
+                const isFavorable = color === '#4CAF50';
                 const r = size * 0.38;
                 const x = cx + Math.cos(t.angle) * r;
                 const y = cy + Math.sin(t.angle) * r;
+                const markerR = size * 0.12;
 
-                // Draw highlight ring
+                // Draw filled sector highlight with higher opacity
                 ctx.beginPath();
-                ctx.arc(x, y, size * 0.12, 0, Math.PI * 2);
-                ctx.fillStyle = highlightColors[t.name] + '30';
+                ctx.arc(x, y, markerR, 0, Math.PI * 2);
+                ctx.fillStyle = color + '55'; // ~33% opacity
                 ctx.fill();
-                ctx.strokeStyle = highlightColors[t.name];
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2.5;
                 ctx.stroke();
 
-                // Draw direction indicator
-                ctx.fillStyle = highlightColors[t.name];
-                ctx.font = `bold ${size * 0.045}px sans-serif`;
+                // Draw glow effect
+                ctx.save();
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.arc(x, y, markerR * 0.7, 0, Math.PI * 2);
+                ctx.strokeStyle = color + '80';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+
+                // Draw direction label
+                const translatedDir = typeof UI !== 'undefined' && UI._translateDirection ? UI._translateDirection(t.dir, lang) : t.dir;
+                ctx.fillStyle = color;
+                ctx.font = `bold ${size * 0.055}px sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                const translatedDir = typeof UI !== 'undefined' && UI._translateDirection ? UI._translateDirection(t.dir, lang) : t.dir;
-                ctx.fillText(translatedDir, x, y);
+                ctx.fillText(translatedDir, x, y - markerR * 0.2);
+
+                // Draw favorable/unfavorable indicator symbol
+                ctx.font = `${size * 0.04}px sans-serif`;
+                ctx.fillText(isFavorable ? '✓' : '✗', x, y + markerR * 0.45);
             }
         });
     }
@@ -2688,19 +2706,47 @@ class UI {
             'Qian': -Math.PI / 2, 'Dui': -Math.PI / 4, 'Li': 0, 'Zhen': Math.PI / 4,
             'Kun': Math.PI / 2, 'Gen': 3 * Math.PI / 4, 'Kan': Math.PI, 'Xun': -3 * Math.PI / 4
         };
+        // Reverse direction map: trigram → houtian direction (for labels)
+        const trigramToDir = {};
+        Object.entries(xiantianDirMap).forEach(([dir, tg]) => {
+            if (dir.length <= 2) trigramToDir[tg] = dir; // Use short forms (S, NE, etc.)
+        });
+
         Object.entries(highlightColors).forEach(([tg, color]) => {
             const angle = xiantianAngles[tg];
             if (angle === undefined) return;
+            const isFavorable = color === '#4CAF50';
             const r = size * 0.38;
             const x = cx + Math.cos(angle) * r;
             const y = cy + Math.sin(angle) * r;
+            const markerR = size * 0.12;
+
+            // Filled highlight with higher opacity
             ctx.beginPath();
-            ctx.arc(x, y, size * 0.12, 0, Math.PI * 2);
-            ctx.fillStyle = color + '30';
+            ctx.arc(x, y, markerR, 0, Math.PI * 2);
+            ctx.fillStyle = color + '55';
             ctx.fill();
             ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2.5;
             ctx.stroke();
+
+            // Glow effect
+            ctx.save();
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(x, y, markerR * 0.7, 0, Math.PI * 2);
+            ctx.strokeStyle = color + '80';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+
+            // Favorable/unfavorable symbol
+            ctx.fillStyle = color;
+            ctx.font = `bold ${size * 0.04}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(isFavorable ? '✓' : '✗', x, y);
         });
     }
 
@@ -3415,11 +3461,11 @@ class UI {
             const earthBadge = this.formatElementBadge('earth', lang, { showZh: true });
             const metalBadge = this.formatElementBadge('metal', lang, { showZh: true });
             const waterBadge = this.formatElementBadge('water', lang, { showZh: true });
-            
+
             // Determine dominant and deficient for highlighting
             const dominant = el.dominant || '';
             const deficient = el.deficient || '';
-            
+
             const elHtml = `
                 <div class="five-elements-balance">
                     <div class="element-bar">
@@ -3623,7 +3669,7 @@ class UI {
                 // Always render section if we have any content
                 if (layeredContent || content) {
                     let finalContent = layeredContent || (content ? this.formatCompactInterp(content, section.key, lang) : '');
-                    
+
                     // Apply highlighting to layered content if it doesn't already have badges
                     if (finalContent && !finalContent.includes('element-badge') && !finalContent.includes('trigram-badge')) {
                         finalContent = this.highlightProperNames(finalContent, lang);
@@ -3705,7 +3751,7 @@ class UI {
         // Helper to translate remedy content asynchronously
         const translateRemedyContent = async (remedy, lang) => {
             if (lang === 'en' || !window.translationService) return remedy;
-            
+
             const fieldsToTranslate = ['relevance', 'description', 'instructions'];
             for (const field of fieldsToTranslate) {
                 if (remedy[field] && typeof remedy[field] === 'string') {
@@ -3733,7 +3779,7 @@ class UI {
             const remedyNameZh = typeof remedy.name === 'object' ? (remedy.name.zh || '') : (remedy.nameZh || '');
 
             let fuluContent = fuluContentList.find(f => f.id === remedy.id) || fuluContentList[index] || {};
-            
+
             // Kick off async translation for remedy content if not English
             if (displayLang !== 'en' && window.translationService) {
                 translateRemedyContent(remedy, displayLang).then(updatedRemedy => {
@@ -4139,7 +4185,7 @@ class UI {
 
         // Append to existing content instead of replacing
         let html = `
-            < div class="bazi-enhanced-container" >
+            <div class="bazi-enhanced-container">
                 <div class="bazi-diagram-wrapper">
                     <canvas id="${canvasId}" width="500" height="500" class="bazi-enhanced-canvas"></canvas>
                     <div class="bazi-legend">
@@ -4162,7 +4208,7 @@ class UI {
             html += this.generateBaziDetailCards(currentBaziExtended, t.currentBaziTitle || 'Current BaZi', lang);
         }
 
-        html += `</div></div > `;
+        html += `</div></div>`;
         container.insertAdjacentHTML('beforeend', html);
 
         // Render the enhanced diagram
@@ -4215,12 +4261,12 @@ class UI {
 
     static generateBaziDetailCards(baziData, title, lang) {
         const t = I18N[lang] || I18N['en'];
-        let html = `< div class="bazi-detail-section" > <h4>${title}</h4>`;
+        let html = `<div class="bazi-detail-section"><h4>${title}</h4>`;
 
         // Hetu info
         if (baziData.hetu) {
             html += `
-            < div class="bazi-detail-card hetu-card" >
+            <div class="bazi-detail-card hetu-card">
                     <div class="card-header">河圖 Hetu</div>
                     <div class="card-content">
                         <div class="detail-row">
@@ -4232,14 +4278,14 @@ class UI {
                             <span class="value">${baziData.hetu.lifePath?.pathType || '-'}</span>
                         </div>
                     </div>
-                </div >
+                </div>
             `;
         }
 
         // Luoshu info
         if (baziData.luoshu) {
             html += `
-            < div class="bazi-detail-card luoshu-card" >
+            <div class="bazi-detail-card luoshu-card">
                     <div class="card-header">洛書 Luoshu</div>
                     <div class="card-content">
                         <div class="detail-row">
@@ -4251,14 +4297,14 @@ class UI {
                             <span class="value">${baziData.luoshu.mingGua?.favorableDirections?.shengQi || '-'}</span>
                         </div>
                     </div>
-                </div >
+                </div>
             `;
         }
 
         // Xiantian info
         if (baziData.xiantian) {
             html += `
-            < div class="bazi-detail-card xiantian-card" >
+            <div class="bazi-detail-card xiantian-card">
                     <div class="card-header">先天 Xiantian</div>
                     <div class="card-content">
                         <div class="detail-row">
@@ -4270,7 +4316,7 @@ class UI {
                             <span class="value">${baziData.xiantian.congenitalNature?.description || '-'}</span>
                         </div>
                     </div>
-                </div >
+                </div>
             `;
         }
 
@@ -4341,7 +4387,7 @@ class UI {
         const upper = reading.binaryKey?.substring(3, 6);
 
         let html = `
-            < div class="graphical-summary-container" >
+            <div class="graphical-summary-container">
                 <div class="summary-hexagram-section">
                     <h4>${hex?.name_en || ''} <span class="zh">${hex?.name_zh || ''}</span></h4>
                     <div class="summary-hexagram-display">
@@ -4360,9 +4406,9 @@ class UI {
                         </div>
                         <div class="hex-info-mini">
                             <div class="trigram-pair">
-                                <span class="trigram-badge upper">${TRIGRAMS[upper]?.name?.[lang] || upper}</span>
-                                <span class="trigram-connector">over</span>
-                                <span class="trigram-badge lower">${TRIGRAMS[lower]?.name?.[lang] || lower}</span>
+                                <span class="trigram-badge upper">${TRIGRAMS[upper]?.name?.[lang] || TRIGRAMS[upper]?.name?.en || upper}</span>
+                                <span class="trigram-connector">${t.over || 'over'}</span>
+                                <span class="trigram-badge lower">${TRIGRAMS[lower]?.name?.[lang] || TRIGRAMS[lower]?.name?.en || lower}</span>
                             </div>
                             <div class="hex-number">#${hex?.number || ''}</div>
                         </div>
@@ -4372,13 +4418,13 @@ class UI {
                 <div class="summary-bagua-section">
                     <h4>${t.baguaDiagram || 'Bagua Diagram'}</h4>
                     <div class="summary-bagua-container">
-                        <canvas id="summaryBaguaCanvas" width="300" height="160"></canvas>
+                        <canvas id="summaryBaguaCanvas" width="400" height="240"></canvas>
                     </div>
                     <div class="active-trigrams">
-                        <span class="active-label">${t.activeTrigrams || 'Active'}:</span>
+                        <span class="active-label">${t.active || 'Active'}:</span>
                         <span class="active-badges">
-                            <span class="badge houtian">${TRIGRAMS[upper]?.name?.en || upper}</span>
-                            <span class="badge houtian">${TRIGRAMS[lower]?.name?.en || lower}</span>
+                            <span class="badge houtian">${TRIGRAMS[upper]?.name?.[lang] || TRIGRAMS[upper]?.name?.en || upper}</span>
+                            <span class="badge houtian">${TRIGRAMS[lower]?.name?.[lang] || TRIGRAMS[lower]?.name?.en || lower}</span>
                         </span>
                     </div>
                 </div>
@@ -4387,7 +4433,7 @@ class UI {
         // Add elements summary if available
         if (reading.equilibrium) {
             html += `
-            < div class="summary-elements-section" >
+            <div class="summary-elements-section">
                     <h4>${t.elements || 'Elements'}</h4>
                     <div class="yin-yang-mini">
                         <div class="balance-bar-mini">
@@ -4397,11 +4443,11 @@ class UI {
                             <span>☯️ ${reading.equilibrium.yangCount}Y / ${reading.equilibrium.yinCount}Y</span>
                         </div>
                     </div>
-                </div >
+                </div>
             `;
         }
 
-        html += `</div > `;
+        html += `</div>`;
         container.innerHTML = html;
 
         // Render mini Bagua diagram
@@ -4426,7 +4472,9 @@ class UI {
         const lowerTrigram = TRIGRAMS[lowerKey];
 
         // Draw dual Bagua with active trigrams highlighted
-        SigilTools.drawDualBagua(ctx, rect.width / 2, rect.height / 2, rect.width * 0.9, {
+        // Size must account for dual layout: total width ≈ size * 1.5 (two diagrams + gap + text)
+        const baguaSize = Math.min(rect.width * 0.65, rect.height * 1.3);
+        SigilTools.drawDualBagua(ctx, rect.width / 2, rect.height / 2, baguaSize, {
             houtianActive: [upperTrigram?.name, lowerTrigram?.name].filter(Boolean),
             xiantianActive: [], // Could calculate based on hexagram
             showLabels: false,

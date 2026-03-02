@@ -1837,7 +1837,7 @@ class SigilTools {
             this.drawHoutianMini(ctx, cx - offset, cy, innerSize, baziData.chart, stroke);
         }
 
-        // Center: Day Master info
+        // Center: master of day info
         this.drawBaziCenterInfo(ctx, cx, cy, size * 0.25, baziData, stroke);
 
         // Draw connecting lines between systems
@@ -1972,7 +1972,7 @@ class SigilTools {
         ctx.textAlign = 'center';
         ctx.fillText('後天 Houtian', cx, cy - size * 0.35);
 
-        // Show Day Master
+        // Show master of day
         if (chart.day && chart.day.stem) {
             const stem = chart.day.stem;
             ctx.fillStyle = '#9C27B0';
@@ -2001,7 +2001,7 @@ class SigilTools {
             const dayMaster = baziData.chart.day.stem;
             const strength = baziData.chart.strength;
 
-            // Day Master character
+            // master of day character
             ctx.fillStyle = stroke;
             ctx.font = `bold ${size * 0.35}px "Noto Serif SC", serif`;
             ctx.textAlign = 'center';

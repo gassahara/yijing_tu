@@ -1,7 +1,7 @@
 class IChingCaster {
     static async fetchHexagramData() {
         try {
-            const cached = Storage.get('iChingData_v4');
+            const cached = Storage.get('iChingData_v5');
             if (cached) {
                 return Object.values(JSON.parse(cached).hexagrams || {});
             }
@@ -10,7 +10,7 @@ class IChingCaster {
             if (!response.ok) throw new Error("Failed to fetch");
 
             const data = await response.json();
-            Storage.set('iChingData_v4', JSON.stringify(data));
+            Storage.set('iChingData_v5', JSON.stringify(data));
             return Object.values(data.hexagrams || {});
         } catch (e) {
             console.error("Could not load hexagram data:", e);

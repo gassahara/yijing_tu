@@ -2,7 +2,7 @@
 
 ## Issue Identified
 The AI interpretation was not using the actual calculated BaZi data. The technical analysis was saying:
-- "fuerza del Maestro del Día es desconocida" (Day Master strength is unknown)
+- "fuerza del Maestro del Día es desconocida" (master of day strength is unknown)
 - Referencing generic hexagram data instead of actual BaZi pillars
 - Missing critical astrological context
 
@@ -11,7 +11,7 @@ The `compactBaziFor*` functions in `buildSectionRequest()` were **over-compressi
 - All four pillars (Year, Month, Day, Hour)
 - Branch information
 - Hidden stems
-- Day Master object
+- master of day object
 - Favorable/unfavorable elements
 
 Only sending:
@@ -46,7 +46,7 @@ Each now includes:
 ### Debug Logging Added
 Added `[AI:BUILD:*]` console logs to verify BaZi data is being sent correctly:
 - Whether current/moment/birth BaZi is present
-- Day Master element and stem
+- master of day element and stem
 - Strength result
 - All four pillars (Year, Month, Day, Hour)
 
@@ -56,7 +56,7 @@ AI should now generate interpretations like:
 ```
 Current Sky (BaZi) 天時八字
 
-The sky reveals a Strong Wood Day Master (Jia 甲) with the following 
+The sky reveals a Strong Wood master of day (Jia 甲) with the following 
 pillar configuration:
 - Year: Bing-Wu (Fire-Fire) - Annual cosmic influence
 - Month: Geng-Yin (Metal-Wood) - Career/external circumstances  
@@ -65,7 +65,7 @@ pillar configuration:
 
 With Earth as Yong Shen, the chart favors steady cultivation and 
 accumulation. The Fire in Year and Hour generates Wood, supporting 
-the Strong Day Master...
+the Strong master of day...
 ```
 
 ## Files Changed

@@ -120,7 +120,7 @@ const SHEN_SHA_FORMULAS = {
     meaning: "Guardian Angel - help from powerful people in crisis",
     quality: "Auspicious"
   },
-  
+
   // Tao Hua - Peach Blossom
   peachBlossom: {
     branchMap: {
@@ -132,7 +132,7 @@ const SHEN_SHA_FORMULAS = {
     meaning: "Charisma, romance, social attraction",
     quality: "Mixed"
   },
-  
+
   // Wen Chang - Academic Star
   wenChang: {
     stemMap: {
@@ -145,7 +145,7 @@ const SHEN_SHA_FORMULAS = {
     meaning: "Intelligence, literary talent, exam success",
     quality: "Auspicious"
   },
-  
+
   // Yi Ma - Travelling Horse
   yiMa: {
     branchMap: {
@@ -159,7 +159,7 @@ const SHEN_SHA_FORMULAS = {
     meaning: "Movement, migration, rapid change",
     quality: "Dynamic"
   },
-  
+
   // Tian Yi - Heavenly Doctor (Feng Shui)
   tianYi: {
     stemMap: {
@@ -170,7 +170,7 @@ const SHEN_SHA_FORMULAS = {
     meaning: "Healing, medical support, recovery",
     quality: "Auspicious"
   },
-  
+
   // Yang Ren - Goat Blade/Sword
   yangRen: {
     stemMap: {
@@ -248,18 +248,18 @@ function calculateAyanamsa(date: Date, location: LocationData): AyanamsaResult {
   // For every 1° of longitude = 4 minutes
   const longitudeDiff = location.longitude - CHINA_REFERENCE_LONGITUDE;
   const correctionMinutes = longitudeDiff * MINUTES_PER_DEGREE;
-  
+
   // Calculate equation of time (Earth's elliptical orbit correction)
   // This accounts for the difference between mean solar time and apparent solar time
   const dayOfYear = getDayOfYear(date);
   const equationOfTime = calculateEquationOfTime(dayOfYear);
-  
+
   // Total correction in milliseconds
   const totalCorrectionMs = (correctionMinutes + equationOfTime) * 60 * 1000;
-  
+
   // Apply correction
   const correctedDate = new Date(date.getTime() + totalCorrectionMs);
-  
+
   return {
     originalTime: date.toISOString(),
     correctedTime: correctedDate.toISOString(),
@@ -280,10 +280,10 @@ function calculateAyanamsa(date: Date, location: LocationData): AyanamsaResult {
 function calculateEquationOfTime(dayOfYear: number): number {
   // B = (360° / 365) * (dayOfYear - 81)
   const B = (360 / 365) * (dayOfYear - 81) * (Math.PI / 180);
-  
+
   // EoT = 9.87 * sin(2B) - 7.53 * cos(B) - 1.5 * sin(B)
   const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-  
+
   return eot;  // in minutes
 }
 
@@ -298,7 +298,7 @@ function formatTimeDifference(minutes: number): string {
   const hours = Math.floor(absMinutes / 60);
   const mins = Math.round(absMinutes % 60);
   const sign = minutes >= 0 ? "+" : "-";
-  
+
   if (hours === 0) {
     return `${sign}${mins} minutes`;
   }
@@ -337,27 +337,27 @@ function calculateBazi(date: Date, location?: LocationData): BaziChart {
   // Apply ayanamsa correction if location provided
   let calculationDate = date;
   let ayanamsaData: AyanamsaResult | null = null;
-  
+
   if (location) {
     ayanamsaData = calculateAyanamsa(date, location);
     calculationDate = new Date(ayanamsaData.correctedTime);
   }
-  
+
   const year = calculationDate.getFullYear();
   const month = calculationDate.getMonth();
   const day = calculationDate.getDate();
   const hours = calculationDate.getHours();
   const minutes = calculationDate.getMinutes();
-  
+
   // 1. YEAR PILLAR
   // BaZi year changes at Li Chun (approx Feb 4)
   let liChun = new Date(year, 1, 4);  // Feb 4
   let baziYear = year;
   if (calculationDate < liChun) baziYear--;
-  
+
   const yearStemIdx = (baziYear - 4 + 10) % 10;
   const yearBranchIdx = (baziYear - 4 + 12) % 12;
-  
+
   // 2. MONTH PILLAR
   // Based on solar terms (Jie Qi)
   const monthStarts = [
@@ -374,26 +374,26 @@ function calculateBazi(date: Date, location?: LocationData): BaziChart {
     { m: 10, d: 7 }, // Nov: Li Dong
     { m: 11, d: 7 }  // Dec: Da Xue
   ];
-  
+
   let baziMonthIdx = month;
   if (day < monthStarts[month].d) {
     baziMonthIdx = (month + 11) % 12;
   }
-  
+
   const monthBranchIdx = (baziMonthIdx + 1) % 12;
   const monthStemIdx = (yearStemIdx * 2 + monthBranchIdx) % 10;
-  
+
   // 3. DAY PILLAR
   // Reference: Jan 1, 2000 was Wu-Wu (4, 6)
   const refDate = new Date(2000, 0, 1);
   const diffDays = Math.floor((calculationDate.getTime() - refDate.getTime()) / (1000 * 60 * 60 * 24));
   const dayStemIdx = (4 + (diffDays % 10) + 10) % 10;
   const dayBranchIdx = (6 + (diffDays % 12) + 12) % 12;
-  
+
   // 4. HOUR PILLAR (with ayanamsa correction applied)
   const hourBranchIdx = Math.floor((hours + 1) / 2) % 12;
   const hourStemIdx = (dayStemIdx * 2 + hourBranchIdx) % 10;
-  
+
   const chart: BaziChart = {
     year: {
       stem: HEAVENLY_STEMS[yearStemIdx],
@@ -419,22 +419,22 @@ function calculateBazi(date: Date, location?: LocationData): BaziChart {
     strength: { score: 0, result: "", yongShen: "" },
     shenSha: {}
   };
-  
+
   // Calculate strength
   chart.strength = calculateStrength(chart);
-  
+
   // Calculate Symbolic Stars (Shen Sha)
   chart.shenSha = calculateShenSha(chart);
-  
+
   return chart;
 }
 
 function calculateStrength(chart: BaziChart): { score: number; result: string; yongShen: string } {
   const dm = chart.day.stem;
   const season = chart.month.branch;
-  
+
   let score = 0;
-  
+
   // Season support
   const fiveElements: Record<string, { produces: string; overcomes: string }> = {
     Wood: { produces: "Fire", overcomes: "Earth" },
@@ -443,13 +443,13 @@ function calculateStrength(chart: BaziChart): { score: number; result: string; y
     Metal: { produces: "Water", overcomes: "Wood" },
     Water: { produces: "Wood", overcomes: "Fire" }
   };
-  
+
   if (season.element === dm.element) score += 40;
   else if (fiveElements[season.element].produces === dm.element) score += 30;
   else if (fiveElements[dm.element].produces === season.element) score -= 20;
   else if (fiveElements[season.element].overcomes === dm.element) score -= 30;
   else score -= 10;
-  
+
   // Other pillars
   const stems = [chart.year.stem, chart.month.stem, chart.hour.stem];
   stems.forEach(s => {
@@ -457,19 +457,19 @@ function calculateStrength(chart: BaziChart): { score: number; result: string; y
     else if (fiveElements[s.element].produces === dm.element) score += 10;
     else score -= 5;
   });
-  
+
   const branches = [chart.year.branch, chart.day.branch, chart.hour.branch];
   branches.forEach(b => {
     if (b.element === dm.element) score += 10;
     else if (fiveElements[b.element].produces === dm.element) score += 10;
     else score -= 5;
   });
-  
+
   let result = "";
   if (score > 20) result = "Strong";
   else if (score < -10) result = "Weak";
   else result = "Balanced";
-  
+
   let yongShen = "";
   if (result === "Strong") {
     yongShen = fiveElements[dm.element].overcomes;
@@ -478,7 +478,7 @@ function calculateStrength(chart: BaziChart): { score: number; result: string; y
   } else {
     yongShen = "Balanced";
   }
-  
+
   return { score, result, yongShen };
 }
 
@@ -487,7 +487,7 @@ function calculateShenSha(chart: BaziChart): Record<string, any> {
   const dayStem = chart.day.stem.name;
   const dayBranch = chart.day.branch.name;
   const yearBranch = chart.year.branch.name;
-  
+
   // Noble Person (Tian Yi Gui Ren)
   const nobleBranches = SHEN_SHA_FORMULAS.tianYiGuiRen.stemMap[dayStem as keyof typeof SHEN_SHA_FORMULAS.tianYiGuiRen.stemMap];
   if (nobleBranches) {
@@ -500,7 +500,7 @@ function calculateShenSha(chart: BaziChart): Record<string, any> {
       presentIn: checkShenShaPresence(nobleBranches, chart)
     };
   }
-  
+
   // Peach Blossom (Tao Hua)
   const peachBranch = SHEN_SHA_FORMULAS.peachBlossom.branchMap[yearBranch as keyof typeof SHEN_SHA_FORMULAS.peachBlossom.branchMap];
   if (peachBranch) {
@@ -513,7 +513,7 @@ function calculateShenSha(chart: BaziChart): Record<string, any> {
       presentIn: checkSingleShenShaPresence(peachBranch, chart)
     };
   }
-  
+
   // Academic Star (Wen Chang)
   const academicBranch = SHEN_SHA_FORMULAS.wenChang.stemMap[dayStem as keyof typeof SHEN_SHA_FORMULAS.wenChang.stemMap];
   if (academicBranch) {
@@ -526,7 +526,7 @@ function calculateShenSha(chart: BaziChart): Record<string, any> {
       presentIn: checkSingleShenShaPresence(academicBranch, chart)
     };
   }
-  
+
   // Travelling Horse (Yi Ma)
   const horseBranch = SHEN_SHA_FORMULAS.yiMa.branchMap[yearBranch as keyof typeof SHEN_SHA_FORMULAS.yiMa.branchMap];
   if (horseBranch) {
@@ -539,7 +539,7 @@ function calculateShenSha(chart: BaziChart): Record<string, any> {
       presentIn: checkSingleShenShaPresence(horseBranch, chart)
     };
   }
-  
+
   // Yang Ren (Sword/Goat Blade)
   const yangRenBranch = SHEN_SHA_FORMULAS.yangRen.stemMap[dayStem as keyof typeof SHEN_SHA_FORMULAS.yangRen.stemMap];
   if (yangRenBranch) {
@@ -552,20 +552,20 @@ function calculateShenSha(chart: BaziChart): Record<string, any> {
       presentIn: checkSingleShenShaPresence(yangRenBranch, chart)
     };
   }
-  
+
   return shenSha;
 }
 
 function checkShenShaPresence(targetBranches: string[], chart: BaziChart): string[] {
   const present: string[] = [];
   const pillars = ['year', 'month', 'day', 'hour'] as const;
-  
+
   pillars.forEach(pillar => {
     if (targetBranches.includes(chart[pillar].branch.name)) {
       present.push(`${pillar} (${chart[pillar].branch.zh})`);
     }
   });
-  
+
   return present;
 }
 
@@ -597,11 +597,11 @@ function calculateLunarMansion(date: Date, location?: LocationData): LunarMansio
     const ayanamsa = calculateAyanamsa(date, location);
     calculationDate = new Date(ayanamsa.correctedTime);
   }
-  
+
   // Calculate moon's position
   // Using simplified but accurate lunar position calculation
   const moonLongitude = calculateMoonLongitude(calculationDate);
-  
+
   // Adjust for location longitude (visual observation)
   let visualLongitude = moonLongitude;
   if (location) {
@@ -610,15 +610,15 @@ function calculateLunarMansion(date: Date, location?: LocationData): LunarMansio
     visualLongitude = (moonLongitude + lstAdjustment * 15) % 360;
     if (visualLongitude < 0) visualLongitude += 360;
   }
-  
+
   // Find which mansion contains this longitude
   const mansion = findMansionForLongitude(visualLongitude);
   const degreeInMansion = visualLongitude - mansion.startDeg;
-  
+
   // Calculate daily and hourly rulers
   const dayRuler = calculateDayRuler(calculationDate);
   const hourRuler = calculateHourRuler(calculationDate);
-  
+
   return {
     mansion,
     degree: degreeInMansion,
@@ -638,16 +638,16 @@ function calculateMoonLongitude(date: Date): number {
   const jd2000 = 2451545.0;
   const msPerDay = 86400000;
   const d = (date.getTime() / msPerDay) - jd2000 + 2440587.5;
-  
+
   // Mean longitude of the moon
   const L = (218.316 + 13.176396 * d) % 360;
-  
+
   // Mean anomaly
   const M = (134.963 + 13.064993 * d) % 360;
-  
+
   // Mean distance
   const F = (93.272 + 13.229350 * d) % 360;
-  
+
   // Calculate longitude with perturbations
   let longitude = L + 6.289 * Math.sin(M * Math.PI / 180);
   longitude += 1.274 * Math.sin((2 * M - L + 134.963) * Math.PI / 180);
@@ -655,23 +655,23 @@ function calculateMoonLongitude(date: Date): number {
   longitude += 0.214 * Math.sin(2 * L * Math.PI / 180);
   longitude -= 0.186 * Math.sin(M * Math.PI / 180);
   longitude -= 0.114 * Math.sin(2 * F * Math.PI / 180);
-  
+
   longitude = longitude % 360;
   if (longitude < 0) longitude += 360;
-  
+
   return longitude;
 }
 
 function findMansionForLongitude(longitude: number): typeof LUNAR_MANSIONS_28[0] {
   // Normalize to 0-365.25 range of mansions
   const normalizedLong = longitude % 365.25;
-  
+
   for (const mansion of LUNAR_MANSIONS_28) {
     if (normalizedLong >= mansion.startDeg && normalizedLong < mansion.endDeg) {
       return mansion;
     }
   }
-  
+
   return LUNAR_MANSIONS_28[0];  // Default to first mansion
 }
 
@@ -691,14 +691,14 @@ function calculateHourRuler(date: Date): string {
 function isMansionAscending(mansion: typeof LUNAR_MANSIONS_28[0], date: Date, location?: LocationData): boolean {
   // Simplified: mansion is ascending if its direction matches current time of day
   const hour = date.getHours();
-  
+
   const directionHours: Record<string, number[]> = {
     "E": [5, 6, 7, 8, 9],      // Morning
     "S": [10, 11, 12, 13, 14], // Midday
     "W": [15, 16, 17, 18, 19], // Afternoon/Evening
     "N": [20, 21, 22, 23, 0, 1, 2, 3, 4] // Night
   };
-  
+
   return directionHours[mansion.direction]?.includes(hour) || false;
 }
 
@@ -733,24 +733,24 @@ function calculateTaiSui(year: number, location?: LocationData): TaiSuiAnalysis 
   // Calculate year branch
   const yearBranchIdx = (year - 4) % 12;
   const yearBranch = EARTHLY_BRANCHES[yearBranchIdx];
-  
+
   // Get Tai Sui position
   const taiSui = TAI_SUI_POSITIONS[yearBranch.name as keyof typeof TAI_SUI_POSITIONS];
-  
+
   // Calculate clashes (branches opposite to Tai Sui)
   const oppositeIdx = (yearBranchIdx + 6) % 12;
   const oppositeBranch = EARTHLY_BRANCHES[oppositeIdx];
-  
+
   // San Sha (Three Killings) - 60° to either side of the opposite
   const sanShaDirections = ["NE", "E", "SE", "S", "SW", "W", "NW", "N"];
   const oppositeDir = taiSui.direction;
-  
+
   // Favorable directions (Heavenly Doctor, etc.)
   const favorable = calculateFavorableDirections(yearBranch.name);
-  
+
   // Unfavorable (Tai Sui direction, Year Breaker, etc.)
   const unfavorable = [taiSui.direction, oppositeBranch.name];
-  
+
   return {
     currentPosition: {
       branch: yearBranch.name,
@@ -791,7 +791,7 @@ function calculateFavorableDirections(yearBranch: string): string[] {
     "Xu": ["NW", "W", "SW"],     // Dog
     "Hai": ["SE", "E", "S"]      // Pig
   };
-  
+
   return directionMap[yearBranch] || ["E", "SE", "S"];
 }
 
@@ -817,67 +817,67 @@ interface BaguaTrigram {
 }
 
 const BAGUA_TRIGRAMS: BaguaTrigram[] = [
-  { 
-    name: "Qian", zh: "乾", binary: "111", element: "Metal", 
-    direction_xiantian: "S", direction_houtian: "NW", 
+  {
+    name: "Qian", zh: "乾", binary: "111", element: "Metal",
+    direction_xiantian: "S", direction_houtian: "NW",
     number_xiantian: 1, number_houtian: 6,
-    nature: "Heaven", family: "Father", bodyPart: "Head", 
+    nature: "Heaven", family: "Father", bodyPart: "Head",
     season: "Autumn", quality: "Creative, strong",
     yao: [1, 1, 1]
   },
-  { 
-    name: "Dui", zh: "兌", binary: "011", element: "Metal", 
-    direction_xiantian: "SE", direction_houtian: "W", 
+  {
+    name: "Dui", zh: "兌", binary: "011", element: "Metal",
+    direction_xiantian: "SE", direction_houtian: "W",
     number_xiantian: 2, number_houtian: 7,
-    nature: "Lake", family: "Youngest Daughter", bodyPart: "Mouth", 
+    nature: "Lake", family: "Youngest Daughter", bodyPart: "Mouth",
     season: "Autumn", quality: "Joyful, peaceful",
     yao: [0, 1, 1]
   },
-  { 
-    name: "Li", zh: "離", binary: "101", element: "Fire", 
-    direction_xiantian: "E", direction_houtian: "S", 
+  {
+    name: "Li", zh: "離", binary: "101", element: "Fire",
+    direction_xiantian: "E", direction_houtian: "S",
     number_xiantian: 3, number_houtian: 9,
-    nature: "Fire", family: "Middle Daughter", bodyPart: "Eyes", 
+    nature: "Fire", family: "Middle Daughter", bodyPart: "Eyes",
     season: "Summer", quality: "Clarity,依附",
     yao: [1, 0, 1]
   },
-  { 
-    name: "Zhen", zh: "震", binary: "001", element: "Wood", 
-    direction_xiantian: "NE", direction_houtian: "E", 
+  {
+    name: "Zhen", zh: "震", binary: "001", element: "Wood",
+    direction_xiantian: "NE", direction_houtian: "E",
     number_xiantian: 4, number_houtian: 3,
-    nature: "Thunder", family: "Eldest Son", bodyPart: "Feet", 
+    nature: "Thunder", family: "Eldest Son", bodyPart: "Feet",
     season: "Spring", quality: "Arousing, movement",
     yao: [0, 0, 1]
   },
-  { 
-    name: "Xun", zh: "巽", binary: "110", element: "Wood", 
-    direction_xiantian: "SW", direction_houtian: "SE", 
+  {
+    name: "Xun", zh: "巽", binary: "110", element: "Wood",
+    direction_xiantian: "SW", direction_houtian: "SE",
     number_xiantian: 5, number_houtian: 4,
-    nature: "Wind", family: "Eldest Daughter", bodyPart: "Thighs", 
+    nature: "Wind", family: "Eldest Daughter", bodyPart: "Thighs",
     season: "Spring", quality: "Gentle, penetrating",
     yao: [1, 1, 0]
   },
-  { 
-    name: "Kan", zh: "坎", binary: "010", element: "Water", 
-    direction_xiantian: "W", direction_houtian: "N", 
+  {
+    name: "Kan", zh: "坎", binary: "010", element: "Water",
+    direction_xiantian: "W", direction_houtian: "N",
     number_xiantian: 6, number_houtian: 1,
-    nature: "Water", family: "Middle Son", bodyPart: "Ears", 
+    nature: "Water", family: "Middle Son", bodyPart: "Ears",
     season: "Winter", quality: "Abysmal, danger",
     yao: [0, 1, 0]
   },
-  { 
-    name: "Gen", zh: "艮", binary: "100", element: "Earth", 
-    direction_xiantian: "NW", direction_houtian: "NE", 
+  {
+    name: "Gen", zh: "艮", binary: "100", element: "Earth",
+    direction_xiantian: "NW", direction_houtian: "NE",
     number_xiantian: 7, number_houtian: 8,
-    nature: "Mountain", family: "Youngest Son", bodyPart: "Hands", 
+    nature: "Mountain", family: "Youngest Son", bodyPart: "Hands",
     season: "Winter", quality: "Keeping still",
     yao: [1, 0, 0]
   },
-  { 
-    name: "Kun", zh: "坤", binary: "000", element: "Earth", 
-    direction_xiantian: "N", direction_houtian: "SW", 
+  {
+    name: "Kun", zh: "坤", binary: "000", element: "Earth",
+    direction_xiantian: "N", direction_houtian: "SW",
     number_xiantian: 8, number_houtian: 2,
-    nature: "Earth", family: "Mother", bodyPart: "Belly", 
+    nature: "Earth", family: "Mother", bodyPart: "Belly",
     season: "Late Summer", quality: "Receptive, yielding",
     yao: [0, 0, 0]
   }
@@ -921,25 +921,25 @@ function calculateBagua(bazi: BaziChart, date: Date): BaguaAnalysis {
   // Determine personal trigrams based on birth data
   const personalTrigram = determinePersonalTrigram(bazi);
   const lifePalaceTrigram = determineLifePalaceTrigram(bazi, date);
-  
+
   // Calculate hexagram from upper and lower trigrams
   const upper = determineUpperTrigram(bazi);
   const lower = determineLowerTrigram(bazi);
   const hexagramLines = [...lower.yao, ...upper.yao];
   const hexagramNumber = binaryToHexagramNumber(hexagramLines);
-  
+
   // Determine temporal influences
   const yearBranch = bazi.year.branch.name;
   const dayBranch = bazi.day.branch.name;
   const trigramOfYear = trigramFromBranch(yearBranch);
   const trigramOfDay = trigramFromBranch(dayBranch);
-  
+
   return {
     xiantian: {
       name: "Xian Tian Ba Gua",
       zh: "先天八卦",
       description: "Pre-Heaven arrangement - congenital nature, spiritual essence, original qi pattern",
-      trigrams: BAGUA_TRIGRAMS.map(t => ({...t, arrangement: "xiantian"})),
+      trigrams: BAGUA_TRIGRAMS.map(t => ({ ...t, arrangement: "xiantian" })),
       personalTrigram: personalTrigram,
       elementFlow: calculateXiantianFlow(bazi)
     },
@@ -947,7 +947,7 @@ function calculateBagua(bazi: BaziChart, date: Date): BaguaAnalysis {
       name: "Hou Tian Ba Gua",
       zh: "后天八卦",
       description: "Post-Heaven arrangement - manifested reality, temporal influences, life path",
-      trigrams: BAGUA_TRIGRAMS.map(t => ({...t, arrangement: "houtian"})),
+      trigrams: BAGUA_TRIGRAMS.map(t => ({ ...t, arrangement: "houtian" })),
       lifePalaceTrigram: lifePalaceTrigram,
       temporalInfluence: calculateHoutianInfluence(bazi, date)
     },
@@ -970,8 +970,8 @@ function determinePersonalTrigram(bazi: BaziChart): BaguaTrigram {
   // Based on year (for men) or year+1 (for women) - Ming Gua calculation
   const year = bazi.year.branch.num;
   const gender = "male"; // Would need gender parameter
-  
-  // Simplified: Use Day Master element to determine trigram
+
+  // Simplified: Use master of day element to determine trigram
   const elementMap: Record<string, string> = {
     "Metal": "Qian",
     "Wood": "Zhen",
@@ -979,7 +979,7 @@ function determinePersonalTrigram(bazi: BaziChart): BaguaTrigram {
     "Fire": "Li",
     "Earth": "Kun"
   };
-  
+
   const trigramName = elementMap[bazi.dayMaster.element] || "Qian";
   return BAGUA_TRIGRAMS.find(t => t.name === trigramName) || BAGUA_TRIGRAMS[0];
 }
@@ -988,11 +988,11 @@ function determineLifePalaceTrigram(bazi: BaziChart, date: Date): BaguaTrigram {
   // Based on month and hour - classic Life Palace calculation
   const month = bazi.month.branch.num;
   const hour = bazi.hour.branch.num;
-  
+
   // Count forward from month to hour, then back 1
   let palaceBranch = month - hour + 1;
   if (palaceBranch <= 0) palaceBranch += 12;
-  
+
   const branchName = EARTHLY_BRANCHES[palaceBranch - 1].name;
   return trigramFromBranch(branchName);
 }
@@ -1014,7 +1014,7 @@ function trigramFromBranch(branchName: string): BaguaTrigram {
     "Yin": "Gen", "Shen": "Qian", "Si": "Xun", "Hai": "Qian",
     "Chen": "Xun", "Xu": "Gen", "Chou": "Gen", "Wei": "Kun"
   };
-  
+
   const trigramName = branchToTrigram[branchName] || "Qian";
   return BAGUA_TRIGRAMS.find(t => t.name === trigramName) || BAGUA_TRIGRAMS[0];
 }
@@ -1148,19 +1148,19 @@ function calculateHetu(bazi: BaziChart): HetuAnalysis {
   const monthNum = calculateHetuNumber(bazi.month);
   const dayNum = calculateHetuNumber(bazi.day);
   const hourNum = calculateHetuNumber(bazi.hour);
-  
+
   // Life number: sum of all pillar numbers reduced to 1-9
   const lifeNum = ((yearNum + monthNum + dayNum + hourNum - 1) % 9) + 1;
-  
-  // Destiny number: based on day master
+
+  // Destiny number: based on master of day
   const destinyNum = stemToNumber(bazi.dayMaster.name);
-  
+
   // Analyze elemental flow
   const flow = analyzeHetuElementalFlow([yearNum, monthNum, dayNum, hourNum]);
-  
+
   // Determine constellations
   const constellations = identifyHetuConstellations([yearNum, monthNum, dayNum, hourNum]);
-  
+
   return {
     name: "He Tu",
     zh: "河图",
@@ -1184,7 +1184,7 @@ function calculateHetuNumber(pillar: { stem: typeof HEAVENLY_STEMS[0]; branch: t
   // Map stem and branch to He Tu number
   const stemNum = pillar.stem.num;
   const branchNum = pillar.branch.num;
-  
+
   // Combine and reduce to 1-9
   let num = (stemNum + branchNum) % 9;
   if (num === 0) num = 9;
@@ -1211,18 +1211,18 @@ function analyzeHetuElementalFlow(numbers: number[]): { sequence: string[]; domi
     4: "Metal", 9: "Metal",
     5: "Earth", 10: "Earth"
   };
-  
+
   const elements = numbers.map(n => elementMap[n] || "Earth");
-  
+
   // Count occurrences
   const counts: Record<string, number> = {};
   elements.forEach(e => { counts[e] = (counts[e] || 0) + 1; });
-  
+
   // Determine dominant and deficient
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   const dominant = sorted[0][0];
   const deficient = sorted[sorted.length - 1][0];
-  
+
   // Generation recommendations
   const recommendations: string[] = [];
   if (dominant === "Wood") recommendations.push("Nurture the creative force, guard against excessive growth");
@@ -1230,13 +1230,13 @@ function analyzeHetuElementalFlow(numbers: number[]): { sequence: string[]; domi
   if (dominant === "Earth") recommendations.push("Maintain center while allowing change");
   if (dominant === "Metal") recommendations.push("Refine and focus, release the unnecessary");
   if (dominant === "Water") recommendations.push("Flow with circumstances, maintain depth");
-  
+
   if (deficient === "Wood") recommendations.push("Cultivate new beginnings and growth");
   if (deficient === "Fire") recommendations.push("Ignite clarity and enthusiasm");
   if (deficient === "Earth") recommendations.push("Establish stability and nourishment");
   if (deficient === "Metal") recommendations.push("Develop precision and discernment");
   if (deficient === "Water") recommendations.push("Deepen wisdom and adaptability");
-  
+
   return {
     sequence: elements,
     dominant,
@@ -1247,10 +1247,10 @@ function analyzeHetuElementalFlow(numbers: number[]): { sequence: string[]; domi
 
 function identifyHetuConstellations(numbers: number[]): { name: string; description: string; stars: number[]; element: string; meaning: string }[] {
   const constellations: { name: string; description: string; stars: number[]; element: string; meaning: string }[] = [];
-  
+
   // Check for special combinations
   const numSet = new Set(numbers);
-  
+
   // Center formation (5 and/or 10)
   if (numSet.has(5) || numSet.has(10)) {
     constellations.push({
@@ -1261,7 +1261,7 @@ function identifyHetuConstellations(numbers: number[]): { name: string; descript
       meaning: "The axis mundi - strong center, ability to receive and transform all elements"
     });
   }
-  
+
   // Generational pairs (numbers that sum to 10)
   const pairs: [number, number][] = [[1, 9], [2, 8], [3, 7], [4, 6]];
   pairs.forEach(([a, b]) => {
@@ -1269,7 +1269,7 @@ function identifyHetuConstellations(numbers: number[]): { name: string; descript
       const elements: Record<string, string> = { "1": "Water", "2": "Fire", "3": "Wood", "4": "Metal" };
       const element = elements[a.toString()] || "Earth";
       const pairNames: Record<string, string> = { "Water": "Tian Sheng", "Fire": "Di Yang", "Wood": "Ren He", "Metal": "Wu Fu" };
-      
+
       constellations.push({
         name: pairNames[element] || "He Tu Pair",
         description: `${element} Generation Pair`,
@@ -1279,7 +1279,7 @@ function identifyHetuConstellations(numbers: number[]): { name: string; descript
       });
     }
   });
-  
+
   // Corner formation (all four cardinal elements)
   const cardinal = [1, 2, 3, 4].filter(n => numSet.has(n));
   if (cardinal.length >= 3) {
@@ -1291,7 +1291,7 @@ function identifyHetuConstellations(numbers: number[]): { name: string; descript
       meaning: "Complete elemental foundation - all directions supported"
     });
   }
-  
+
   return constellations;
 }
 
@@ -1328,21 +1328,21 @@ function calculateQiMen(date: Date, location?: LocationData): QiMenPlate {
     const ayanamsa = calculateAyanamsa(date, location);
     calculationDate = new Date(ayanamsa.correctedTime);
   }
-  
+
   const year = calculationDate.getFullYear();
   const month = calculationDate.getMonth();
   const day = calculationDate.getDate();
   const hours = calculationDate.getHours();
-  
+
   // Calculate Ju number (plate setup)
   const { ju, yinYang } = calculateQiMenJu(year, month, day);
-  
+
   // Determine Yang or Yin遁 based on solar term
   // Yang遁: Jia/Ji days in Yang months
   // Yin遁: Yi/Geng days in Yin months
-  
+
   const palaces = setupQiMenPalaces(ju, yinYang, calculationDate);
-  
+
   return {
     ju,
     yinYang,
@@ -1355,21 +1355,21 @@ function calculateQiMen(date: Date, location?: LocationData): QiMenPlate {
 function calculateQiMenJu(year: number, month: number, day: number): { ju: number; yinYang: string } {
   // Simplified Ju calculation based on year and solar terms
   // Full calculation would use precise solar term times
-  
+
   const yearMod = (year - 4) % 10;
   const baseJu = (yearMod % 9) + 1;
-  
+
   // Adjust for season
   const season = Math.floor(month / 3);
   const seasonAdjust = [0, -1, -2, -1][season] || 0;
-  
+
   let ju = baseJu + seasonAdjust;
   if (ju < 1) ju += 9;
   if (ju > 9) ju -= 9;
-  
+
   // Determine Yin/Yang遁
   const yinYang = month < 6 ? "Yang" : "Yin";
-  
+
   return { ju, yinYang };
 }
 
@@ -1377,13 +1377,13 @@ function setupQiMenPalaces(ju: number, yinYang: string, date: Date): Record<stri
   const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   const gates = ["Xiu", "Sheng", "Shang", "Du", "Jing", "Si", "Jing2", "Kai"];
   const deities = ["Zhi Fu", "Teng She", "Tai Yin", "Liu He", "Bai Hu", "Xuan Wu", "Jiu Di", "Jiu Tian"];
-  
+
   const palaces: Record<string, QiMenPalace> = {};
-  
+
   directions.forEach((dir, idx) => {
     // Calculate star position based on Ju and direction
     const starIdx = (ju + idx) % 9;
-    
+
     palaces[dir] = {
       palace: `${idx + 1}`,
       direction: dir,
@@ -1394,7 +1394,7 @@ function setupQiMenPalaces(ju: number, yinYang: string, date: Date): Record<stri
       deity: deities[idx]
     };
   });
-  
+
   return palaces;
 }
 
@@ -1436,34 +1436,34 @@ interface AstrologyResponse {
 function generateResponse(request: AstrologyRequest): AstrologyResponse {
   const date = new Date(request.date);
   const location = request.location;
-  
+
   // Calculate ayanamsa
   const ayanamsa = location ? calculateAyanamsa(date, location) : null;
-  
+
   // Calculate BaZi
   const bazi = calculateBazi(date, location);
-  
+
   // Calculate Lunar Mansion
-  const lunarMansion = request.includeLunar !== false 
-    ? calculateLunarMansion(date, location) 
+  const lunarMansion = request.includeLunar !== false
+    ? calculateLunarMansion(date, location)
     : null;
-  
+
   // Calculate Tai Sui
   const taiSui = request.includeTaiSui !== false
     ? calculateTaiSui(date.getFullYear(), location)
     : null;
-  
+
   // Calculate Qi Men
   const qiMen = request.includeQiMen !== false
     ? calculateQiMen(date, location)
     : null;
-  
+
   // Calculate Bagua analysis
   const bagua = calculateBagua(bazi, date);
-  
+
   // Calculate He Tu analysis
   const hetu = calculateHetu(bazi);
-  
+
   // Comparison with birth chart if provided
   let comparison = undefined;
   if (request.birthDate) {
@@ -1475,7 +1475,7 @@ function generateResponse(request: AstrologyRequest): AstrologyResponse {
       cycles: calculateCycles(birthBazi, bazi)
     };
   }
-  
+
   return {
     timestamp: new Date().toISOString(),
     ayanamsa,
@@ -1506,33 +1506,33 @@ function analyzeCurrentInfluence(birth: BaziChart, current: BaziChart): string {
   // Compare birth chart with current chart
   const sameDayMaster = birth.dayMaster.name === current.dayMaster.name;
   const sameYearBranch = birth.year.branch.name === current.year.branch.name;
-  
+
   if (sameYearBranch) {
     return "Ben Ming Nian (Birth Year) - Major transformation cycle";
   } else if (current.year.branch.name === EARTHLY_BRANCHES[(EARTHLY_BRANCHES.findIndex(b => b.name === birth.year.branch.name) + 6) % 12].name) {
     return "Chong (Clash Year) - Opposition and challenge";
   } else if (sameDayMaster) {
-    return "Rhythmic resonance with Day Master";
+    return "Rhythmic resonance with master of day";
   }
-  
+
   return "Standard influence flow";
 }
 
 function calculateCycles(birth: BaziChart, current: BaziChart): string[] {
   const cycles: string[] = [];
-  
+
   // Year pillar cycle
   const yearDiff = current.year.stem.num - birth.year.stem.num;
   if (yearDiff % 10 === 0) {
     cycles.push(`Year Stem cycle: ${Math.abs(yearDiff / 10)}`);
   }
-  
+
   // Day pillar cycle
   const dayDiff = current.day.stem.num - birth.day.stem.num;
   if (dayDiff % 10 === 0) {
     cycles.push(`Day Stem cycle: ${Math.abs(dayDiff / 10)}`);
   }
-  
+
   return cycles;
 }
 
@@ -1552,17 +1552,17 @@ function generateRequestId(): string {
 
 serve(async (req) => {
   const requestId = generateRequestId();
-  
+
   // Handle CORS preflight immediately
   if (req.method === "OPTIONS") {
-    return new Response(null, { 
+    return new Response(null, {
       status: 204,
-      headers: corsHeaders 
+      headers: corsHeaders
     });
   }
-  
+
   const url = new URL(req.url);
-  
+
   try {
     // Health check endpoint
     if (url.pathname.endsWith('/health')) {
@@ -1571,7 +1571,7 @@ serve(async (req) => {
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     // Only accept POST for astrology calculations
     if (req.method !== 'POST') {
       return new Response(
@@ -1579,9 +1579,9 @@ serve(async (req) => {
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     const body = await req.json();
-    
+
     // Route to appropriate handler
     if (url.pathname.endsWith('/chinese-astrology') || url.pathname.endsWith('/astrology')) {
       // Validate required fields
@@ -1591,7 +1591,7 @@ serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      
+
       // Create request object from body
       const request: AstrologyRequest = {
         date: body.date,
@@ -1602,21 +1602,21 @@ serve(async (req) => {
         includeTaiSui: body.includeTaiSui,
         includeQiMen: body.includeQiMen
       };
-      
+
       // Generate comprehensive astrology calculation
       const data = generateResponse(request);
-      
+
       return new Response(
         JSON.stringify({ success: true, data }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     return new Response(
       JSON.stringify({ success: false, error: "Unknown endpoint" }),
       { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-    
+
   } catch (error: any) {
     console.error(`[ASTROLOGY:${requestId}] Error: ${error.message}`);
     return new Response(

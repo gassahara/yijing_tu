@@ -62,17 +62,17 @@ year: '<span class="pillar-zh">年柱</span><span class="pillar-en">Year</span>'
 <th data-i18n="hiddenStemsCol">Hidden Stems<br><span class="sub">藏干</span></th>
 ```
 
-#### Day Master Panel (Lines ~263-286)
+#### master of day Panel (Lines ~263-286)
 ```javascript
 // Current (hardcoded):
-<h4>Day Master <span class="zh">日主</span></h4>
+<h4>master of day <span class="zh">日主</span></h4>
 <span class="st-label">Strength <span class="zh">強弱</span></span>
 <span class="ys-label">Useful God <span class="zh">用神</span>:</span>
 <div class="dm-name">${dm.name || 'Unknown'}</div>
 <span class="st-result">${st.result || 'Unknown'}</span>
 
 // Should be:
-<h4 data-i18n="dayMaster">Day Master <span class="zh">日主</span></h4>
+<h4 data-i18n="dayMaster">master of day <span class="zh">日主</span></h4>
 <span class="st-label" data-i18n="strengthLabel">Strength <span class="zh">強弱</span></span>
 <span class="ys-label" data-i18n="yongShenLabel">Useful God <span class="zh">用神</span>:</span>
 <div class="dm-name">${dm.name || I18N[lang].unknown}</div>
@@ -243,8 +243,8 @@ const I18N = {
         earthlyBranchCol: "Earthly Branch",
         hiddenStemsCol: "Hidden Stems",
         
-        // Day Master
-        dayMasterLabel: "Day Master",
+        // master of day
+        dayMasterLabel: "master of day",
         strengthLabel: "Strength",
         yongShenLabel: "Useful God",
         unknown: "Unknown",
@@ -340,7 +340,7 @@ const I18N = {
         earthlyBranchCol: "地支",
         hiddenStemsCol: "藏干",
         
-        // Day Master
+        // master of day
         dayMasterLabel: "日主",
         strengthLabel: "强弱",
         yongShenLabel: "用神",
@@ -490,7 +490,7 @@ This is more maintainable and consistent with the rest of the codebase.
 | Priority | Section | Reason |
 |----------|---------|--------|
 | **Critical** | BaZi Pillars Table | Most frequently viewed |
-| **Critical** | Day Master Panel | Core information |
+| **Critical** | master of day Panel | Core information |
 | **High** | Bagua Section | Important for understanding |
 | **High** | He Tu / Luo Shu | Frequently referenced |
 | **Medium** | Symbolic Stars | Secondary info |

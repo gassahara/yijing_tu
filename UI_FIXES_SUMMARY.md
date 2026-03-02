@@ -8,7 +8,7 @@
 **Fix:**
 - Added null-safe accessors (`bazi.strength?.result`, `bazi.strength?.score`)
 - Added Ten God (十神) display for each pillar
-- Fixed Day Master section with proper structure
+- Fixed master of day section with proper structure
 - Added fallback values ('Unknown', 'N/A') for missing data
 
 ### 2. ✅ Bagua Diagram - Hexagon Shape
@@ -37,7 +37,7 @@
 - Added `.bazi-fullwidth` class for 100% width
 - Created two-column layout with `.bazi-content`
 - Left column: Four Pillars grid
-- Right column: Day Master analysis + Symbolic Stars
+- Right column: master of day analysis + Symbolic Stars
 - Responsive: Stacks to single column on mobile (< 900px)
 
 ## Files Modified
@@ -50,7 +50,7 @@
 ### 2. `chinese-astrology.css`
 - **BaZi section**: Added full-width and two-column styles
 - **Ten God display**: Added styling for 十神 labels
-- **Day Master**: Updated structure with dm-details, dm-name, dm-element, dm-tengod
+- **master of day**: Updated structure with dm-details, dm-name, dm-element, dm-tengod
 - **Bagua hexagon**: Added complete hexagon diagram styling
 
 ## Visual Changes
@@ -65,7 +65,7 @@ undefined: Balanced
 
 ### After:
 ```
-Day Master: 辛 Xin (Metal, Yin)
+master of day: 辛 Xin (Metal, Yin)
 Ten God: 比肩
 Chart Strength: Balanced (Score: 15)
 [Hexagon Bagua diagram with 8 trigrams around center]
@@ -79,4 +79,4 @@ Open `test_chinese_astrology.html` and verify:
 2. Bagua diagrams show hexagon shape with center Yin-Yang
 3. BaZi section uses full width with two columns
 4. Ten Gods (十神) display correctly for each pillar
-5. Day Master shows: Chinese character, name, element, polarity, Ten God
+5. master of day shows: Chinese character, name, element, polarity, Ten God

@@ -25,7 +25,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 1. FOUNDATIONAL TEXTS - BA GUA & YI JING
   // ============================================
-  
+
   foundationalTexts: {
     yi_jing: {
       title: {
@@ -63,7 +63,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 2. STAR HORARY SYSTEMS (SAN SHI - 三式)
   // ============================================
-  
+
   starHorarySystems: {
     overview: {
       name: "San Shi (Three Styles)",
@@ -163,7 +163,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 3. BAZI WITH STAR POSITIONS (SHEN SHA)
   // ============================================
-  
+
   baziSymbolicStars: {
     overview: {
       name: "Shen Sha",
@@ -180,7 +180,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
         name_zh: "天乙貴人",
         translation: "Noble Person Star",
         meaning: "The 'Guardian Angel' star - suggests help from powerful people and turning bad luck into good.",
-        calculation: "Based on Day Master (Heavenly Stem of birth day)",
+        calculation: "Based on master of day (Heavenly Stem of birth day)",
         formula: {
           "Jia/Wu/Geng": ["Ox", "Goat"],
           "Yi/Ji": ["Rat", "Monkey"],
@@ -227,7 +227,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
         name_zh: "文昌",
         translation: "Academic Star",
         meaning: "Governs intelligence, literary talent, and the ability to pass examinations.",
-        calculation: "Based on Day Master",
+        calculation: "Based on master of day",
         historicalContext: "Crucial for ancient civil service examinations",
         formula: {
           "Jia": "Snake",
@@ -245,7 +245,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
         name_zh: "羊刃",
         translation: "Sword Star / Goat Blade",
         meaning: "A star of extreme persistence and aggression - can lead to great power or great injury.",
-        calculation: "Based on Day Master",
+        calculation: "Based on master of day",
         quality: "Double-edged - requires careful balancing"
       }
     ],
@@ -261,7 +261,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 4. ENVIRONMENTAL HORARY (DI LI)
   // ============================================
-  
+
   environmentalHorary: {
     overview: {
       name: "Di Li",
@@ -311,7 +311,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 5. HE TU AND LO SHU STAR ANALYSIS
   // ============================================
-  
+
   heTuLoShu: {
     heTu: {
       name: "He Tu",
@@ -343,7 +343,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 6. TEN ANCIENT LEGITIMATE REFERENCES
   // ============================================
-  
+
   ancientReferences: [
     {
       number: 1,
@@ -379,7 +379,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
       author: "Xu Zi Ping (compiled by Qin Hezhong)",
       era: "Song/Ming Dynasty",
       focus: ["BaZi", "Four Pillars"],
-      significance: "The 'Bible' of Bazi. Shifted focus from Year Pillar to Day Master, which is the standard for all modern Bazi analysis.",
+      significance: "The 'Bible' of Bazi. Shifted focus from Year Pillar to master of day, which is the standard for all modern Bazi analysis.",
       category: "Bazi Foundation"
     },
     {
@@ -474,7 +474,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 7. KEY CONCEPTS REFERENCE TABLE
   // ============================================
-  
+
   keyConcepts: {
     loShuSquare: {
       name: "Lo Shu Square",
@@ -507,7 +507,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 8. COMPARISON TABLES
   // ============================================
-  
+
   comparisons: {
     systemsComparison: {
       description: "Birth vs. Environmental Horary Systems",
@@ -570,7 +570,7 @@ const CHINESE_METAPHYSICS_LITERATURE = {
   // ============================================
   // 9. HISTORICAL CONTEXT
   // ============================================
-  
+
   historicalContext: {
     purposeOfHorary: {
       ancient: "In ancient literature, 'Horary' wasn't just about personal questions like 'Will I get the job?' It was often a matter of statecraft or survival.",

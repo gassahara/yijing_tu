@@ -573,7 +573,7 @@ async function selectRemedies(body: any): Promise<any> {
       });
 
       if (entry.verified) score += 4;
-      score += Math.random() * 15;
+      score += Math.random() * 5;
 
       return { entry, score };
     })

@@ -1336,7 +1336,7 @@
     line-height: 1;
 }
 
-/* Day Master special styling */
+/* master of day special styling */
 .pillar-box .stem.day-master {
     color: #FFD700;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
@@ -1876,7 +1876,7 @@ body.loading-active {
    NARRATIVE TECHNICAL ANALYSIS - Enhanced Readability
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-/* Day Master Card */
+/* master of day Card */
 .day-master-card {
     background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
     border-radius: 12px;

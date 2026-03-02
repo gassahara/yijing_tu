@@ -1,7 +1,7 @@
 # 3-Layer Analysis Structure Implementation
 
 ## Problem
-AI was hallucinating data (e.g., "weak Water Day Master") without actual BaZi calculations being provided in the prompts.
+AI was hallucinating data (e.g., "weak Water master of day") without actual BaZi calculations being provided in the prompts.
 
 ## Solution
 Implemented proper 3-layer structure across all sections:
@@ -17,10 +17,10 @@ All section generators now return `technicalData` field with actual calculated d
 
 1. **generateCelestialSection()** - Returns full celestial technicalData
 2. **generateCelestialAstro()** - Returns astro data (Lunar Mansion, He Tu, Luo Shu, Life Gua, Tai Sui)
-3. **generateCelestialBazi()** - Returns BaZi data (Birth/Current pillars, Day Master, strengths)
+3. **generateCelestialBazi()** - Returns BaZi data (Birth/Current pillars, master of day, strengths)
 4. **generateElementsAnalysis()** - Returns element counts, trigram elements, BaZi strengths
 5. **generateElementsSynthesis()** - Returns same element data for consistency
-6. **generateHoutouEmperor()** - Returns Emperor (Day Master) technical data
+6. **generateHoutouEmperor()** - Returns Emperor (master of day) technical data
 7. **generateHoutouMaster()** - Returns Masters (governing pillars) technical data
 8. **generateCoreTechnical()** - Returns hexagram technical data (trigrams, elements, moving lines)
 9. **generateCoreNarrative()** - Returns same hexagram data for consistency
@@ -110,7 +110,7 @@ All 4 languages have translations:
 - [ ] celestial-astro returns lunar mansion data in technicalData
 - [ ] celestial-bazi returns BaZi data in technicalData
 - [ ] elements-analysis returns element counts in technicalData
-- [ ] houtou-emperor returns Day Master data in technicalData
+- [ ] houtou-emperor returns master of day data in technicalData
 - [ ] houtou-master returns pillar data in technicalData
 - [ ] core-technical returns hexagram data in technicalData
 - [ ] UI shows Technical Data (JSON) collapsible section

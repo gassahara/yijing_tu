@@ -14,18 +14,18 @@
         DB_URL: base + bucketPath,
 
         // Split Function Endpoints
-        HEXAGRAM_FUNCTION_URL:  env.HEXAGRAM_FUNCTION_URL  || base + "/functions/v1/yijingtu",
+        HEXAGRAM_FUNCTION_URL: env.HEXAGRAM_FUNCTION_URL || base + "/functions/v1/yijingtu",
         TRANSLATE_FUNCTION_URL: env.TRANSLATE_FUNCTION_URL || base + "/functions/v1/yijingtu-translate",
         ASTROLOGY_FUNCTION_URL: env.ASTROLOGY_FUNCTION_URL || base + "/functions/v1/bazi-astrol",
-        EXPORT_FUNCTION_URL:    env.EXPORT_FUNCTION_URL    || base + "/functions/v1/yijing-export",
-        
+        EXPORT_FUNCTION_URL: env.EXPORT_FUNCTION_URL || base + "/functions/v1/yijing-export",
+
         // New Dedicated Endpoints (v2.1+)
-        REMEDIES_FUNCTION_URL:  env.REMEDIES_FUNCTION_URL  || base + "/functions/v1/yijingtu-remedies",
-        ADVICE_FUNCTION_URL:    env.ADVICE_FUNCTION_URL    || base + "/functions/v1/yijingtu-advice",
+        REMEDIES_FUNCTION_URL: env.REMEDIES_FUNCTION_URL || base + "/functions/v1/yijingtu-remedies",
+        ADVICE_FUNCTION_URL: env.ADVICE_FUNCTION_URL || base + "/functions/v1/yijingtu-advice",
 
         // Legacy aliases (backward compat)
-        API_URL:              (env.HEXAGRAM_FUNCTION_URL  || base + "/functions/v1/yijingtu") + "/random",
-        SUPABASE_FUNCTION_URL: env.HEXAGRAM_FUNCTION_URL  || base + "/functions/v1/yijingtu",
+        API_URL: (env.HEXAGRAM_FUNCTION_URL || base + "/functions/v1/yijingtu") + "/random",
+        SUPABASE_FUNCTION_URL: env.HEXAGRAM_FUNCTION_URL || base + "/functions/v1/yijingtu",
 
         // Legacy direct API keys (not used in client — kept for reference only)
         DEEPSEEK_KEY: "sk-4a39f094b5ee4e47a753e645541c934e",
@@ -245,8 +245,9 @@ const I18N = {
         analysis: "Analysis", advice: "Advice", symbolism: "Symbolism",
         movingLines: "Moving Lines",
         judgment: "Judgment", image: "Image", lineTexts: "Line Texts",
+        over: "over", active: "Active",
         wood: "Wood", fire: "Fire", earth: "Earth", metal: "Metal", water: "Water",
-        dayMaster: "Day Master", lunarMansion: "Lunar Mansion", taiSui: "Tai Sui", lifeGua: "Life Gua",
+        dayMaster: "master of day", lunarMansion: "Lunar Mansion", taiSui: "Tai Sui", lifeGua: "Life Gua",
         chineseAstrologyContext: "Chinese Astrology Context",
         loading: "Loading...", consulting: "Consulting oracle...",
         pleaseWait: "Connecting with the I Ching wisdom",
@@ -283,7 +284,7 @@ const I18N = {
         readingImpact: "Reading Impact",
         currentBaziTitle: "Moment Influence (BaZi)",
         optional: "optional",
-        dayMaster: "Day Master",
+        dayMaster: "master of day",
         tenGods: "Ten Gods",
         strength: "Strength",
         yongShen: "Useful God",
@@ -325,7 +326,7 @@ const I18N = {
         relevance: "Relevance",
         instructions: "Instructions",
         houtou: "Later Heaven (Houtian)",
-        emperorAnalysis: "Emperor (Day Master) Analysis",
+        emperorAnalysis: "Emperor (master of day) Analysis",
         masterAnalysis: "Master (Governing Pillars) Analysis",
         talisman: "Fulu (Talisman)",
         charm: "Fuzhou (Incantation)",
@@ -610,6 +611,7 @@ const I18N = {
         analysis: "分析", advice: "建议", symbolism: "象征",
         movingLines: "动爻详解",
         judgment: "卦辞", image: "象", lineTexts: "爻辞",
+        over: "上", active: "活跃",
         wood: "木", fire: "火", earth: "土", metal: "金", water: "水",
         dayMaster: "日元", lunarMansion: "宿度", taiSui: "太岁", lifeGua: "命卦",
         chineseAstrologyContext: "中国占星背景",
@@ -922,6 +924,7 @@ const I18N = {
         analysis: "Análisis", advice: "Consejo", symbolism: "Simbolismo",
         movingLines: "Líneas Móviles",
         judgment: "Juicio", image: "Imagen", lineTexts: "Textos de Líneas",
+        over: "sobre", active: "Activos",
         wood: "Madera", fire: "Fuego", earth: "Tierra", metal: "Metal", water: "Agua",
         dayMaster: "Maestro del Día", lunarMansion: "Mansión Lunar", taiSui: "Tai Sui", lifeGua: "Gua de Vida",
         chineseAstrologyContext: "Contexto Astrológico Chino",
@@ -1255,6 +1258,7 @@ const I18N = {
         analysis: "Analisi", advice: "Consiglio", symbolism: "Simbolismo",
         movingLines: "Linee in Movimento",
         judgment: "Giudizio", image: "Immagine", lineTexts: "Testi delle Linee",
+        over: "sopra", active: "Attivi",
         wood: "Legno", fire: "Fuoco", earth: "Terra", metal: "Metallo", water: "Acqua",
         dayMaster: "Maestro del Giorno", lunarMansion: "Mansione Lunare", taiSui: "Tai Sui", lifeGua: "Gua della Vita",
         chineseAstrologyContext: "Contesto Astrologico Cinese",
@@ -1716,7 +1720,7 @@ const STAR_HORARY_LITERATURE = {
     classical_texts: [
         { title: "Huangdi Neijing (黃帝內經)", era: "Han Dynasty", focus: "He Tu, Five Elements, San Sheng" },
         { title: "Yi Jing (周易)", era: "Zhou Dynasty", focus: "Ba Gua, 64 Hexagrams, Source" },
-        { title: "Yuan Hai Zi Ping (淵海子平)", era: "Song/Ming", focus: "BaZi foundation, Day Master" },
+        { title: "Yuan Hai Zi Ping (淵海子平)", era: "Song/Ming", focus: "BaZi foundation, master of day" },
         { title: "Di Tian Sui (滴天髓)", era: "Song/Ming", focus: "Advanced BaZi, Qi flow" },
         { title: "Qi Men Dun Jia Fu Yi (奇門遁甲賦役)", era: "Ming", focus: "Qi Men methodology" },
         { title: "Xie Ji Bian Fang Shu (協紀辨方書)", era: "Qing (Qianlong)", focus: "Tai Sui, Date Selection" },

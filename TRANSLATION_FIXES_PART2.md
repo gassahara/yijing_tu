@@ -4,7 +4,7 @@
 
 ### 1. Celestial Section Labels Not Translated
 **Problem**: The celestial section was using hardcoded English labels:
-- "Day Master:" instead of "Maestro del Día" (Spanish)
+- "master of day:" instead of "Maestro del Día" (Spanish)
 - "Lunar Mansion:" instead of "Mansión Lunar" (Spanish)
 - "Tai Sui:" (not translated)
 - "Life Gua:" instead of "Gua de Vida" (Spanish)

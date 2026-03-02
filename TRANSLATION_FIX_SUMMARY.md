@@ -48,8 +48,8 @@ These strings are never run through the translation system.
 - Column headers: "Pillar", "Heavenly Stem", "Earthly Branch", "Hidden Stems"
 - Pillar labels: "Hour", "Day", "Month", "Year"
 
-### 4. Day Master Panel
-- "Day Master"
+### 4. master of day Panel
+- "master of day"
 - "Strength"
 - "Useful God"
 - "Unknown" (fallback)

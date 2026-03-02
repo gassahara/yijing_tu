@@ -42,7 +42,7 @@ All Chinese astrology functionality has been merged into the main `supabase_func
 
 - **BaZi (Four Pillars)** (Lines 7,950-8,100)
   - `calculateBazi()` - Complete chart calculation
-  - `calculateStrength()` - Day Master strength analysis
+  - `calculateStrength()` - master of day strength analysis
   - `calculateShenSha()` - Symbolic stars
 
 - **Bagua (八卦) Analysis** (Lines 8,100-8,400)
@@ -189,7 +189,7 @@ npx supabase functions deploy yijingtu
 
 ### BaZi (八字)
 - Four Pillars calculation
-- Day Master strength analysis
+- master of day strength analysis
 - Symbolic stars (Shen Sha):
   - Tian Yi Gui Ren (Noble Person)
   - Tao Hua (Peach Blossom)

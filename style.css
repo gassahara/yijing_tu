@@ -2632,8 +2632,8 @@ border-radius: 2px;
 /* Canvases in the medicine section */
 .bagua-medicine-canvas {
     display: block;
-    width: 260px;
-    height: 260px;
+    width: 300px;
+    height: 300px;
     border: 1px solid rgba(212, 175, 55, 0.25);
     border-radius: 4px;
 }
@@ -6744,7 +6744,7 @@ to {
     font-size: 1.1em;
 }
 
-/* Day Master Badge */
+/* master of day Badge */
 .daymaster-badge {
     display: inline-flex;
     align-items: center;

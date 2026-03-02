@@ -144,7 +144,7 @@ POST /interpret-phase1
 
 ### Key Features
 - **Accurate Classical Texts**: Judgment, Image, Line texts with Chinese originals
-- **Complete BaZi**: Pillars, Day Master, Yong Shen, elemental balance
+- **Complete BaZi**: Pillars, master of day, Yong Shen, elemental balance
 - **Celestial Data**: Lunar mansion, Life Palace (if birth time provided)
 - **Five Elements**: Hexagram + BaZi interaction, generating/controlling cycles
 - **Bagua Analysis**: Later Heaven directions, Feng Shui applications
@@ -229,7 +229,7 @@ POST /interpret-phase2
           "resultingChange": "Moving to Hexagram 13 (Fellowship) suggests..."
         },
         "baziInsights": {
-          "personalResonance": "Your Day Master of Fire harmonizes with...",
+          "personalResonance": "Your master of day of Fire harmonizes with...",
           "timingAlignment": "Current Metal month supports...",
           "elementalAdvice": ["Strengthen Water element for balance", "..."],
           "destinyContext": "This reading aligns with your life's creative phase"

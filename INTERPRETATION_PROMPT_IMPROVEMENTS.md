@@ -7,7 +7,7 @@
 **After**: Each section BUILDS upon the previous, creating a cascading understanding
 
 ### 2. English BaZi Terms ❌ → Localized Terms ✅
-**Before**: "Day Master", "Wood", "Fire", "Strength" appeared in all languages
+**Before**: "master of day", "Wood", "Fire", "Strength" appeared in all languages
 **After**: 
 - ES: "Maestro del Día", "Madera", "Fuego", "Fortaleza"
 - IT: "Maestro del Giorno", "Legno", "Fuoco", "Forza"
@@ -25,7 +25,7 @@
 **Before**: "4-6 specific orientations" without context
 **After**: Each orientation considers:
 - The celestial moment (Lunar Mansion, Tai Sui)
-- The querent's destiny pattern (Day Master strength, Useful God)
+- The querent's destiny pattern (master of day strength, Useful God)
 - The elemental landscape (dominant/deficient)
 - The hexagram's specific wisdom (Judgment, Image, Lines)
 
@@ -35,7 +35,7 @@
 ```typescript
 // Now includes:
 - Full hexagram data (name in target language, Judgment, Image)
-- BaZi with localized terms (Day Master, strength, Yong Shen)
+- BaZi with localized terms (master of day, strength, Yong Shen)
 - Five Elements with localized names
 - Complete astrology (Lunar Mansion, Life Gua, Tai Sui)
 - Moving lines with classical Chinese text
@@ -44,7 +44,7 @@
 ### Improved Prompt Structure
 ```
 CELESTIAL SECTION (2-3 paragraphs):
-"Synthesize: Current sky + Day Master + Strength + Hexagram position..."
+"Synthesize: Current sky + master of day + Strength + Hexagram position..."
 
 ELEMENTS SECTION (2-3 paragraphs):
 "BUILDING ON CELESTIAL context, now analyze energetic landscape..."
@@ -87,7 +87,7 @@ const getElementName = (element: string) => {
 
 - [ ] BaZi terms appear in target language (not English)
 - [ ] Element names are translated (Madera, Legno, 木)
-- [ ] Celestial section mentions Day Master + Lunar Mansion + Tai Sui
+- [ ] Celestial section mentions master of day + Lunar Mansion + Tai Sui
 - [ ] Elements section references trigrams and connects to celestial
 - [ ] Analysis section synthesizes all previous layers
 - [ ] Advice considers the specific celestial moment and destiny pattern

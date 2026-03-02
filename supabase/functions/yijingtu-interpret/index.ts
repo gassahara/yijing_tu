@@ -168,7 +168,7 @@ async function getHexagramData(): Promise<any> {
   if (hexagramCache && (now - cacheTime) < CACHE_TTL) {
     return hexagramCache;
   }
-  
+
   const url = `${SUPABASE_URL}${HEXAGRAM_BUCKET_PATH}`;
   try {
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
@@ -199,7 +199,7 @@ async function callAI(
   if (!DEEPSEEK_API_KEY) {
     throw new Error("DEEPSEEK_API_KEY not configured");
   }
-  
+
   const payload: any = {
     model: options.model || DEFAULT_MODEL,
     messages: [
@@ -210,11 +210,11 @@ async function callAI(
     temperature: options.temperature ?? 0.3,
     stream: false
   };
-  
+
   if (options.response_format) {
     payload.response_format = options.response_format;
   }
-  
+
   const res = await fetch(DEEPSEEK_ENDPOINT, {
     method: "POST",
     headers: {
@@ -223,12 +223,12 @@ async function callAI(
     },
     body: JSON.stringify(payload)
   });
-  
+
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`DeepSeek API error: ${res.status} - ${err}`);
   }
-  
+
   const data = await res.json();
   return data.choices?.[0]?.message?.content || "";
 }
@@ -239,25 +239,25 @@ async function callAI(
 
 function repairJSON(text: string): { success: boolean; data?: any; error?: string } {
   if (!text) return { success: false, error: 'Empty response' };
-  
+
   let cleaned = text.trim()
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/\s*```\s*$/i, '')
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
-  
+
   // Extract JSON from surrounding text
   const firstBrace = cleaned.indexOf('{');
   const lastBrace = cleaned.lastIndexOf('}');
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     cleaned = cleaned.substring(firstBrace, lastBrace + 1);
   }
-  
+
   // Apply repairs
   cleaned = cleaned
     .replace(/,(\s*[}\]])/g, '$1')
     .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')
     .replace(/'/g, '"');
-  
+
   try {
     return { success: true, data: JSON.parse(cleaned) };
   } catch (e: any) {
@@ -267,18 +267,18 @@ function repairJSON(text: string): { success: boolean; data?: any; error?: strin
 
 function validateResponse(data: any, schema: any): string[] {
   const errors: string[] = [];
-  
+
   for (const [key, config] of Object.entries(schema)) {
     const c = config as any;
     const value = data[key];
-    
+
     if (c.required && !value) {
       errors.push(`Missing: ${key}`);
       continue;
     }
-    
+
     if (!value) continue;
-    
+
     if (c.type === 'string') {
       if (typeof value !== 'string') {
         errors.push(`${key}: expected string, got ${typeof value}`);
@@ -292,12 +292,12 @@ function validateResponse(data: any, schema: any): string[] {
         }
       }
     }
-    
+
     if (c.type === 'array' && !Array.isArray(value)) {
       errors.push(`${key}: expected array`);
     }
   }
-  
+
   return errors;
 }
 
@@ -321,7 +321,7 @@ function fillMissingFields(data: any, schema: any): any {
 const PROMPTS = {
   technical(hex: any, hexData: any, question: string): { system: string; user: string; schema: any } {
     const compressed = { h: compressHexagram(hex), c: compressClassical(hexData) };
-    
+
     const system = `ROLE: Yi Jing textual scholar specializing in structural analysis
 
 RULES:
@@ -350,10 +350,10 @@ Provide technical analysis grounded in classical texts.`;
       symbolism: { type: 'string' },
       quotedReferences: { type: 'array' }
     };
-    
+
     return { system, user, schema };
   },
-  
+
   colloquial(hex: any, question: string, context: string): { system: string; user: string; schema: any } {
     const system = `ROLE: Yi Jing scholar providing accessible hermeneutic narrative
 
@@ -387,17 +387,17 @@ Write hermeneutic narrative connecting classical meaning to the question.`;
       colloquialInterpretation: { type: 'string', required: true, minLength: 50 },
       quotedReferences: { type: 'array' }
     };
-    
+
     return { system, user, schema };
   },
-  
+
   advice(hex: any, hexData: any, question: string, lines: any[]): { system: string; user: string; schema: any } {
     const moving = lines.map((l, i) => l.isChanging ? i + 1 : null).filter(Boolean);
     const lineTexts = moving.map(p => ({
       p,
       e: truncate(hexData?.lines_en?.[p - 1], 150)
     }));
-    
+
     const system = `ROLE: Yi Jing textual scholar extracting practical orientations
 
 RULES:
@@ -433,21 +433,21 @@ Provide 4-6 classically-grounded orientations with citations.`;
       advice: { type: 'string', required: true, minLength: 50 },
       quotedReferences: { type: 'array' }
     };
-    
+
     return { system, user, schema };
   },
-  
+
   movingLines(hex: any, hexData: any, question: string, lines: any[]): { system: string; user: string; schema: any } | null {
     const moving = lines.map((l, i) => l.isChanging ? i + 1 : null).filter(Boolean);
     if (moving.length === 0) return null;
-    
+
     const lineData = moving.map(p => ({
       p,
       name: ["Bottom", "Second", "Third", "Fourth", "Fifth", "Top"][p - 1],
       z: truncate(hexData?.lines_zh?.[p - 1], 150),
       e: truncate(hexData?.lines_en?.[p - 1], 200)
     }));
-    
+
     const system = `ROLE: Yi Jing scholar specializing in Yao Ci (Line Text) exegesis
 
 RULES:
@@ -479,10 +479,10 @@ Provide Yao Ci commentary for moving lines.`;
       lineTexts: { type: 'array', required: true },
       quotedReferences: { type: 'array' }
     };
-    
+
     return { system, user, schema };
   },
-  
+
   elements(hex: any, equilibrium: any, question: string): { system: string; user: string; schema: any } {
     const system = `ROLE: Yi Jing scholar specializing in Wuxing (Five Elements) cosmology
 
@@ -516,16 +516,16 @@ Analyze Wuxing cycles and elemental dynamics.`;
       trigramRelationship: { type: 'string' },
       recommendations: { type: 'string' }
     };
-    
+
     return { system, user, schema };
   },
-  
+
   bazi(birthBazi: any, currentBazi: any, hex: any, question: string): { system: string; user: string; schema: any } {
     const system = `ROLE: Daoist Master compounding BaZi and Five Elements analysis
 
 RULES:
-- USE PROVIDED TECHNICAL DATA: Analyze actual Day Master, stems, branches
-- BIRTH BAZI: Day Master, strength, favorable elements from data
+- USE PROVIDED TECHNICAL DATA: Analyze actual master of day, stems, branches
+- BIRTH BAZI: master of day, strength, favorable elements from data
 - CURRENT BAZI: Moment energies (Prasna) from data
 - HEXAGRAM PRIMARY: Astrology provides context for I Ching reading
 - READING IMPACT: How does astrological backdrop affect THIS reading?
@@ -554,7 +554,7 @@ Provide BaZi analysis based on ACTUAL technical data. Hexagram is primary.`;
       currentBazi: { type: 'object' },
       celestial: { type: 'string' }
     };
-    
+
     return { system, user, schema };
   }
 };
@@ -570,10 +570,10 @@ async function generateSection(
   context?: string
 ): Promise<SectionResult> {
   const maxRetries = 2;
-  
+
   // Get prompt generator
   let promptGen: { system: string; user: string; schema: any } | null = null;
-  
+
   switch (name) {
     case 'technical':
       promptGen = PROMPTS.technical(request.hexagram, hexData, request.question);
@@ -598,25 +598,25 @@ async function generateSection(
       }
       break;
   }
-  
+
   if (!promptGen) {
     return { success: false, error: 'No prompt generator for section' };
   }
-  
+
   // Retry loop
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       log(2, `Generating ${name}, attempt ${attempt}/${maxRetries}`);
-      
+
       const tokensIn = countTokens(promptGen.system) + countTokens(promptGen.user);
       log(3, `${name} tokens in: ${tokensIn}`);
-      
+
       const raw = await callAI(promptGen.system, promptGen.user, {
         max_tokens: TOKEN_BUDGETS.response,
         temperature: attempt > 1 ? 0.2 : 0.3,
         response_format: { type: 'json_object' }
       });
-      
+
       // Parse and repair
       const parsed = repairJSON(raw);
       if (!parsed.success) {
@@ -626,15 +626,15 @@ async function generateSection(
         }
         continue;
       }
-      
+
       // Validate
       const errors = validateResponse(parsed.data, promptGen.schema);
       if (errors.length > 0) {
         log(1, `${name} validation errors:`, errors);
-        
+
         // Auto-repair
         const repaired = fillMissingFields(parsed.data, promptGen.schema);
-        
+
         return {
           success: errors.length < 2, // Success if only minor issues
           data: repaired,
@@ -643,13 +643,13 @@ async function generateSection(
           attempt
         };
       }
-      
+
       return {
         success: true,
         data: parsed.data,
         attempt
       };
-      
+
     } catch (e: any) {
       log(0, `${name} generation error: ${e.message}`);
       if (attempt === maxRetries) {
@@ -658,7 +658,7 @@ async function generateSection(
       await new Promise(r => setTimeout(r, 500 * attempt));
     }
   }
-  
+
   return { success: false, error: 'Max retries exceeded' };
 }
 
@@ -669,40 +669,40 @@ async function generateSection(
 async function handleInterpret(request: InterpretationRequest): Promise<any> {
   const startTime = Date.now();
   const requestId = crypto.randomUUID();
-  
+
   log(2, `Starting interpretation`, { requestId, hexagram: request.hexagram.number });
-  
+
   // Load hexagram data
   const hexData = await getHexagram(request.hexagram.number);
-  
+
   // Determine which sections to generate
   const sections = request.sections || ['technical', 'elements', 'bazi', 'movingLines', 'advice'];
   const results: any = {};
-  
+
   // Phase 1: Generate independent sections in parallel
   const independentTasks: Promise<void>[] = [];
-  
+
   if (sections.includes('technical')) {
     independentTasks.push(
       generateSection('technical', request, hexData)
         .then(r => { results.technical = r; })
     );
   }
-  
+
   if (sections.includes('elements') && request.equilibrium) {
     independentTasks.push(
       generateSection('elements', request, hexData)
         .then(r => { results.elements = r; })
     );
   }
-  
+
   if (sections.includes('bazi') && (request.birthBazi || request.currentBazi)) {
     independentTasks.push(
       generateSection('bazi', request, hexData)
         .then(r => { results.bazi = r; })
     );
   }
-  
+
   if (sections.includes('movingLines')) {
     const hasMoving = request.lines?.some(l => l.isChanging);
     if (hasMoving) {
@@ -712,36 +712,36 @@ async function handleInterpret(request: InterpretationRequest): Promise<any> {
       );
     }
   }
-  
+
   await Promise.all(independentTasks);
-  
+
   // Build technical context for dependent sections
   const technicalContext = [
     results.technical?.success && `[Technical] ${truncate(results.technical.data.technicalAnalysis, 300)}`,
     results.elements?.success && `[Elements] ${truncate(results.elements.data.technicalAnalysis, 200)}`,
     results.bazi?.success && `[BaZi] ${truncate(results.bazi.data.technicalAnalysis, 200)}`
   ].filter(Boolean).join('\n---\n');
-  
+
   // Phase 2: Generate dependent sections
   if (sections.includes('advice')) {
     results.advice = await generateSection('advice', request, hexData);
   }
-  
+
   if (sections.includes('colloquial')) {
     results.colloquial = await generateSection('colloquial', request, hexData, technicalContext);
   }
-  
+
   // Compile final result
   const duration = Date.now() - startTime;
   const successCount = Object.values(results).filter((r: any) => r.success).length;
   const totalSections = Object.keys(results).length;
-  
-  log(2, `Interpretation complete`, { 
-    requestId, 
-    duration, 
-    success: `${successCount}/${totalSections}` 
+
+  log(2, `Interpretation complete`, {
+    requestId,
+    duration,
+    success: `${successCount}/${totalSections}`
   });
-  
+
   return {
     success: successCount === totalSections,
     partial: successCount > 0 && successCount < totalSections,
@@ -763,16 +763,16 @@ async function handleInterpret(request: InterpretationRequest): Promise<any> {
 serve(async (req) => {
   const startTime = Date.now();
   const requestId = crypto.randomUUID();
-  
+
   // CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-  
+
   try {
     const url = new URL(req.url);
     const path = url.pathname.split("/").pop() || "";
-    
+
     // Health check
     if (path === "" || path === "yijingtu-interpret") {
       return new Response(
@@ -798,11 +798,11 @@ serve(async (req) => {
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     // Interpret endpoint
     if (path === "interpret" && req.method === "POST") {
       const body = await req.json();
-      
+
       // Validate request
       if (!body.question || !body.hexagram?.number) {
         return new Response(
@@ -811,26 +811,26 @@ serve(async (req) => {
             error: { message: "question and hexagram.number are required", code: "VALIDATION_ERROR" },
             meta: { requestId, timestamp: new Date().toISOString() }
           }),
-          { 
-            status: 400, 
-            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
           }
         );
       }
-      
+
       const result = await handleInterpret(body as InterpretationRequest);
-      
+
       return new Response(
         JSON.stringify(result),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     // Single section endpoint
     if (path === "interpret-section" && req.method === "POST") {
       const body = await req.json();
       const { section, ...request } = body;
-      
+
       if (!section || !request.question) {
         return new Response(
           JSON.stringify({
@@ -838,23 +838,23 @@ serve(async (req) => {
             error: { message: "section and question are required", code: "VALIDATION_ERROR" },
             meta: { requestId, timestamp: new Date().toISOString() }
           }),
-          { 
-            status: 400, 
-            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
           }
         );
       }
-      
+
       const hexData = await getHexagram(request.hexagram.number);
       const result = await generateSection(section, request as InterpretationRequest, hexData);
-      
+
       return new Response(
         JSON.stringify({
           success: result.success,
           data: result.data,
           error: result.error,
-          meta: { 
-            requestId, 
+          meta: {
+            requestId,
             section,
             timestamp: new Date().toISOString(),
             duration: Date.now() - startTime
@@ -863,7 +863,7 @@ serve(async (req) => {
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
+
     // Unknown endpoint
     return new Response(
       JSON.stringify({
@@ -871,31 +871,31 @@ serve(async (req) => {
         error: { message: `Unknown endpoint: ${path}`, code: "NOT_FOUND" },
         meta: { requestId, timestamp: new Date().toISOString() }
       }),
-      { 
-        status: 404, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
-    
+
   } catch (error: any) {
     log(0, `Unhandled error: ${error.message}`, { stack: error.stack });
-    
+
     return new Response(
       JSON.stringify({
         success: false,
-        error: { 
-          message: error.message || "Internal server error", 
-          code: "INTERNAL_ERROR" 
+        error: {
+          message: error.message || "Internal server error",
+          code: "INTERNAL_ERROR"
         },
-        meta: { 
-          requestId, 
+        meta: {
+          requestId,
           timestamp: new Date().toISOString(),
           duration: Date.now() - startTime
         }
       }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
   }

@@ -78,7 +78,7 @@ const previousContext = body.previousContext || cumulativeTechnicalData || '';
 **3. `generateHoutouEmperor` (line ~2763)**
 - Added `cumulativeTechnicalData` destructuring
 - Updated CONTEXT to: "CONTEXT FROM PREVIOUS SECTIONS" with fallback
-- Updated colloquialInterpretation scope: "focus EXCLUSIVELY on the Day Master (Emperor)"
+- Updated colloquialInterpretation scope: "focus EXCLUSIVELY on the master of day (Emperor)"
 
 **4. `generateHoutouMaster` (line ~2821)**
 - Added `cumulativeTechnicalData` destructuring
@@ -88,18 +88,18 @@ const previousContext = body.previousContext || cumulativeTechnicalData || '';
 **5. `generateCoreNarrative` (line ~2531)**
 - Added `cumulativeTechnicalData` destructuring
 - Updated CONTEXT to use fallback
-- Updated colloquialInterpretation scope: "integrating celestial astrology, BaZi destiny, Five Elements dynamics, and Day Master analysis from prior sections into a unified narrative"
+- Updated colloquialInterpretation scope: "integrating celestial astrology, BaZi destiny, Five Elements dynamics, and master of day analysis from prior sections into a unified narrative"
 
 **6. `generateCoreApplication` (line ~2601)**
 - Added `cumulativeTechnicalData` destructuring
 - Updated CONTEXT to use fallback
-- Updated colloquialInterpretation scope: "drawing on ALL prior analyses (celestial, BaZi, Five Elements, Day Master, Governing Pillars, and hexagram narrative)"
+- Updated colloquialInterpretation scope: "drawing on ALL prior analyses (celestial, BaZi, Five Elements, master of day, Governing Pillars, and hexagram narrative)"
 
 **7. `generateCelestialAstro` (line ~2081)**
 - Updated colloquialInterpretation scope: "focusing EXCLUSIVELY on celestial astrology (Lunar Mansion, Tai Sui, Xiu system)"
 
 **8. `generateCelestialBazi` (line ~2121)**
-- Updated colloquialInterpretation scope: "focusing EXCLUSIVELY on BaZi destiny (Day Master, Four Pillars), PaGua correspondences (Xian Tian/Hou Tian/Life Gua), and Five Elements astrology (He Tu/Luo Shu)"
+- Updated colloquialInterpretation scope: "focusing EXCLUSIVELY on BaZi destiny (master of day, Four Pillars), PaGua correspondences (Xian Tian/Hou Tian/Life Gua), and Five Elements astrology (He Tu/Luo Shu)"
 
 ## Result: Proper Context Flow
 
@@ -131,7 +131,7 @@ Each section's "Interpretación Moderna" now focuses on its specific domain:
 | celestial-bazi | BaZi destiny + PaGua + Five Elements astrology |
 | elements-analysis | Wuxing cycles (technical, no colloquial) |
 | elements-synthesis | Five Elements dynamics synthesis |
-| houtou-emperor | Day Master (Emperor) analysis |
+| houtou-emperor | master of day (Emperor) analysis |
 | houtou-master | Governing Pillars (Year/Month/Hour) |
 | core-narrative | Integrated narrative weaving all layers |
 | core-application | Comprehensive practical synthesis |

@@ -30,15 +30,15 @@ ADVICE: 1. Do this. 2. Do that.
 ### After: Flowing & Integrated
 ```
 CELESTIAL: At this moment, the Lunar Mansion Ji aligns with your 
-Day Master Yi Wood, suggesting...
+master of day Yi Wood, suggesting...
 
 ELEMENTS: Within this celestial context, the hexagram's trigrams 
 reveal an energetic landscape where Wood dominates...
 
 ANALYSIS: The wisdom of the Judgment —"Fellowship with Men"— 
-comes alive when we consider your strong Wood Day Master...
+comes alive when we consider your strong Wood master of day...
 
-ADVICE: Given that your Day Master Yi Wood is strong and the 
+ADVICE: Given that your master of day Yi Wood is strong and the 
 Mansion favors accumulation...
 ```
 
@@ -53,7 +53,7 @@ Mansion favors accumulation...
 #### Localized BaZi Terms
 | English | Spanish | Italian | Chinese |
 |---------|---------|---------|---------|
-| Day Master | Maestro del Día | Maestro del Giorno | 日元 |
+| master of day | Maestro del Día | Maestro del Giorno | 日元 |
 | Strength | Fortaleza | Forza | 身强身弱 |
 | Useful God | Dios Útil | Dio Utile | 用神 |
 | Wood | Madera | Legno | 木 |
@@ -65,7 +65,7 @@ Mansion favors accumulation...
 #### Enhanced Data Context
 The prompt now includes:
 - Full hexagram data (localized name, Judgment, Image)
-- Complete BaZi (Day Master stem/branch, strength, Yong Shen)
+- Complete BaZi (master of day stem/branch, strength, Yong Shen)
 - Five Elements with percentages and dominant/deficient
 - Full astrology (Lunar Mansion animal/element, Life Gua, Tai Sui)
 - Moving lines with classical Chinese text
@@ -91,7 +91,7 @@ The prompt now includes:
 - [ ] Line texts → show Spanish/Italian (not Chinese)
 
 ### Interpretation Quality
-- [ ] Celestial section mentions Day Master + Lunar Mansion + Tai Sui
+- [ ] Celestial section mentions master of day + Lunar Mansion + Tai Sui
 - [ ] Element names are translated in Five Elements bars
 - [ ] Analysis flows naturally (not robotic bullet points)
 - [ ] Each section builds on the previous one
@@ -128,14 +128,14 @@ static getSourceLang(obj) {
 ## 6. Expected User Experience
 
 ### Before
-> "The celestial influences are aligned... Day Master: Yi Wood..."
+> "The celestial influences are aligned... master of day: Yi Wood..."
 
 ### After  
 > "En este momento, la Mansión Lunar Ji se alinea con tu Maestro del Día Yi Madera, que es fuerte en primavera..."
 
 The reading now feels like a personalized consultation that weaves together:
 - The cosmic moment (Lunar Mansion, Tai Sui)
-- The querent's destiny (BaZi Day Master, strength)
+- The querent's destiny (BaZi master of day, strength)
 - The elemental landscape (Five Elements, trigrams)
 - The hexagram's wisdom (Judgment, Image, Lines)
 - Practical guidance (synthesizing everything)

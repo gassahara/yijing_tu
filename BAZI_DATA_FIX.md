@@ -3,7 +3,7 @@
 ## Problem
 
 The AI interpretation was receiving incomplete BaZi data, causing it to:
-1. Report "Day Master strength is unknown" when the UI clearly showed "Strength: Strong"
+1. Report "master of day strength is unknown" when the UI clearly showed "Strength: Strong"
 2. Generate generic hexagram-based interpretations instead of using actual calculated BaZi data
 3. Miss critical astrological context (all four pillars, hidden stems, etc.)
 
@@ -29,7 +29,7 @@ This only passed:
 - All four pillars (Year, Month, Day, Hour)
 - Branch information
 - Hidden stems
-- Day Master object
+- master of day object
 - Favorable/unfavorable elements
 
 ## Solution
@@ -135,14 +135,14 @@ With complete data, the AI should now generate:
 ```
 Influencia del Momento (Current Sky / BaZi) 天時八字
 
-The sky reveals a Strong Wood Day Master (Jia 甲) born in the month of 
+The sky reveals a Strong Wood master of day (Jia 甲) born in the month of 
 Geng-Yin (Metal-Wood), supported by the Hour pillar Bing-Yin (Fire-Wood). 
-The Day pillar Jia-Xu (Wood-Earth) shows the Day Master sitting on 
+The Day pillar Jia-Xu (Wood-Earth) shows the master of day sitting on 
 Wealth (Xu contains Wu Earth). 
 
 With Strong strength and Earth as Yong Shen, this indicates abundant 
 resources available for cultivation. The Fire elements (Bing in Year 
-and Hour) generate the Wood Day Master, while the Metal in the Month 
+and Hour) generate the Wood master of day, while the Metal in the Month 
 presents some pressure that can be channeled through the Earth output.
 
 Current Elemental Flow: Wood (DM) → Fire (Resource) → Earth (Output/Wealth)

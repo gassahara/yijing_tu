@@ -2186,8 +2186,8 @@ async function generateCelestialBazi(request: InterpretationRequest): Promise<an
 All string values must be plain text - no markdown formatting.
 
 CRITICAL REQUIREMENTS:
-1. USE PROVIDED TECHNICAL DATA: Analyze the actual Day Master, stems, branches, and element strengths provided.
-2. BIRTH BAZI: Analyze Day Master, strength, favorable elements from the data.
+1. USE PROVIDED TECHNICAL DATA: Analyze the actual master of day, stems, branches, and element strengths provided.
+2. BIRTH BAZI: Analyze master of day, strength, favorable elements from the data.
 3. CURRENT SKY BAZI & MOMENT: Analyze moment energies (Prasna) from the data.
 4. PAGUA & FIVE ELEMENTS: Integrate the PaGua (Xian Tian/Hou Tian/Life Gua) and Five Elements (He Tu/Luo Shu) data into a single coherent analysis.
 5. HEXAGRAM CENTRALITY: The hexagram is absolutely primary; the entire compounded astrology (BaZi + PaGua + Elements) simply provides the destiny and timing context for the Hexagram cast.
@@ -2203,7 +2203,7 @@ FORMAT (JSON only):
 {
   "_verification_scratchpad": "Self-check of the rules...",
   "technicalAnalysis": "Title\\nClassical compounded BaZi, PaGua, and Five Elements analysis...",
-  "colloquialInterpretation": "Title\\nAccessible modern interpretation focusing EXCLUSIVELY on BaZi destiny (Day Master, Four Pillars), PaGua correspondences (Xian Tian/Hou Tian/Life Gua), and Five Elements astrology (He Tu/Luo Shu) — the compounded astrological backdrop. Do NOT provide a generic hexagram interpretation here.",
+  "colloquialInterpretation": "Title\\nAccessible modern interpretation focusing EXCLUSIVELY on BaZi destiny (master of day, Four Pillars), PaGua correspondences (Xian Tian/Hou Tian/Life Gua), and Five Elements astrology (He Tu/Luo Shu) — the compounded astrological backdrop. Do NOT provide a generic hexagram interpretation here.",
   "birthBazi": { "description": "", "readingImpact": "" },
   "currentBazi": { "description": "", "readingImpact": "" },
   "celestial": "Combined narrative explaining how the whole sky influences the cast"
@@ -2566,14 +2566,14 @@ RULES:
 1. Your narrative MUST derive from the classical Judgment (Tuan Ci) and Image Commentary (Xiang Ci) — cite them explicitly.
 2. Weave together the classical imagery, Five Elements balance, and moving lines into a unified interpretation.
 3. Connect the classical meaning to the querent's situation — but all connections must flow from the text, not from external advice.
-4. Write 3-4 substantive paragraphs. No bullet points. No headings.
+4. Write 4-5 substantive paragraphs with genuine depth. Each paragraph should develop a distinct layer of meaning: (a) the hexagram's core symbolism from the Judgment, (b) the Image Commentary's practical wisdom, (c) the interplay of trigrams and their elemental dynamics, (d) the moving lines and their specific counsel, (e) synthesis with the querent's situation.
 5. Do NOT add motivational or life-coaching language.
-6. Provide an accessible paragraph that explains the classical themes in plain language, INTEGRATING insights from the celestial, elemental, and houtou analyses provided in the context. This should be a unified narrative that weaves all prior layers together through the lens of the hexagram's classical texts.
+6. Provide a rich accessible section (2-3 paragraphs) that explains the classical themes in plain language, INTEGRATING insights from the celestial, elemental, and houtou analyses. Weave all prior layers into a cohesive narrative through the hexagram's classical lens. Be specific — reference actual trigram names, element cycles, and classical images rather than generic statements.
 
 FORMAT (JSON only):
 {
-  "analysis": "3-4 paragraph narrative rooted in classical texts...",
-  "colloquialInterpretation": "1-2 paragraph accessible explanation of the hexagram's classical themes, integrating celestial astrology, BaZi destiny, Five Elements dynamics, and Day Master analysis from prior sections into a unified narrative...",
+  "analysis": "4-5 paragraph narrative rooted in classical texts, each paragraph developing a distinct interpretive layer...",
+  "colloquialInterpretation": "2-3 paragraph rich accessible explanation integrating celestial astrology, BaZi destiny, Five Elements dynamics, and master of day analysis with specific classical references...",
   "quotedReferences": ["Classical citation (source)", "..."]
 }`;
 
@@ -2588,7 +2588,7 @@ ${previousContext || cumulativeTechnicalData || "None."}
 
 Write the hermeneutic narrative. Quote the Judgment or Image Commentary and explain their relevance to the question.`;
 
-  const parsed = await getStructuredInterpretation(userPrompt, 2000, { systemPrompt, response_mime_type: "application/json" }, ["analysis"], 2);
+  const parsed = await getStructuredInterpretation(userPrompt, 2500, { systemPrompt, response_mime_type: "application/json" }, ["analysis"], 2);
 
   return {
     technicalData: JSON.stringify(technicalData, null, 2),
@@ -2629,16 +2629,16 @@ async function generateCoreApplication(request: InterpretationRequest, previousC
 
 RULES:
 1. The Judgment (Tuan Ci) and Image Commentary (Xiang Ci) are your primary sources. ALL application guidance must be derived from them.
-2. For moving lines: cite the specific line text (Yao Ci) when applying its meaning.
-3. Provide an accessible synthesis (colloquialInterpretation) that translates classical imagery into plain language, drawing on ALL prior analyses (celestial, BaZi, Five Elements, Day Master, Governing Pillars, and hexagram narrative) to provide a comprehensive, practical interpretation. This is the final integrative layer — synthesize everything.
-4. The "advice" field must contain 4-6 specific orientations derived EXCLUSIVELY from the classical texts provided. Each orientation must cite its classical source.
+2. For moving lines: cite the specific line text (Yao Ci) when applying its meaning. Explain the line's position, yin/yang quality, and what it counsels.
+3. Provide a rich, comprehensive synthesis (colloquialInterpretation) of 3-4 paragraphs that: (a) Opens with the hexagram's central message grounded in the Judgment; (b) Develops the Image Commentary's practical wisdom for the querent's situation; (c) Integrates celestial timing (BaZi, master of day), Five Elements dynamics, and trigram interplay into concrete guidance; (d) Closes with a synthesis that connects all layers to the querent's question. This is the FINAL integrative layer — be thorough and specific.
+4. The "advice" field must contain 4-6 specific orientations derived EXCLUSIVELY from the classical texts provided. Each orientation must: cite its classical source in quotes, explain the imagery, and give a concrete application. Separate each orientation clearly.
 5. Do NOT invent advice not supported by the classical corpus. No motivational language. No generic life-coaching.
 6. Plain text only — no markdown.
 
 FORMAT (JSON only):
 {
-  "colloquialInterpretation": "Comprehensive practical synthesis building on ALL prior section analyses (celestial, BaZi, elements, houtou) to deliver integrated guidance grounded in classical texts...",
-  "advice": "Classical orientations with citations...",
+  "colloquialInterpretation": "3-4 paragraph comprehensive synthesis integrating all prior analyses (celestial, BaZi, elements, houtou, trigrams) into specific, grounded guidance...",
+  "advice": "4-6 classical orientations, each with quoted source, imagery explanation, and concrete application...",
   "quotedReferences": ["Classical citation (source)", "..."]
 }`;
 
@@ -2663,7 +2663,7 @@ Synthesize the classical reading. Every application must cite a specific classic
   const requiredFields = ["colloquialInterpretation", "advice"];
   const parsed = await getStructuredInterpretation(
     userPrompt,
-    3000,
+    3500,
     { systemPrompt, temperature: 0.3, response_mime_type: "application/json" },
     requiredFields,
     3
@@ -2761,14 +2761,14 @@ Provide 4-6 classically-grounded orientations. Quote the relevant passage first,
 }
 
 async function generateHoutouEmperor(request: InterpretationRequest, previousContext?: string): Promise<any> {
-  log(4, `[SECTION:houtou-emperor] Generating Emperor (Day Master) analysis...`);
+  log(4, `[SECTION:houtou-emperor] Generating Emperor (master of day) analysis...`);
   const { birthBazi, currentBazi, question, hexagram, cumulativeTechnicalData } = request;
 
   const technicalData = {
     timestamp: new Date().toISOString(),
     hexagram: hexagram ? { number: hexagram.number, name: hexagram.name_en } : null,
     emperor: {
-      type: "Day Master (日主)",
+      type: "master of day (日主)",
       birth: birthBazi?.dayMaster || null,
       current: currentBazi?.dayMaster || null,
       strength: {
@@ -2779,21 +2779,21 @@ async function generateHoutouEmperor(request: InterpretationRequest, previousCon
     }
   };
 
-  const systemPrompt = `You are a BaZi Master. Provide Emperor (Day Master) analysis only.
+  const systemPrompt = `You are a BaZi Master. Provide Emperor (master of day) analysis only.
 All string values must be plain text - no markdown formatting.
 
 CRITICAL REQUIREMENTS:
-1. USE PROVIDED TECHNICAL DATA: Analyze the actual Day Master element and strength from the data.
-2. EMPEROR ONLY: Analyze the Day Master (Emperor) - its element, strength, and current situation.
+1. USE PROVIDED TECHNICAL DATA: Analyze the actual master of day element and strength from the data.
+2. EMPEROR ONLY: Analyze the master of day (Emperor) - its element, strength, and current situation.
 3. NO MASTERS: Do NOT analyze the governing pillars (Year/Month/Hour).
 4. NO DIAGRAM: Do NOT generate FDL diagram data.
 5. READING IMPACT: How does the Emperor's condition affect this I Ching reading?
-6. SCOPE: The "colloquialInterpretation" must focus EXCLUSIVELY on the Day Master (Emperor) — its element, strength, and how it shapes this reading. Reference prior celestial and elemental context for background but do NOT provide a general hexagram interpretation.
+6. SCOPE: The "colloquialInterpretation" must focus EXCLUSIVELY on the master of day (Emperor) — its element, strength, and how it shapes this reading. Reference prior celestial and elemental context for background but do NOT provide a general hexagram interpretation.
 
 FORMAT (JSON only):
 {
-  "technicalAnalysis": "Title\\nEmperor analysis using actual Day Master data",
-  "colloquialInterpretation": "Title\\nAccessible interpretation focusing EXCLUSIVELY on the Day Master (Emperor) — its element, strength, and how it shapes this reading. Reference prior celestial and elemental context for background but do NOT provide a general hexagram interpretation.",
+  "technicalAnalysis": "Title\\nEmperor analysis using actual master of day data",
+  "colloquialInterpretation": "Title\\nAccessible interpretation focusing EXCLUSIVELY on the master of day (Emperor) — its element, strength, and how it shapes this reading. Reference prior celestial and elemental context for background but do NOT provide a general hexagram interpretation.",
   "emperorAnalysis": "Detailed Emperor analysis"
 }`;
 
@@ -2806,7 +2806,7 @@ ${previousContext || cumulativeTechnicalData || "N/A"}
 ### QUESTION
 "${question}"
 
-Provide Emperor (Day Master) analysis based on the ACTUAL technical data above. Reference prior celestial, elemental, and BaZi context where relevant. No Masters, no diagram.`;
+Provide Emperor (master of day) analysis based on the ACTUAL technical data above. Reference prior celestial, elemental, and BaZi context where relevant. No Masters, no diagram.`;
 
   const parsed = await getStructuredInterpretation(userPrompt, 1000, { systemPrompt, response_mime_type: "application/json" }, ["technicalAnalysis"], 2);
 
@@ -2846,15 +2846,15 @@ All string values must be plain text - no markdown formatting.
 CRITICAL REQUIREMENTS:
 1. USE PROVIDED TECHNICAL DATA: Analyze the actual Year, Month, Hour pillars from the data.
 2. MASTERS ONLY: Analyze the governing pillars (Year, Month, Hour) and their influence.
-3. NO EMPEROR: Do NOT analyze the Day Master.
+3. NO EMPEROR: Do NOT analyze the master of day.
 4. NO DIAGRAM: Do NOT generate FDL diagram data.
 5. READING IMPACT: How do the Masters affect this I Ching reading?
-6. SCOPE: The "colloquialInterpretation" must focus EXCLUSIVELY on the Governing Pillars (Year, Month, Hour Masters) — their elemental influences and timing dynamics. Reference prior celestial, Day Master, and elemental context but do NOT provide a general hexagram interpretation.
+6. SCOPE: The "colloquialInterpretation" must focus EXCLUSIVELY on the Governing Pillars (Year, Month, Hour Masters) — their elemental influences and timing dynamics. Reference prior celestial, master of day, and elemental context but do NOT provide a general hexagram interpretation.
 
 FORMAT (JSON only):
 {
   "technicalAnalysis": "Title\\nMasters analysis using actual pillar data",
-  "colloquialInterpretation": "Title\\nAccessible interpretation focusing EXCLUSIVELY on the Governing Pillars (Year, Month, Hour Masters) — their elemental influences and timing dynamics. Reference prior celestial, Day Master, and elemental context but do NOT provide a general hexagram interpretation.",
+  "colloquialInterpretation": "Title\\nAccessible interpretation focusing EXCLUSIVELY on the Governing Pillars (Year, Month, Hour Masters) — their elemental influences and timing dynamics. Reference prior celestial, master of day, and elemental context but do NOT provide a general hexagram interpretation.",
   "masterAnalysis": "Detailed Master analysis"
 }`;
 
@@ -2867,7 +2867,7 @@ ${previousContext || cumulativeTechnicalData || "N/A"}
 ### QUESTION
 "${question}"
 
-Provide Master (Pillars) analysis based on the ACTUAL technical data above. Reference prior celestial, Day Master, and elemental context where relevant. No Emperor, no diagram.`;
+Provide Master (Pillars) analysis based on the ACTUAL technical data above. Reference prior celestial, master of day, and elemental context where relevant. No Emperor, no diagram.`;
 
   const parsed = await getStructuredInterpretation(userPrompt, 1000, { systemPrompt, response_mime_type: "application/json" }, ["technicalAnalysis"], 2);
 
@@ -3739,7 +3739,7 @@ async function handleRemediesSelect(body: any, requestId: string, startTime: num
       });
 
       if (entry.verified) score += 4;
-      score += Math.random() * 15;
+      score += Math.random() * 5;
 
       return { entry, score };
     })
@@ -4368,22 +4368,22 @@ serve(async (req) => {
 
 async function handleInterpretationTab(body: any, requestId: string, startTime: number): Promise<Response> {
   log(4, `[TAB:interpretation] Generating compact interpretation...`);
-  
+
   const { hexagram, lines, question, astrology, bazi, equilibrium, lang = 'en' } = body;
-  
+
   // Get hexagram data from database for classical texts
   const hexData = await getHexagram(hexagram.number);
-  
+
   // Compact element name lookup
   const elName = (e: string) => {
     if (!e) return '';
-    const m: Record<string, string> = { wood:'W', fire:'F', earth:'E', metal:'M', water:'Wa' };
+    const m: Record<string, string> = { wood: 'W', fire: 'F', earth: 'E', metal: 'M', water: 'Wa' };
     return m[e.toLowerCase()] || e;
   };
-  
+
   // Get moving lines
-  const mLines = lines?.map((l: any, i: number) => l.isChanging ? {p:i+1, t:hexData?.lines_zh?.[i]?.slice(0,20)} : null).filter(Boolean) || [];
-  
+  const mLines = lines?.map((l: any, i: number) => l.isChanging ? { p: i + 1, t: hexData?.lines_zh?.[i]?.slice(0, 20) } : null).filter(Boolean) || [];
+
   // Compact context
   const ctx = {
     h: { n: hexagram.number, name: hexagram[`name_${lang}`] || hexagram.name_en, zh: hexagram.name_zh },
@@ -4406,7 +4406,7 @@ async function handleInterpretationTab(body: any, requestId: string, startTime: 
 Judgment: ${ctx.j}
 Image: ${ctx.i}
 Trigrams: ${ctx.tu}/${ctx.tl}
-${mLines.length ? `Lines: ${mLines.map((l:any)=>`#${l.p}:${l.t}...`).join(', ')}` : 'Stable'}
+${mLines.length ? `Lines: ${mLines.map((l: any) => `#${l.p}:${l.t}...`).join(', ')}` : 'Stable'}
 
 Cosmic: Mansion ${ctx.lm}, LifeGua ${ctx.lg}, DayMaster ${ctx.dm}(${ctx.dme}), Strength ${ctx.str}
 Elements: W${ctx.w}% F${ctx.f}% E${ctx.e}% M${ctx.m}% Wa${ctx.wa}% | Dom:${ctx.dom} Def:${ctx.def}
@@ -4414,7 +4414,7 @@ Elements: W${ctx.w}% F${ctx.f}% E${ctx.e}% M${ctx.m}% Wa${ctx.wa}% | Dom:${ctx.d
 Question: "${question?.slice(0, 100)}"
 
 Return COMPACT JSON (minimize whitespace, no newlines in values):
-{"c":"CELESTIAL:2-3 paras integrating sky(${ctx.lm})+destiny(${ctx.dm})+timing","e":"ELEMENTS:2-3 paras on ${ctx.tu}/${ctx.tl}+5E(${ctx.dom}dom)","a":"ANALYSIS:4-5 paras weaving all+judgment+${mLines.length?'lines':'stable wisdom'}","d":"ADVICE:4-6 practical steps citing classics","r":["ref1","ref2"]}`;
+{"c":"CELESTIAL:2-3 paras integrating sky(${ctx.lm})+destiny(${ctx.dm})+timing","e":"ELEMENTS:2-3 paras on ${ctx.tu}/${ctx.tl}+5E(${ctx.dom}dom)","a":"ANALYSIS:4-5 paras weaving all+judgment+${mLines.length ? 'lines' : 'stable wisdom'}","d":"ADVICE:4-6 practical steps citing classics","r":["ref1","ref2"]}`;
 
   try {
     const result = await getStructuredInterpretation(
@@ -4444,9 +4444,9 @@ Return COMPACT JSON (minimize whitespace, no newlines in values):
 
 async function handleRemediesTab(body: any, requestId: string, startTime: number): Promise<Response> {
   log(4, `[TAB:remedies] Generating remedies tab...`);
-  
+
   const { hexagram, question, astrology, bazi, lang = 'en' } = body;
-  
+
   // Build context for remedy selection
   const readingContext = {
     hexagramNumber: hexagram?.number,
@@ -4485,7 +4485,7 @@ OUTPUT FORMAT (JSON):
   const userPrompt = `### READING CONTEXT
 Hexagram: ${readingContext.hexagramNumber} ${readingContext.hexagramName}
 Element: ${readingContext.element}
-Day Master: ${readingContext.dayMaster} (${readingContext.strength})
+master of day: ${readingContext.dayMaster} (${readingContext.strength})
 Life Gua: ${readingContext.lifeGua}
 Question: "${question}"
 
@@ -4514,9 +4514,9 @@ Select appropriate remedies and provide complete details in ${lang}.`;
 
 async function handleFengShuiMedicineTab(body: any, requestId: string, startTime: number): Promise<Response> {
   log(4, `[TAB:fengshui-medicine] Generating Feng Shui and Medicine tab...`);
-  
+
   const { hexagram, bazi, astrology, equilibrium, lang = 'en' } = body;
-  
+
   const context = {
     hexagramElement: hexagram?.element,
     dayMaster: bazi?.current?.dayMaster?.element,
@@ -4552,7 +4552,7 @@ OUTPUT FORMAT (JSON):
 
   const userPrompt = `### CONTEXT
 Hexagram Element: ${context.hexagramElement}
-Day Master: ${context.dayMaster} (${context.strength})
+master of day: ${context.dayMaster} (${context.strength})
 Favorable Elements: ${context.favorable}
 Life Gua: ${context.lifeGua?.number} (${context.lifeGua?.element})
 Five Elements Balance: ${JSON.stringify(context.elements)}
@@ -4719,7 +4719,7 @@ async function handlePostRequest(
             coreApplication: "POST /core-application - Practical advice",
             lines: "POST /lines - Moving lines analysis",
             classical: "POST /classical - Classical texts retrieval",
-            houtouEmperor: "POST /houtou-emperor - Emperor (Day Master) analysis",
+            houtouEmperor: "POST /houtou-emperor - Emperor (master of day) analysis",
             houtouMaster: "POST /houtou-master - Master (Pillars) analysis",
             advice: "POST /advice - Dedicated advice synthesis",
 
