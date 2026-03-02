@@ -4374,47 +4374,71 @@ async function handleInterpretationTab(body: any, requestId: string, startTime: 
   // Get hexagram data from database for classical texts
   const hexData = await getHexagram(hexagram.number);
 
-  // Compact element name lookup
+  // Element name lookup - returns full name in target language
   const elName = (e: string) => {
     if (!e) return '';
-    const m: Record<string, string> = { wood: 'W', fire: 'F', earth: 'E', metal: 'M', water: 'Wa' };
-    return m[e.toLowerCase()] || e;
+    const el = e.toLowerCase();
+    const m: Record<string, Record<string, string>> = {
+      en: { wood: 'Wood', fire: 'Fire', earth: 'Earth', metal: 'Metal', water: 'Water' },
+      es: { wood: 'Madera', fire: 'Fuego', earth: 'Tierra', metal: 'Metal', water: 'Agua' },
+      it: { wood: 'Legno', fire: 'Fuoco', earth: 'Terra', metal: 'Metallo', water: 'Acqua' },
+      zh: { wood: '木', fire: '火', earth: '土', metal: '金', water: '水' }
+    };
+    return m[lang]?.[el] || m['en'][el] || el;
   };
 
   // Get moving lines
   const mLines = lines?.map((l: any, i: number) => l.isChanging ? { p: i + 1, t: hexData?.lines_zh?.[i]?.slice(0, 20) } : null).filter(Boolean) || [];
+
+  // Find dominant and deficient elements
+  const els = equilibrium?.elements || {};
+  const sortedEls = Object.entries(els)
+    .filter(([k]) => ['wood', 'fire', 'earth', 'metal', 'water'].includes(k))
+    .sort((a: any, b: any) => b[1] - a[1]);
+  const domEl = sortedEls[0]?.[0] || '';
+  const defEl = sortedEls[sortedEls.length - 1]?.[0] || '';
 
   // Compact context
   const ctx = {
     h: { n: hexagram.number, name: hexagram[`name_${lang}`] || hexagram.name_en, zh: hexagram.name_zh },
     j: (hexData?.[`judgment_${lang}`] || hexData?.judgment_en || '').slice(0, 150),
     i: (hexData?.image?.[`image_${lang}`] || hexData?.image?.image_en || '').slice(0, 150),
-    tu: hexagram.trigramUpper?.zh, tl: hexagram.trigramLower?.zh,
+    tu: hexagram.trigramUpper?.zh || hexagram.trigramUpper?.name?.slice(0, 3) || '?',
+    tl: hexagram.trigramLower?.zh || hexagram.trigramLower?.name?.slice(0, 3) || '?',
+    tue: elName(hexagram.trigramUpper?.element),
+    tle: elName(hexagram.trigramLower?.element),
     dm: bazi?.current?.day?.stem?.zh,
     dme: elName(bazi?.current?.day?.stem?.element),
     str: bazi?.current?.strength?.result,
     lm: astrology?.lunarMansion?.mansion?.zh,
+    lmn: astrology?.lunarMansion?.mansion?.name,
     lg: astrology?.lifeGua?.number,
-    w: equilibrium?.elements?.wood, f: equilibrium?.elements?.fire,
-    e: equilibrium?.elements?.earth, m: equilibrium?.elements?.metal, wa: equilibrium?.elements?.water,
-    dom: equilibrium?.elements?.dominant ? elName(equilibrium.elements.dominant) : '',
-    def: equilibrium?.elements?.deficient ? elName(equilibrium.elements.deficient) : ''
+    w: els.wood, f: els.fire, e: els.earth, m: els.metal, wa: els.water,
+    dom: domEl ? elName(domEl) : 'balanced',
+    def: defEl ? elName(defEl) : 'balanced'
   };
 
-  const prompt = `Yi Jing reading in ${lang}. Hexagram #${ctx.h.n} ${ctx.h.zh} ${ctx.h.name}.
+  const t = {
+    en: { ce: 'CELESTIAL', el: 'ELEMENTS', an: 'ANALYSIS', ad: 'ADVICE', wr: 'Write in English' },
+    es: { ce: 'CELESTIAL', el: 'ELEMENTOS', an: 'ANÁLISIS', ad: 'CONSEJO', wr: 'Escribe en español' },
+    it: { ce: 'CELESTE', el: 'ELEMENTI', an: 'ANALISI', ad: 'CONSIGLIO', wr: 'Scrivi in italiano' },
+    zh: { ce: '天体', el: '五行', an: '分析', ad: '建议', wr: '用中文写' }
+  }[lang] || t.en;
+
+  const prompt = `${t.wr}. Yi Jing reading for Hexagram #${ctx.h.n} ${ctx.h.zh} ${ctx.h.name}.
 
 Judgment: ${ctx.j}
 Image: ${ctx.i}
-Trigrams: ${ctx.tu}/${ctx.tl}
+Trigrams: ${ctx.tu}(${ctx.tue})/${ctx.tl}(${ctx.tle})
 ${mLines.length ? `Lines: ${mLines.map((l: any) => `#${l.p}:${l.t}...`).join(', ')}` : 'Stable'}
 
-Cosmic: Mansion ${ctx.lm}, LifeGua ${ctx.lg}, DayMaster ${ctx.dm}(${ctx.dme}), Strength ${ctx.str}
-Elements: W${ctx.w}% F${ctx.f}% E${ctx.e}% M${ctx.m}% Wa${ctx.wa}% | Dom:${ctx.dom} Def:${ctx.def}
+Cosmic: Mansion ${ctx.lm}(${ctx.lmn}), LifeGua ${ctx.lg}, DayMaster ${ctx.dm}(${ctx.dme}), Strength ${ctx.str}
+Elements: ${ctx.w}%${elName('wood')} ${ctx.f}%${elName('fire')} ${ctx.e}%${elName('earth')} ${ctx.m}%${elName('metal')} ${ctx.wa}%${elName('water')} | Dom:${ctx.dom} Def:${ctx.def}
 
 Question: "${question?.slice(0, 100)}"
 
-Return COMPACT JSON (minimize whitespace, no newlines in values):
-{"c":"CELESTIAL:2-3 paras integrating sky(${ctx.lm})+destiny(${ctx.dm})+timing","e":"ELEMENTS:2-3 paras on ${ctx.tu}/${ctx.tl}+5E(${ctx.dom}dom)","a":"ANALYSIS:4-5 paras weaving all+judgment+${mLines.length ? 'lines' : 'stable wisdom'}","d":"ADVICE:4-6 practical steps citing classics","r":["ref1","ref2"]}`;
+Return JSON in ${lang} language (no newlines in values):
+{"c":"${t.ce}: ...","e":"${t.el}: ...","a":"${t.an}: ...","d":"${t.ad}: ...","r":["..."]}`;
 
   try {
     const result = await getStructuredInterpretation(
@@ -4443,72 +4467,155 @@ Return COMPACT JSON (minimize whitespace, no newlines in values):
 }
 
 async function handleRemediesTab(body: any, requestId: string, startTime: number): Promise<Response> {
-  log(4, `[TAB:remedies] Generating remedies tab...`);
+  log(4, `[TAB:remedies] Selecting remedies from database...`);
 
-  const { hexagram, question, astrology, bazi, lang = 'en' } = body;
+  const { hexagram, question, astrology, bazi, equilibrium, binaryKey, lang = 'en' } = body;
 
-  // Build context for remedy selection
-  const readingContext = {
-    hexagramNumber: hexagram?.number,
-    hexagramName: hexagram?.name_en,
-    element: hexagram?.element,
-    dayMaster: bazi?.current?.dayMaster?.element,
-    strength: bazi?.current?.strength?.result,
-    lifeGua: astrology?.lifeGua?.element,
-    question
+  // Load the remedy database
+  const database = await loadFuluDatabase();
+  
+  // Build context for scoring
+  const lowerTrigram = binaryKey?.substring(0, 3) || "";
+  const upperTrigram = binaryKey?.substring(3, 6) || "";
+  
+  // Get interpretation context for keyword matching
+  const interpretation = body.interpretation || {};
+  const analysisText = interpretation.analysis || interpretation.celestial || "";
+  const combinedContext = `${analysisText} ${question}`.toLowerCase();
+
+  // Score and rank candidates
+  const getScoredCandidates = (typePool: FuluEntry[]) => {
+    return typePool.map(entry => {
+      let score = 0;
+      // Hexagram match
+      if (entry.hexagrams?.includes(hexagram.number)) score += 15;
+      // Trigram matches
+      if (entry.trigram_associations?.includes(upperTrigram)) score += 7;
+      if (entry.trigram_associations?.includes(lowerTrigram)) score += 7;
+      // Keyword matching
+      const keywords = [...(entry.usage || []), entry.purpose || ""].map(k => k.replace(/_/g, ' '));
+      keywords.forEach(kw => {
+        if (kw.length > 3 && combinedContext.includes(kw.toLowerCase())) score += 6;
+      });
+      // Verified entries get boost
+      if (entry.verified) score += 4;
+      // Element matching with Day Master
+      const dayMasterElement = bazi?.current?.dayMaster?.element;
+      if (dayMasterElement && entry.elements?.includes(dayMasterElement)) score += 5;
+      // Random tiebreaker
+      score += Math.random() * 3;
+      return { entry, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10)
+    .map(s => s.entry);
   };
 
-  const systemPrompt = `You are a Daoist remedy master selecting appropriate remedies.
+  // Get scored pools
+  const fuluPool = getScoredCandidates(database.filter(e => e.remedyType === 'fulu'));
+  const envPool = getScoredCandidates(database.filter(e => e.remedyType !== 'fulu'));
 
-CRITICAL RULES:
-1. Select 2-3 remedies based on the hexagram, question, and astrological context
-2. Choose from: Fulu (talisman), Feng Shui (environmental), Medicine (alchemical)
-3. Each remedy must include relevance explaining WHY it fits this reading
-4. Provide usage instructions in accessible language
-5. Include classical source references
-6. Output must be in ${lang} language
+  // Create slim catalog for AI selection
+  const slimCatalog = [...fuluPool, ...envPool].map(entry => ({
+    id: entry.id,
+    name: entry.name,
+    purpose: entry.purpose || "General Balance",
+    usage: entry.usage || [],
+    remedyType: entry.remedyType,
+    elements: entry.elements || [],
+    hexagrams: entry.hexagrams || []
+  }));
 
-OUTPUT FORMAT (JSON):
-{
-  "remedies": [
-    {
-      "type": "fulu|fengshui|medicine",
-      "name": { "zh": "中文名", "en": "English Name", "${lang}": "Name in ${lang}" },
-      "relevance": "Why this remedy fits (in ${lang})",
-      "description": "What the remedy does (in ${lang})",
-      "instructions": "How to use it (in ${lang})",
-      "source": "Classical text reference"
-    }
-  ]
-}`;
+  // If catalog is empty, return empty result
+  if (slimCatalog.length === 0) {
+    return new Response(
+      JSON.stringify(createSuccessResponse({ remedies: [] }, requestId, startTime)),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  }
 
-  const userPrompt = `### READING CONTEXT
-Hexagram: ${readingContext.hexagramNumber} ${readingContext.hexagramName}
-Element: ${readingContext.element}
-master of day: ${readingContext.dayMaster} (${readingContext.strength})
-Life Gua: ${readingContext.lifeGua}
-Question: "${question}"
+  // Astrology context for conflict avoidance
+  const astrologyContext = astrology
+    ? `ASTROLOGY: LifeGua ${astrology.lifeGua?.element}, Mansion ${astrology.lunarMansion?.mansion?.element}, DayMaster ${bazi?.current?.dayMaster?.element} ${bazi?.current?.strength?.result}`
+    : "";
 
-Select appropriate remedies and provide complete details in ${lang}.`;
+  const systemPrompt = `You are a Daoist Remedy Selector. Select appropriate remedies from the AUTHENTICATED CATALOG below.
+
+${astrologyContext}
+
+AUTHENTICATED CATALOG (top matches):
+${JSON.stringify(slimCatalog, null, 2)}
+
+STRICT RULES:
+1. Select ONE fulu/talisman (remedyType: "fulu") and ONE environmental remedy (remedyType: "fengshui" or "medicine")
+2. Return ONLY existing IDs from the catalog - DO NOT invent new remedies
+3. Consider element balance - avoid remedies that conflict with Day Master or Life Gua
+4. Brief relevance text (1-2 sentences) in ${lang}
+5. Output valid JSON: {"remedies": [{"id": "...", "relevance": "..."}]}`;
+
+  const userPrompt = `READING:
+- Hexagram: ${hexagram.number} ${hexagram.name_en} (${hexagram.element})
+- Question: "${question?.slice(0, 100)}"
+- Trigrams: ${upperTrigram}/${lowerTrigram}
+
+Select the 2 best fitting remedies (one fulu, one environmental) from the catalog.`;
 
   try {
     const result = await getStructuredInterpretation(
       userPrompt,
-      2000,
-      { systemPrompt, response_mime_type: "application/json" },
+      1500,
+      { systemPrompt, temperature: 0.3, response_mime_type: "application/json" },
       ['remedies'],
       2
     );
 
+    // Validate and enrich selected remedies
+    const selectedRemedies = [];
+    for (const sel of (result.remedies || [])) {
+      const entry = database.find(e => e.id === sel.id);
+      if (entry) {
+        // Use database entry with AI-generated relevance
+        selectedRemedies.push({
+          type: entry.remedyType,
+          id: entry.id,
+          name: entry.name,
+          relevance: sel.relevance || getRelevance(entry, lang, equilibrium),
+          description: entry.description?.[lang] || entry.description?.en || "",
+          instructions: entry.structure?.instructions || entry.instructions || "Apply according to traditional practice.",
+          application: entry.application || "",
+          source: entry.source || entry.canonicalText || "Daoist tradition",
+          fdl: entry.visualData?.fdl,
+          image: entry.image
+        });
+      }
+    }
+
     return new Response(
       JSON.stringify(createSuccessResponse({
-        remedies: result.remedies || []
+        remedies: selectedRemedies
       }, requestId, startTime)),
       { headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     log(4, `[TAB:remedies] Error: ${error.message}`);
-    throw new AppError(`Remedies tab generation failed: ${error.message}`, 500, 'REMEDIES_TAB_ERROR');
+    // Fallback: return top scored remedies without AI
+    const fallbackRemedies = [...fuluPool.slice(0, 1), ...envPool.slice(0, 1)].map(entry => ({
+      type: entry.remedyType,
+      id: entry.id,
+      name: entry.name,
+      relevance: getRelevance(entry, lang, equilibrium),
+      description: entry.description?.[lang] || entry.description?.en || "",
+      instructions: entry.structure?.instructions || entry.instructions || "Apply according to traditional practice.",
+      application: entry.application || "",
+      source: entry.source || "Daoist tradition"
+    }));
+    
+    return new Response(
+      JSON.stringify(createSuccessResponse({
+        remedies: fallbackRemedies
+      }, requestId, startTime)),
+      { headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 

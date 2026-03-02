@@ -236,7 +236,7 @@ const ChineseAstrologyDisplay = {
                 <td class="branch" data-element="${data.branch.element}">
                     <span class="hz">${data.branch.zh}</span>
                     <span class="py">${data.branch.name}</span>
-                    <span class="zodiac">${data.branch.zodiac}</span>
+                    <span class="zodiac">${this.translateZodiac(data.branch.zodiac)}</span>
                 </td>
                 <td class="hidden">${(data.hiddenStems || []).map(h => `<span class="hs">${h}</span>`).join('')}</td>
             </tr>`;
@@ -285,7 +285,7 @@ const ChineseAstrologyDisplay = {
             <div class="dm-card" data-element="${dm.element}">
                 <div class="dm-header">
                     <h4>${this.t('dayMaster')} <span class="zh">日主</span></h4>
-                    <span class="element-tag ${dm.element?.toLowerCase()}">${dm.element}</span>
+                    <span class="element-tag ${dm.element?.toLowerCase()}">${this.translateElement(dm.element)}</span>
                 </div>
                 <div class="dm-display">
                     <span class="dm-hz">${dm.zh || '?'}</span>
@@ -302,7 +302,7 @@ const ChineseAstrologyDisplay = {
                     <div class="st-meter"><div class="st-fill" style="width:${Math.min(100, Math.max(0, 50 + (st.score || 0)))}%"></div></div>
                     <div class="yong-shen">
                         <span class="ys-label">${this.t('yongShen')} <span class="zh">用神</span>:</span>
-                        <span class="ys-element ${st.yongShen?.toLowerCase()}">${st.yongShen || 'N/A'}</span>
+                        <span class="ys-element ${st.yongShen?.toLowerCase()}">${this.translateElement(st.yongShen) || 'N/A'}</span>
                     </div>
                 </div>
             </div>
@@ -361,16 +361,16 @@ const ChineseAstrologyDisplay = {
                                 <span class="name-zh">${upperXT?.z || '?'}</span>
                                 <span class="name-en">${upperName || '?'}</span>
                             </div>
-                            <span class="trig-element ${upperXT?.e?.toLowerCase()}">${upperXT?.e || ''}</span>
+                            <span class="trig-element ${upperXT?.e?.toLowerCase()}">${this.translateElement(upperXT?.e)}</span>
                         </div>
                     </div>
-                    
+
                     <div class="trigrams-divider">
                         <span class="divider-line"></span>
-                        <span class="divider-text">${this.t('over')}</span>
+                        <span class="divider-text">${this.t('trigramDivider')}</span>
                         <span class="divider-line"></span>
                     </div>
-                    
+
                     <div class="trig-display lower-trigram">
                         <div class="trig-label">
                             <span class="label-en">${this.t('lowerTrigram')}</span>
@@ -382,7 +382,7 @@ const ChineseAstrologyDisplay = {
                                 <span class="name-zh">${lowerXT?.z || '?'}</span>
                                 <span class="name-en">${lowerName || '?'}</span>
                             </div>
-                            <span class="trig-element ${lowerXT?.e?.toLowerCase()}">${lowerXT?.e || ''}</span>
+                            <span class="trig-element ${lowerXT?.e?.toLowerCase()}">${this.translateElement(lowerXT?.e)}</span>
                         </div>
                     </div>
                 </div>
@@ -625,7 +625,7 @@ const ChineseAstrologyDisplay = {
             svg += `<text x="${pos.x}" y="${pos.y + 14}" text-anchor="middle" font-size="11" fill="${colors.text}">${t.z}</text>`;
 
             // Direction label
-            svg += `<text x="${pos.x}" y="${pos.y + 24}" text-anchor="middle" font-size="8" fill="#666">${pos.dir}</text>`;
+            svg += `<text x="${pos.x}" y="${pos.y + 24}" text-anchor="middle" font-size="8" fill="#666">${this.translateDirection(pos.dir)}</text>`;
         });
 
         // Connecting lines showing sequence
@@ -709,7 +709,7 @@ const ChineseAstrologyDisplay = {
             svg += `<text x="${pos.x}" y="${pos.y + 14}" text-anchor="middle" font-size="11" fill="${colors.text}">${t.z}</text>`;
 
             // Direction
-            svg += `<text x="${pos.x}" y="${pos.y + 24}" text-anchor="middle" font-size="8" fill="#666">${pos.dir}</text>`;
+            svg += `<text x="${pos.x}" y="${pos.y + 24}" text-anchor="middle" font-size="8" fill="#666">${this.translateDirection(pos.dir)}</text>`;
         });
 
         return svg + '</svg>';
@@ -743,27 +743,27 @@ const ChineseAstrologyDisplay = {
                         <!-- Center Earth -->
                         <circle cx="200" cy="200" r="55" fill="${elementColors.Earth.bg}" stroke="#d4af37" stroke-width="3"/>
                         <text x="200" y="195" text-anchor="middle" fill="${elementColors.Earth.text}" font-size="22" font-weight="bold">5·10</text>
-                        <text x="200" y="220" text-anchor="middle" fill="${elementColors.Earth.text}" font-size="12">Earth 土</text>
-                        
+                        <text x="200" y="220" text-anchor="middle" fill="${elementColors.Earth.text}" font-size="12">${this.translateElement('Earth')} 土</text>
+
                         <!-- North Water -->
                         <circle cx="200" cy="70" r="45" fill="${elementColors.Water.bg}" stroke="${elementColors.Water.accent}" stroke-width="3"/>
                         <text x="200" y="65" text-anchor="middle" fill="${elementColors.Water.text}" font-size="20" font-weight="bold">1·6</text>
-                        <text x="200" y="85" text-anchor="middle" fill="${elementColors.Water.text}" font-size="11">Water 水</text>
-                        
+                        <text x="200" y="85" text-anchor="middle" fill="${elementColors.Water.text}" font-size="11">${this.translateElement('Water')} 水</text>
+
                         <!-- South Fire -->
                         <circle cx="200" cy="330" r="45" fill="${elementColors.Fire.bg}" stroke="${elementColors.Fire.accent}" stroke-width="3"/>
                         <text x="200" y="325" text-anchor="middle" fill="${elementColors.Fire.text}" font-size="20" font-weight="bold">2·7</text>
-                        <text x="200" y="345" text-anchor="middle" fill="${elementColors.Fire.text}" font-size="11">Fire 火</text>
-                        
+                        <text x="200" y="345" text-anchor="middle" fill="${elementColors.Fire.text}" font-size="11">${this.translateElement('Fire')} 火</text>
+
                         <!-- East Wood -->
                         <circle cx="330" cy="200" r="45" fill="${elementColors.Wood.bg}" stroke="${elementColors.Wood.accent}" stroke-width="3"/>
                         <text x="330" y="195" text-anchor="middle" fill="${elementColors.Wood.text}" font-size="20" font-weight="bold">3·8</text>
-                        <text x="330" y="215" text-anchor="middle" fill="${elementColors.Wood.text}" font-size="11">Wood 木</text>
-                        
+                        <text x="330" y="215" text-anchor="middle" fill="${elementColors.Wood.text}" font-size="11">${this.translateElement('Wood')} 木</text>
+
                         <!-- West Metal -->
                         <circle cx="70" cy="200" r="45" fill="${elementColors.Metal.bg}" stroke="${elementColors.Metal.accent}" stroke-width="3"/>
                         <text x="70" y="195" text-anchor="middle" fill="${elementColors.Metal.text}" font-size="20" font-weight="bold">4·9</text>
-                        <text x="70" y="215" text-anchor="middle" fill="${elementColors.Metal.text}" font-size="11">Metal 金</text>
+                        <text x="70" y="215" text-anchor="middle" fill="${elementColors.Metal.text}" font-size="11">${this.translateElement('Metal')} 金</text>
                         
                         <!-- Connection lines showing generation cycle -->
                         <path d="M 200,115 L 200,145" stroke="#90EE90" stroke-width="3" stroke-dasharray="5,3" marker-end="url(#arrowhead)"/>
@@ -787,11 +787,11 @@ const ChineseAstrologyDisplay = {
                     <div class="hetu-flow-card">
                         <h4>${this.t('elementalFlow')} <span class="zh">五行流通</span></h4>
                         <div class="flow-sequence">${(hetu.elementalFlow?.sequence || []).map((e, i, a) =>
-            `<span class="flow-item ${e.toLowerCase()}">${e} ${this.getElementZh(e)}</span>${i < a.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
+            `<span class="flow-item ${e.toLowerCase()}">${this.translateElement(e)} ${this.getElementZh(e)}</span>${i < a.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
         ).join('')}</div>
                         <div class="flow-analysis">
-                            <div class="dominant"><span class="label">${this.t('dominant')}:</span><span class="value ${hetu.elementalFlow?.dominant?.toLowerCase()}">${hetu.elementalFlow?.dominant || 'N/A'}</span></div>
-                            <div class="deficient"><span class="label">${this.t('deficient')}:</span><span class="value ${hetu.elementalFlow?.deficient?.toLowerCase()}">${hetu.elementalFlow?.deficient || 'N/A'}</span></div>
+                            <div class="dominant"><span class="label">${this.t('dominant')}:</span><span class="value ${hetu.elementalFlow?.dominant?.toLowerCase()}">${this.translateElement(hetu.elementalFlow?.dominant) || 'N/A'}</span></div>
+                            <div class="deficient"><span class="label">${this.t('deficient')}:</span><span class="value ${hetu.elementalFlow?.deficient?.toLowerCase()}">${this.translateElement(hetu.elementalFlow?.deficient) || 'N/A'}</span></div>
                         </div>
                     </div>
                 </div>
@@ -828,19 +828,19 @@ const ChineseAstrologyDisplay = {
                 <div class="magic-square-container">
                     <div class="magic-square">
                         <div class="sq-row">
-                            <div class="cell wood" data-num="4"><b>4</b><span>SE</span></div>
-                            <div class="cell fire" data-num="9"><b>9</b><span>S</span></div>
-                            <div class="cell earth" data-num="2"><b>2</b><span>SW</span></div>
+                            <div class="cell wood" data-num="4"><b>4</b><span>${this.translateDirection('SE')}</span></div>
+                            <div class="cell fire" data-num="9"><b>9</b><span>${this.translateDirection('S')}</span></div>
+                            <div class="cell earth" data-num="2"><b>2</b><span>${this.translateDirection('SW')}</span></div>
                         </div>
                         <div class="sq-row">
-                            <div class="cell wood" data-num="3"><b>3</b><span>E</span></div>
-                            <div class="cell earth center" data-num="5"><b>5</b><span>C</span></div>
-                            <div class="cell metal" data-num="7"><b>7</b><span>W</span></div>
+                            <div class="cell wood" data-num="3"><b>3</b><span>${this.translateDirection('E')}</span></div>
+                            <div class="cell earth center" data-num="5"><b>5</b><span>${this.translateDirection('C')}</span></div>
+                            <div class="cell metal" data-num="7"><b>7</b><span>${this.translateDirection('W')}</span></div>
                         </div>
                         <div class="sq-row">
-                            <div class="cell earth" data-num="8"><b>8</b><span>NE</span></div>
-                            <div class="cell water" data-num="1"><b>1</b><span>N</span></div>
-                            <div class="cell metal" data-num="6"><b>6</b><span>NW</span></div>
+                            <div class="cell earth" data-num="8"><b>8</b><span>${this.translateDirection('NE')}</span></div>
+                            <div class="cell water" data-num="1"><b>1</b><span>${this.translateDirection('N')}</span></div>
+                            <div class="cell metal" data-num="6"><b>6</b><span>${this.translateDirection('NW')}</span></div>
                         </div>
                     </div>
                     <div class="luoshu-note">${this.t('magicSquareNote')}</div>
@@ -853,7 +853,7 @@ const ChineseAstrologyDisplay = {
                             <div class="gua-number">${mg.number}</div>
                             <div class="gua-details">
                                 <div class="gua-trigram">${mg.trigram} ${mg.zh || ''}</div>
-                                <div class="gua-element" style="color: ${style.text}">${mg.element}</div>
+                                <div class="gua-element" style="color: ${style.text}">${this.translateElement(mg.element)}</div>
                                 <div class="gua-binary">${mg.binary || ''}</div>
                             </div>
                         </div>
@@ -928,13 +928,13 @@ const ChineseAstrologyDisplay = {
                             <span class="hz">${mn.zh || ''}</span>
                             <span class="en">${mn.name || ''}</span>
                         </div>
-                        <div class="lunar-group">${mn.group || ''} ${mn.group_zh || ''}</div>
+                        <div class="lunar-group">${this.translateGroup(mn.group)} ${mn.group_zh || ''}</div>
                     </div>
-                    <div class="lunar-animal">${mn.animal || ''}</div>
+                    <div class="lunar-animal">${this.translateAnimal(mn.animal)}</div>
                 </div>
                 <div class="lunar-details">
-                    <div class="detail-item"><span class="label">${this.t('element')}</span><span class="value ${mn.element?.toLowerCase()}">${mn.element || ''}</span></div>
-                    <div class="detail-item"><span class="label">${this.t('direction')}</span><span class="value">${mn.direction || ''}</span></div>
+                    <div class="detail-item"><span class="label">${this.t('element')}</span><span class="value ${mn.element?.toLowerCase()}">${this.translateElement(mn.element)}</span></div>
+                    <div class="detail-item"><span class="label">${this.t('direction')}</span><span class="value">${this.translateDirection(mn.direction)}</span></div>
                     <div class="detail-item"><span class="label">${this.t('degrees')}</span><span class="value">${(m.degree || 0).toFixed(1)}°</span></div>
                     <div class="detail-item"><span class="label">${this.t('dayRuler')}</span><span class="value">${m.dayRuler || ''}</span></div>
                     <div class="detail-item"><span class="label">${this.t('hourRuler')}</span><span class="value">${m.hourRuler || ''}</span></div>
@@ -962,8 +962,8 @@ const ChineseAstrologyDisplay = {
                     <div class="position-main">
                         <div class="branch-large">${p.zh || '?'}</div>
                         <div class="branch-details">
-                            <div class="branch-name">${p.branch || ''} ${p.zodiac || ''}</div>
-                            <div class="branch-direction">${p.direction || ''} ${p.degree || 0}°</div>
+                            <div class="branch-name">${p.branch || ''} ${this.translateZodiac(p.zodiac)}</div>
+                            <div class="branch-direction">${this.translateDirection(p.direction)} ${p.degree || 0}°</div>
                         </div>
                     </div>
                 </div>
@@ -971,14 +971,14 @@ const ChineseAstrologyDisplay = {
                     <div class="warning-card sansha">
                         <div class="warning-icon">⚠️</div>
                         <div class="warning-content">
-                            <b>${this.t('sanSha')} 三煞</b>
-                            <span>${t.sanSha?.description || this.t('avoidConstruction')}</span>
+                            <b>${this.t('sanSha')}</b>
+                            <span>${this.t('sanShaDesc')}</span>
                         </div>
                     </div>
                     <div class="warning-card suipo">
                         <div class="warning-icon">⚡</div>
                         <div class="warning-content">
-                            <b>${this.t('suiPo')} 歲破</b>
+                            <b>${this.t('suiPo')}</b>
                             <span>${this.t('opposite')}: ${t.suiPo?.branch || ''} ${t.suiPo?.zh || ''}</span>
                         </div>
                     </div>
@@ -1000,6 +1000,61 @@ const ChineseAstrologyDisplay = {
     getElementZh(element) {
         const map = { 'Wood': '木', 'Fire': '火', 'Earth': '土', 'Metal': '金', 'Water': '水' };
         return map[element] || '';
+    },
+
+    translateElement(element) {
+        if (!element) return '';
+        const map = {
+            en: { Wood: 'Wood', Fire: 'Fire', Earth: 'Earth', Metal: 'Metal', Water: 'Water' },
+            es: { Wood: 'Madera', Fire: 'Fuego', Earth: 'Tierra', Metal: 'Metal', Water: 'Agua' },
+            it: { Wood: 'Legno', Fire: 'Fuoco', Earth: 'Terra', Metal: 'Metallo', Water: 'Acqua' },
+            zh: { Wood: '木', Fire: '火', Earth: '土', Metal: '金', Water: '水' }
+        };
+        return (map[this.lang] || map.en)[element] || element;
+    },
+
+    translateDirection(dir) {
+        if (!dir) return '';
+        const map = {
+            en: { N: 'N', S: 'S', E: 'E', W: 'W', NE: 'NE', NW: 'NW', SE: 'SE', SW: 'SW', C: 'C' },
+            es: { N: 'N', S: 'S', E: 'E', W: 'O', NE: 'NE', NW: 'NO', SE: 'SE', SW: 'SO', C: 'C' },
+            it: { N: 'N', S: 'S', E: 'E', W: 'O', NE: 'NE', NW: 'NO', SE: 'SE', SW: 'SO', C: 'C' },
+            zh: { N: '北', S: '南', E: '東', W: '西', NE: '東北', NW: '西北', SE: '東南', SW: '西南', C: '中' }
+        };
+        return (map[this.lang] || map.en)[dir] || dir;
+    },
+
+    translateZodiac(zodiac) {
+        if (!zodiac) return '';
+        const map = {
+            en: { Rat: 'Rat', Ox: 'Ox', Tiger: 'Tiger', Rabbit: 'Rabbit', Dragon: 'Dragon', Snake: 'Snake', Horse: 'Horse', Goat: 'Goat', Monkey: 'Monkey', Rooster: 'Rooster', Dog: 'Dog', Pig: 'Pig' },
+            es: { Rat: 'Rata', Ox: 'Buey', Tiger: 'Tigre', Rabbit: 'Conejo', Dragon: 'Dragón', Snake: 'Serpiente', Horse: 'Caballo', Goat: 'Cabra', Monkey: 'Mono', Rooster: 'Gallo', Dog: 'Perro', Pig: 'Cerdo' },
+            it: { Rat: 'Topo', Ox: 'Bue', Tiger: 'Tigre', Rabbit: 'Coniglio', Dragon: 'Drago', Snake: 'Serpente', Horse: 'Cavallo', Goat: 'Capra', Monkey: 'Scimmia', Rooster: 'Gallo', Dog: 'Cane', Pig: 'Maiale' },
+            zh: { Rat: '鼠', Ox: '牛', Tiger: '虎', Rabbit: '兔', Dragon: '龍', Snake: '蛇', Horse: '馬', Goat: '羊', Monkey: '猴', Rooster: '雞', Dog: '狗', Pig: '豬' }
+        };
+        return (map[this.lang] || map.en)[zodiac] || zodiac;
+    },
+
+    translateAnimal(animal) {
+        if (!animal) return '';
+        const map = {
+            en: { Dragon: 'Dragon', Badger: 'Badger', Rabbit: 'Rabbit', Fox: 'Fox', Tiger: 'Tiger', Leopard: 'Leopard', Ox: 'Ox', Bat: 'Bat', Rat: 'Rat', Swallow: 'Swallow', Pig: 'Pig', Porcupine: 'Porcupine', Wolf: 'Wolf', Dog: 'Dog', Pheasant: 'Pheasant', Rooster: 'Rooster', Crow: 'Crow', Monkey: 'Monkey', Ape: 'Ape', Tapir: 'Tapir', Sheep: 'Sheep', Deer: 'Deer', Horse: 'Horse', Snake: 'Snake', Worm: 'Worm', Hare: 'Hare', Raccoon: 'Raccoon' },
+            es: { Dragon: 'Dragón', Badger: 'Tejón', Rabbit: 'Conejo', Fox: 'Zorro', Tiger: 'Tigre', Leopard: 'Leopardo', Ox: 'Buey', Bat: 'Murciélago', Rat: 'Rata', Swallow: 'Golondrina', Pig: 'Cerdo', Porcupine: 'Puercoespín', Wolf: 'Lobo', Dog: 'Perro', Pheasant: 'Faisán', Rooster: 'Gallo', Crow: 'Cuervo', Monkey: 'Mono', Ape: 'Simio', Tapir: 'Tapir', Sheep: 'Oveja', Deer: 'Ciervo', Horse: 'Caballo', Snake: 'Serpiente', Worm: 'Gusano', Hare: 'Liebre', Raccoon: 'Mapache' },
+            it: { Dragon: 'Drago', Badger: 'Tasso', Rabbit: 'Coniglio', Fox: 'Volpe', Tiger: 'Tigre', Leopard: 'Leopardo', Ox: 'Bue', Bat: 'Pipistrello', Rat: 'Topo', Swallow: 'Rondine', Pig: 'Maiale', Porcupine: 'Porcospino', Wolf: 'Lupo', Dog: 'Cane', Pheasant: 'Fagiano', Rooster: 'Gallo', Crow: 'Corvo', Monkey: 'Scimmia', Ape: 'Scimmia', Tapir: 'Tapiro', Sheep: 'Pecora', Deer: 'Cervo', Horse: 'Cavallo', Snake: 'Serpente', Worm: 'Verme', Hare: 'Lepre', Raccoon: 'Procione' },
+            zh: { Dragon: '龍', Badger: '獾', Rabbit: '兔', Fox: '狐', Tiger: '虎', Leopard: '豹', Ox: '牛', Bat: '蝠', Rat: '鼠', Swallow: '燕', Pig: '豬', Porcupine: '豪豬', Wolf: '狼', Dog: '犬', Pheasant: '雉', Rooster: '雞', Crow: '烏', Monkey: '猴', Ape: '猿', Tapir: '貘', Sheep: '羊', Deer: '鹿', Horse: '馬', Snake: '蛇', Worm: '蟲', Hare: '兔', Raccoon: '貉' }
+        };
+        return (map[this.lang] || map.en)[animal] || animal;
+    },
+
+    translateGroup(group) {
+        if (!group) return '';
+        const map = {
+            en: { 'Azure Dragon': 'Azure Dragon', 'Vermilion Bird': 'Vermilion Bird', 'White Tiger': 'White Tiger', 'Black Tortoise': 'Black Tortoise' },
+            es: { 'Azure Dragon': 'Dragón Azul', 'Vermilion Bird': 'Pájaro Bermellón', 'White Tiger': 'Tigre Blanco', 'Black Tortoise': 'Tortuga Negra' },
+            it: { 'Azure Dragon': 'Drago Azzurro', 'Vermilion Bird': 'Uccello Vermiglio', 'White Tiger': 'Tigre Bianca', 'Black Tortoise': 'Tartaruga Nera' },
+            zh: { 'Azure Dragon': '青龍', 'Vermilion Bird': '朱雀', 'White Tiger': '白虎', 'Black Tortoise': '玄武' }
+        };
+        return (map[this.lang] || map.en)[group] || group;
     },
 
     getOrdinal(reverseIndex) {

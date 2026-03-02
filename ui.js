@@ -125,7 +125,7 @@ class UI {
         if (!mansion) return '';
         const name = mansion['name_' + lang] || mansion.name_en;
         const zh = mansion.zh || '';
-        const animal = mansion.animal || '';
+        const animal = typeof ChineseAstrologyDisplay !== 'undefined' ? ChineseAstrologyDisplay.translateAnimal.call({lang}, mansion.animal) : (mansion.animal || '');
 
         return `
             <span class="mansion-badge">
@@ -282,7 +282,7 @@ class UI {
                 </div>
                 <div class="lunar-detail">
                     <div class="lunar-detail-label">${t.animal || 'Animal'}</div>
-                    <div class="lunar-detail-value">${mansion.animal}</div>
+                    <div class="lunar-detail-value">${typeof ChineseAstrologyDisplay !== 'undefined' ? ChineseAstrologyDisplay.translateAnimal.call({lang}, mansion.animal) : mansion.animal}</div>
                 </div>
                 <div class="lunar-detail">
                     <div class="lunar-detail-label">${t.degrees || 'Degrees'}</div>
@@ -1538,6 +1538,16 @@ class UI {
 
         if (!upperTrigram || !lowerTrigram) return '';
 
+        const lang = typeof App !== 'undefined' ? App.lang : 'en';
+        const tEl = (e) => typeof ChineseAstrologyDisplay !== 'undefined' ? ChineseAstrologyDisplay.translateElement.call({lang}, e) : e;
+        const tDiv = typeof AstrologyI18N !== 'undefined' ? (AstrologyI18N.translations[lang]?.trigramDivider || 'over') : (typeof I18N !== 'undefined' ? (I18N[lang]?.over || 'over') : 'over');
+        const tLabels = {
+            upper: { en: 'Upper Trigram', es: 'Trigrama Superior', it: 'Trigramma Superiore', zh: '上卦' },
+            lower: { en: 'Lower Trigram', es: 'Trigrama Inferior', it: 'Trigramma Inferiore', zh: '下卦' },
+            spiritual: { en: 'Spiritual', es: 'Espiritual', it: 'Spirituale', zh: '靈性' },
+            lifeArea: { en: 'Life Area', es: 'Área de Vida', it: 'Area di Vita', zh: '生活領域' }
+        };
+
         const getElementClass = (element) => {
             if (!element) return '';
             const e = element.toLowerCase();
@@ -1552,8 +1562,8 @@ class UI {
         return `
             <div class="arr-trigram upper ${getElementClass(upperTrigram.element)}" data-trigram="${upperTrigram.name}">
                 <div class="trig-header">
-                    <span class="trig-position">Upper Trigram (${upperTrigram.dir})</span>
-                    <span class="trig-element-badge">${upperTrigram.element}</span>
+                    <span class="trig-position">${tLabels.upper[lang] || tLabels.upper.en} (${upperTrigram.dir})</span>
+                    <span class="trig-element-badge">${tEl(upperTrigram.element)}</span>
                 </div>
                 <div class="trig-body">
                     <div class="trig-lines">${this.getTrigramLinesHtml(upperTrigram.binary)}</div>
@@ -1564,22 +1574,22 @@ class UI {
                 </div>
                 <div class="trig-meaning">
                     ${arrangement === 'xiantian'
-                ? `<span class="meaning-label">Spiritual:</span> <span class="meaning-value">${upperTrigram.spiritual}</span>`
-                : `<span class="meaning-label">Life Area:</span> <span class="meaning-value">${upperTrigram.lifeArea}</span>`
+                ? `<span class="meaning-label">${tLabels.spiritual[lang] || tLabels.spiritual.en}:</span> <span class="meaning-value">${upperTrigram.spiritual}</span>`
+                : `<span class="meaning-label">${tLabels.lifeArea[lang] || tLabels.lifeArea.en}:</span> <span class="meaning-value">${upperTrigram.lifeArea}</span>`
             }
                 </div>
             </div>
-            
+
             <div class="arr-trigram-divider">
                 <span class="divider-line-h"></span>
-                <span class="divider-text">over</span>
+                <span class="divider-text">${tDiv}</span>
                 <span class="divider-line-h"></span>
             </div>
-            
+
             <div class="arr-trigram lower ${getElementClass(lowerTrigram.element)}" data-trigram="${lowerTrigram.name}">
                 <div class="trig-header">
-                    <span class="trig-position">Lower Trigram (${lowerTrigram.dir})</span>
-                    <span class="trig-element-badge">${lowerTrigram.element}</span>
+                    <span class="trig-position">${tLabels.lower[lang] || tLabels.lower.en} (${lowerTrigram.dir})</span>
+                    <span class="trig-element-badge">${tEl(lowerTrigram.element)}</span>
                 </div>
                 <div class="trig-body">
                     <div class="trig-lines">${this.getTrigramLinesHtml(lowerTrigram.binary)}</div>
@@ -1590,8 +1600,8 @@ class UI {
                 </div>
                 <div class="trig-meaning">
                     ${arrangement === 'xiantian'
-                ? `<span class="meaning-label">Spiritual:</span> <span class="meaning-value">${lowerTrigram.spiritual}</span>`
-                : `<span class="meaning-label">Life Area:</span> <span class="meaning-value">${lowerTrigram.lifeArea}</span>`
+                ? `<span class="meaning-label">${tLabels.spiritual[lang] || tLabels.spiritual.en}:</span> <span class="meaning-value">${lowerTrigram.spiritual}</span>`
+                : `<span class="meaning-label">${tLabels.lifeArea[lang] || tLabels.lifeArea.en}:</span> <span class="meaning-value">${lowerTrigram.lifeArea}</span>`
             }
                 </div>
             </div>
@@ -1777,7 +1787,13 @@ class UI {
             const isTalisman = remedy.type === 'fulu';
             const isFengShui = remedy.type === 'fengshui';
             const hasVisual = isTalisman || isFengShui;
-            const fuluContent = fuluContentList.find(f => f.id === remedy.id) || fuluContentList[index] || {};
+            let fuluContent = fuluContentList.find(f => f.id === remedy.id) || fuluContentList[index] || {};
+            
+            // Merge remedy.fdl and remedy.image from backend (3-tab architecture)
+            if (remedy.fdl) fuluContent.fdl = remedy.fdl;
+            if (remedy.image) fuluContent.image = remedy.image;
+            if (remedy.visualData?.fdl) fuluContent.fdl = remedy.visualData.fdl;
+            
             const hasImage = fuluContent.image || (Array.isArray(fuluContent.image) && fuluContent.image.length > 0);
             const imageUrls = hasImage ? (Array.isArray(fuluContent.image) ? fuluContent.image : [fuluContent.image]) : [];
 
@@ -3435,7 +3451,8 @@ class UI {
             }
             if (astro.taiSui?.currentPosition) {
                 const taiSuiLabel = t.taiSui || 'Tai Sui';
-                astroSummary.push(`<span class="yinyang-badge yang">${taiSuiLabel}: ${astro.taiSui.currentPosition.zh} (${astro.taiSui.currentPosition.direction})</span>`);
+                const tDir = typeof ChineseAstrologyDisplay !== 'undefined' ? ChineseAstrologyDisplay.translateDirection.call({lang}, astro.taiSui.currentPosition.direction) : astro.taiSui.currentPosition.direction;
+                astroSummary.push(`<span class="yinyang-badge yang">${taiSuiLabel}: ${astro.taiSui.currentPosition.zh} (${tDir})</span>`);
             }
             if (astro.bagua?.hexiangua) {
                 astroSummary.push(this.formatHexagramBadge({
@@ -3778,7 +3795,13 @@ class UI {
             const remedyName = this._resolveRemedyName(remedy, displayLang);
             const remedyNameZh = typeof remedy.name === 'object' ? (remedy.name.zh || '') : (remedy.nameZh || '');
 
+            // Get fulu content from multiple sources: backend fuluContentList, backend remedy.fdl, or local DB
             let fuluContent = fuluContentList.find(f => f.id === remedy.id) || fuluContentList[index] || {};
+            
+            // Merge remedy.fdl and remedy.image from backend if present (3-tab architecture)
+            if (remedy.fdl) fuluContent.fdl = remedy.fdl;
+            if (remedy.image) fuluContent.image = remedy.image;
+            if (remedy.visualData?.fdl) fuluContent.fdl = remedy.visualData.fdl;
 
             // Kick off async translation for remedy content if not English
             if (displayLang !== 'en' && window.translationService) {
@@ -3843,10 +3866,13 @@ class UI {
                 }
             }
 
-            const hasImage = fuluContent.image || (Array.isArray(fuluContent.image) && fuluContent.image.length > 0);
-            const imageUrls = hasImage ? (Array.isArray(fuluContent.image) ? fuluContent.image : [fuluContent.image]) : [];
-            // hasFDL: true for all remedy types — FDL is generated for medicine via generateFuluFDL too
-            const hasFDL = fuluContent.fdl || isFengShui || isTalisman || remedy.type === 'medicine';
+            // Check for images in multiple sources
+            const remedyImage = remedy.image || remedy.images;
+            const hasImage = fuluContent.image || remedyImage || (Array.isArray(fuluContent.image) && fuluContent.image.length > 0);
+            const imageUrls = hasImage ? (Array.isArray(fuluContent.image) ? fuluContent.image : fuluContent.image ? [fuluContent.image] : remedyImage ? [remedyImage] : []) : [];
+            
+            // hasFDL: check remedy.fdl, fuluContent.fdl, or remedy.visualData.fdl
+            const hasFDL = fuluContent.fdl || remedy.fdl || remedy.visualData?.fdl || isFengShui || isTalisman || remedy.type === 'medicine';
 
             // Always show visual side since all types get FDL diagrams generated
             const showVisual = true;

@@ -2514,14 +2514,14 @@ class App {
     static async translateToSelectedLanguage(result) {
         const targetLang = this.lang;
 
-        // No translation needed for English
-        if (targetLang === 'en') {
-            console.log('[PIPELINE:TRANSLATE] Language is English, skipping translation');
-            return result;
-        }
-
         // Find source language dynamically (not always 'en')
         const sourceLang = this.getSourceLang(result);
+
+        // If target is same as source, no translation needed
+        if (targetLang === sourceLang) {
+            console.log(`[PIPELINE:TRANSLATE] Target (${targetLang}) equals source, skipping translation`);
+            return result;
+        }
 
         // Check if we already have unique translated content
         const hasUniqueTranslation = result[targetLang]?.analysis &&
@@ -5227,8 +5227,18 @@ class App {
 
         langs.forEach(lang => {
             if (!result[lang]) {
-                // Seed from whichever language has the actual content
-                result[lang] = { ...sourceData };
+                // Only seed languages that come AFTER the source language
+                // Languages before sourceLang in priority should remain empty
+                // to preserve correct source language detection
+                const sourceIndex = langs.indexOf(sourceLang);
+                const langIndex = langs.indexOf(lang);
+                if (langIndex > sourceIndex) {
+                    // Seed from source language
+                    result[lang] = { ...sourceData };
+                } else {
+                    // Create empty structure for languages before source
+                    result[lang] = {};
+                }
             }
             keys.forEach(key => {
                 if (!result[lang][key]) result[lang][key] = "";
