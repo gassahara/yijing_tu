@@ -1,4 +1,254 @@
 class UI {
+    // ============================================
+    // FORMATTING UTILITIES - Proper Names & Badges
+    // ============================================
+    
+    /**
+     * Format an element with badge styling
+     * @param {string} element - Element name (wood, fire, earth, metal, water)
+     * @param {string} lang - Language code
+     * @param {Object} options - Options { showZh: boolean, capitalize: boolean }
+     * @returns {string} HTML string with badge
+     */
+    static formatElementBadge(element, lang = 'en', options = {}) {
+        const { showZh = true, capitalize = true } = options;
+        const t = I18N[lang] || I18N['en'];
+        
+        const elementMap = {
+            wood: { zh: '木', color: 'wood' },
+            fire: { zh: '火', color: 'fire' },
+            earth: { zh: '土', color: 'earth' },
+            metal: { zh: '金', color: 'metal' },
+            water: { zh: '水', color: 'water' }
+        };
+        
+        const el = element?.toLowerCase() || '';
+        const data = elementMap[el];
+        if (!data) return element;
+        
+        const name = t[el] || element;
+        const displayName = capitalize ? name.charAt(0).toUpperCase() + name.slice(1) : name;
+        const zhChar = showZh ? `<span class="zh">${data.zh}</span>` : '';
+        
+        return `<span class="element-badge ${data.color}">${displayName}${zhChar}</span>`;
+    }
+    
+    /**
+     * Format a trigram with badge styling
+     * @param {Object} trigram - Trigram object with name, zh, element
+     * @param {string} lang - Language code
+     * @returns {string} HTML string with badge
+     */
+    static formatTrigramBadge(trigram, lang = 'en') {
+        if (!trigram) return '';
+        const t = I18N[lang] || I18N['en'];
+        const name = trigram['name_' + lang] || trigram.name || trigram.name_en;
+        const zh = trigram.zh || '';
+        const element = (trigram.element || '').toLowerCase();
+        
+        const elementToTrigram = {
+            wood: 'wind', fire: 'fire', earth: 'earth', 
+            metal: 'heaven', water: 'water'
+        };
+        
+        // Map trigram names to their proper bagua names
+        const nameMap = {
+            'heaven': 'heaven', 'lake': 'lake', 'fire': 'fire', 'thunder': 'thunder',
+            'wind': 'wind', 'water': 'water', 'mountain': 'mountain', 'earth': 'earth'
+        };
+        
+        const baguaName = nameMap[name.toLowerCase()] || elementToTrigram[element] || 'earth';
+        
+        return `<span class="trigram-badge ${baguaName}"><span class="symbol">${zh}</span> ${name}</span>`;
+    }
+    
+    /**
+     * Format a BaZi stem with badge styling
+     * @param {Object} stem - Stem object with zh, name, element
+     * @param {string} lang - Language code
+     * @returns {string} HTML string with badge
+     */
+    static formatStemBadge(stem, lang = 'en') {
+        if (!stem) return '';
+        const zh = stem.zh || '';
+        const name = stem.name || '';
+        const element = stem.element || '';
+        
+        return `<span class="stem-badge" title="${name} ${element}">${zh}</span>`;
+    }
+    
+    /**
+     * Format a BaZi branch with badge styling
+     * @param {Object} branch - Branch object with zh, name, animal
+     * @param {string} lang - Language code
+     * @returns {string} HTML string with badge
+     */
+    static formatBranchBadge(branch, lang = 'en') {
+        if (!branch) return '';
+        const zh = branch.zh || '';
+        const animal = branch.animal || '';
+        
+        return `<span class="branch-badge" title="${animal}">${zh}</span>`;
+    }
+    
+    /**
+     * Format Day Master display
+     * @param {Object} dayMaster - Day Master object with zh, name, element
+     * @param {string} lang - Language code
+     * @returns {string} HTML string
+     */
+    static formatDayMasterBadge(dayMaster, lang = 'en') {
+        if (!dayMaster) return '';
+        const t = I18N[lang] || I18N['en'];
+        const zh = dayMaster.zh || '';
+        const name = dayMaster.name || '';
+        const element = dayMaster.element || '';
+        
+        const elementClass = element.toLowerCase();
+        
+        return `
+            <span class="daymaster-badge">
+                <span class="stem">${zh}</span>
+                <span class="name">${name}</span>
+                <span class="element element-badge ${elementClass}">${t[elementClass] || element}</span>
+            </span>
+        `;
+    }
+    
+    /**
+     * Format Lunar Mansion display
+     * @param {Object} mansion - Mansion object
+     * @param {string} lang - Language code
+     * @returns {string} HTML string
+     */
+    static formatMansionBadge(mansion, lang = 'en') {
+        if (!mansion) return '';
+        const name = mansion['name_' + lang] || mansion.name_en;
+        const zh = mansion.zh || '';
+        const animal = mansion.animal || '';
+        
+        return `
+            <span class="mansion-badge">
+                <span class="animal">${animal}</span>
+                <span class="name">${zh} ${name}</span>
+            </span>
+        `;
+    }
+    
+    /**
+     * Format hexagram name display
+     * @param {Object} hex - Hexagram object
+     * @param {string} lang - Language code
+     * @returns {string} HTML string
+     */
+    static formatHexagramBadge(hex, lang = 'en') {
+        if (!hex) return '';
+        const name = hex['name_' + lang] || hex.name_en;
+        const zh = hex.name_zh || '';
+        const number = hex.number || '';
+        
+        return `
+            <span class="hexagram-badge">
+                <span class="number">#${number}</span>
+                <span class="name-zh">${zh}</span>
+                <span class="name">${name}</span>
+            </span>
+        `;
+    }
+    
+    /**
+     * Format Yin/Yang indicator
+     * @param {boolean} isYang - True if Yang
+     * @param {string} lang - Language code
+     * @returns {string} HTML string
+     */
+    static formatYinYangBadge(isYang, lang = 'en') {
+        const t = I18N[lang] || I18N['en'];
+        const type = isYang ? 'yang' : 'yin';
+        const label = isYang ? (t.yang || 'Yang') : (t.yin || 'Yin');
+        const symbol = isYang ? '☰' : '☷';
+        
+        return `<span class="yinyang-badge ${type}">${symbol} ${label}</span>`;
+    }
+    
+    /**
+     * Format compact interpretation text into rich HTML
+     * Expands compact format (CELESTIAL:..., ELEMENTS:..., etc.) into styled sections
+     * @param {string} text - Compact text from AI
+     * @param {string} sectionType - 'celestial' | 'elements' | 'analysis' | 'advice'
+     * @param {string} lang - Language code
+     * @returns {string} Rich HTML
+     */
+    static formatCompactInterp(text, sectionType, lang = 'en') {
+        if (!text) return '';
+        const t = I18N[lang] || I18N['en'];
+        
+        // Remove section prefix if present (e.g., "CELESTIAL:" or "ELEMENTS:")
+        const prefixes = ['CELESTIAL:', 'ELEMENTS:', 'ANALYSIS:', 'ADVICE:'];
+        let cleanText = text;
+        for (const prefix of prefixes) {
+            if (cleanText.startsWith(prefix)) {
+                cleanText = cleanText.slice(prefix.length).trim();
+                break;
+            }
+        }
+        
+        // Split into paragraphs
+        const paragraphs = cleanText.split(/\n+/).filter(p => p.trim());
+        
+        if (paragraphs.length === 0) return cleanText;
+        
+        // For advice section, format as numbered list
+        if (sectionType === 'advice') {
+            // Try to detect numbered items or split by sentences for advice
+            const items = cleanText.match(/\d+[.)]\s+[^\d]+(?=\d+[.)]|$)/g) || 
+                         cleanText.split(/\.\s+(?=[A-Z])/).filter(s => s.trim().length > 10);
+            
+            if (items.length >= 3) {
+                return `<ol class="advice-list">
+                    ${items.map((item, i) => `<li>${this.highlightProperNames(item.trim(), lang)}</li>`).join('')}
+                </ol>`;
+            }
+        }
+        
+        // Format as paragraphs with proper styling
+        return paragraphs.map(p => {
+            const highlighted = this.highlightProperNames(p.trim(), lang);
+            return `<p>${highlighted}</p>`;
+        }).join('');
+    }
+    
+    /**
+     * Process text to highlight proper names
+     * @param {string} text - Input text
+     * @param {string} lang - Language code
+     * @returns {string} HTML with highlighted proper names
+     */
+    static highlightProperNames(text, lang = 'en') {
+        if (!text) return '';
+        const t = I18N[lang] || I18N['en'];
+        
+        // Element names to highlight
+        const elements = ['wood', 'fire', 'earth', 'metal', 'water'];
+        const elementNames = elements.map(e => t[e]?.toLowerCase()).filter(Boolean);
+        
+        // Create regex for element names
+        if (elementNames.length > 0) {
+            const elementRegex = new RegExp(`\\b(${elementNames.join('|')})\\b`, 'gi');
+            text = text.replace(elementRegex, (match) => {
+                const elementKey = elements.find(e => 
+                    t[e]?.toLowerCase() === match.toLowerCase()
+                );
+                if (elementKey) {
+                    return this.formatElementBadge(elementKey, lang, { showZh: false });
+                }
+                return match;
+            });
+        }
+        
+        return text;
+    }
+
     static renderLunarMansion(mansion, date, lang) {
         // Support both old panel and new tabbed layout
         const panel = document.getElementById('lunarMansionPanel');
@@ -21,14 +271,14 @@ class UI {
             <div class="lunar-mansion-header">
                 <div class="moon-icon">${mansion.symbol}</div>
                 <div>
-                    <div class="lunar-mansion-title">${mansion['name_' + lang] || mansion.name_en} ${mansion.name_zh}</div>
+                    <div class="lunar-mansion-title">${this.formatMansionBadge(mansion, lang)}</div>
                     <div class="lunar-mansion-subtitle">${moonPhase.icon} ${moonPhase.name[lang]} • ${dateStr}</div>
                 </div>
             </div>
             <div class="lunar-mansion-content">
                 <div class="lunar-detail">
                     <div class="lunar-detail-label">${t.elements}</div>
-                    <div class="lunar-detail-value">${mansion.element}</div>
+                    <div class="lunar-detail-value">${this.formatElementBadge(mansion.element, lang)}</div>
                 </div>
                 <div class="lunar-detail">
                     <div class="lunar-detail-label">${t.animal || 'Animal'}</div>
@@ -3130,40 +3380,28 @@ class UI {
         if (celestialContent && reading?.chineseAstrology) {
             const astro = reading.chineseAstrology;
             const astroSummary = [];
-            
-            // Helper to translate element names
-            const translateElement = (elementEn) => {
-                if (!elementEn) return elementEn;
-                const el = elementEn.toLowerCase();
-                if (el.includes('wood')) return t.wood || 'Wood';
-                if (el.includes('fire')) return t.fire || 'Fire';
-                if (el.includes('earth')) return t.earth || 'Earth';
-                if (el.includes('metal')) return t.metal || 'Metal';
-                if (el.includes('water')) return t.water || 'Water';
-                return elementEn;
-            };
 
             if (astro.bazi?.dayMaster) {
-                const dayMasterLabel = t.dayMaster || AstrologyI18N.getTranslations(lang).dayMaster || 'Day Master';
-                const elementTranslated = translateElement(astro.bazi.dayMaster.element);
-                astroSummary.push(`${dayMasterLabel}: ${astro.bazi.dayMaster.zh} ${astro.bazi.dayMaster.name} (${elementTranslated})`);
+                astroSummary.push(this.formatDayMasterBadge(astro.bazi.dayMaster, lang));
             }
             if (astro.lunarMansion?.mansion) {
-                const lunarMansionLabel = t.lunarMansion || 'Lunar Mansion';
-                astroSummary.push(`${lunarMansionLabel}: ${astro.lunarMansion.mansion.zh} ${astro.lunarMansion.mansion.name}`);
+                astroSummary.push(this.formatMansionBadge(astro.lunarMansion.mansion, lang));
             }
             if (astro.taiSui?.currentPosition) {
                 const taiSuiLabel = t.taiSui || 'Tai Sui';
-                astroSummary.push(`${taiSuiLabel}: ${astro.taiSui.currentPosition.zh} (${astro.taiSui.currentPosition.direction})`);
+                astroSummary.push(`<span class="yinyang-badge yang">${taiSuiLabel}: ${astro.taiSui.currentPosition.zh} (${astro.taiSui.currentPosition.direction})</span>`);
             }
             if (astro.bagua?.hexiangua) {
-                const lifeGuaLabel = t.lifeGua || AstrologyI18N.getTranslations(lang).lifeGua || 'Life Gua';
-                astroSummary.push(`${lifeGuaLabel}: #${astro.bagua.hexiangua.hexagramNumber} ${astro.bagua.hexiangua.hexagramName}`);
+                astroSummary.push(this.formatHexagramBadge({
+                    number: astro.bagua.hexiangua.hexagramNumber,
+                    name_zh: astro.bagua.hexiangua.hexagramNameZh || '',
+                    name_en: astro.bagua.hexiangua.hexagramName
+                }, lang));
             }
 
             if (astroSummary.length > 0) {
                 const astroContextLabel = t.chineseAstrologyContext || 'Chinese Astrology Context';
-                celestialContent = `**${astroContextLabel}:**\n${astroSummary.join(' • ')}\n\n${celestialContent}`;
+                celestialContent = `**${astroContextLabel}:**<br>${astroSummary.join(' ')}<br><br>${celestialContent}`;
             }
         }
 
@@ -3171,19 +3409,44 @@ class UI {
         let elementsContent = r.elements;
         if (reading?.equilibrium?.elements) {
             const el = reading.equilibrium.elements;
-            // Translate element names
-            const woodLabel = t.wood || 'Wood';
-            const fireLabel = t.fire || 'Fire';
-            const earthLabel = t.earth || 'Earth';
-            const metalLabel = t.metal || 'Metal';
-            const waterLabel = t.water || 'Water';
+            // Use new formatElementBadge for consistent styling
+            const woodBadge = this.formatElementBadge('wood', lang, { showZh: true });
+            const fireBadge = this.formatElementBadge('fire', lang, { showZh: true });
+            const earthBadge = this.formatElementBadge('earth', lang, { showZh: true });
+            const metalBadge = this.formatElementBadge('metal', lang, { showZh: true });
+            const waterBadge = this.formatElementBadge('water', lang, { showZh: true });
+            
+            // Determine dominant and deficient for highlighting
+            const dominant = el.dominant || '';
+            const deficient = el.deficient || '';
+            
             const elHtml = `
                 <div class="five-elements-balance">
-                    <div class="element-bar"><span class="el-label">${woodLabel} 木</span><div class="el-bar"><div class="el-fill wood" style="width:${el.wood || 0}%"></div></div><span class="el-value">${el.wood || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">${fireLabel} 火</span><div class="el-bar"><div class="el-fill fire" style="width:${el.fire || 0}%"></div></div><span class="el-value">${el.fire || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">${earthLabel} 土</span><div class="el-bar"><div class="el-fill earth" style="width:${el.earth || 0}%"></div></div><span class="el-value">${el.earth || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">${metalLabel} 金</span><div class="el-bar"><div class="el-fill metal" style="width:${el.metal || 0}%"></div></div><span class="el-value">${el.metal || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">${waterLabel} 水</span><div class="el-bar"><div class="el-fill water" style="width:${el.water || 0}%"></div></div><span class="el-value">${el.water || 0}%</span></div>
+                    <div class="element-bar">
+                        <span class="el-label">${woodBadge}</span>
+                        <div class="el-bar"><div class="el-fill wood ${dominant === 'wood' ? 'dominant' : ''} ${deficient === 'wood' ? 'deficient' : ''}" style="width:${el.wood || 0}%"></div></div>
+                        <span class="el-value">${el.wood || 0}%</span>
+                    </div>
+                    <div class="element-bar">
+                        <span class="el-label">${fireBadge}</span>
+                        <div class="el-bar"><div class="el-fill fire ${dominant === 'fire' ? 'dominant' : ''} ${deficient === 'fire' ? 'deficient' : ''}" style="width:${el.fire || 0}%"></div></div>
+                        <span class="el-value">${el.fire || 0}%</span>
+                    </div>
+                    <div class="element-bar">
+                        <span class="el-label">${earthBadge}</span>
+                        <div class="el-bar"><div class="el-fill earth ${dominant === 'earth' ? 'dominant' : ''} ${deficient === 'earth' ? 'deficient' : ''}" style="width:${el.earth || 0}%"></div></div>
+                        <span class="el-value">${el.earth || 0}%</span>
+                    </div>
+                    <div class="element-bar">
+                        <span class="el-label">${metalBadge}</span>
+                        <div class="el-bar"><div class="el-fill metal ${dominant === 'metal' ? 'dominant' : ''} ${deficient === 'metal' ? 'deficient' : ''}" style="width:${el.metal || 0}%"></div></div>
+                        <span class="el-value">${el.metal || 0}%</span>
+                    </div>
+                    <div class="element-bar">
+                        <span class="el-label">${waterBadge}</span>
+                        <div class="el-bar"><div class="el-fill water ${dominant === 'water' ? 'dominant' : ''} ${deficient === 'water' ? 'deficient' : ''}" style="width:${el.water || 0}%"></div></div>
+                        <span class="el-value">${el.water || 0}%</span>
+                    </div>
                 </div>
             `;
             elementsContent = elHtml + (elementsContent ? `<div class="elements-text">${elementsContent}</div>` : '');
@@ -3348,19 +3611,23 @@ class UI {
 
                 // Fallback to regular content if no layered content
                 if (!layeredContent && content) {
-                    const isAdvice = section.key === 'advice';
-                    layeredContent = this.formatParagraphs(content, { isAdvice });
+                    // Use formatCompactInterp to handle both compact and regular text
+                    layeredContent = this.formatCompactInterp(content, section.key, lang);
                 }
 
                 // Special handling for analysis section - ensure we always show analysis text
                 if (!layeredContent && section.key === 'analysis' && r.analysis) {
-                    layeredContent = this.formatParagraphs(r.analysis);
+                    layeredContent = this.formatCompactInterp(r.analysis, 'analysis', lang);
                 }
 
                 // Always render section if we have any content
                 if (layeredContent || content) {
-                    const isAdvice = section.key === 'advice';
-                    const finalContent = layeredContent || (content ? this.formatParagraphs(content, { isAdvice }) : '');
+                    let finalContent = layeredContent || (content ? this.formatCompactInterp(content, section.key, lang) : '');
+                    
+                    // Apply highlighting to layered content if it doesn't already have badges
+                    if (finalContent && !finalContent.includes('element-badge') && !finalContent.includes('trigram-badge')) {
+                        finalContent = this.highlightProperNames(finalContent, lang);
+                    }
                     html += `
                         <div class="tab-content-card ${section.class}" data-section="${section.key}">
                             <div class="card-title">

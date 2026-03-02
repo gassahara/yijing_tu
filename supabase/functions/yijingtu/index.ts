@@ -4367,88 +4367,78 @@ serve(async (req) => {
 // ============================================================================
 
 async function handleInterpretationTab(body: any, requestId: string, startTime: number): Promise<Response> {
-  log(4, `[TAB:interpretation] Generating full interpretation tab...`);
+  log(4, `[TAB:interpretation] Generating compact interpretation...`);
   
   const { hexagram, lines, question, astrology, bazi, equilibrium, lang = 'en' } = body;
   
-  // Build compact technical data summary
-  const technicalData = {
-    hexagram: compactHexagramFormat(hexagram),
-    lines: lines?.map((l: any) => `${l.isYang ? 'Yang' : 'Yin'}${l.isChanging ? '*' : ''}`).join(', '),
-    bazi: {
-      birth: compactBaziFormat(bazi?.birth),
-      current: compactBaziFormat(bazi?.current)
-    },
-    elements: compactElementsFormat(equilibrium?.elements),
-    lifeGua: astrology?.lifeGua ? `${astrology.lifeGua.number} (${astrology.lifeGua.element})` : 'N/A',
-    lunarMansion: astrology?.lunarMansion?.mansion?.name || 'N/A'
+  // Get hexagram data from database for classical texts
+  const hexData = await getHexagram(hexagram.number);
+  
+  // Compact element name lookup
+  const elName = (e: string) => {
+    if (!e) return '';
+    const m: Record<string, string> = { wood:'W', fire:'F', earth:'E', metal:'M', water:'Wa' };
+    return m[e.toLowerCase()] || e;
+  };
+  
+  // Get moving lines
+  const mLines = lines?.map((l: any, i: number) => l.isChanging ? {p:i+1, t:hexData?.lines_zh?.[i]?.slice(0,20)} : null).filter(Boolean) || [];
+  
+  // Compact context
+  const ctx = {
+    h: { n: hexagram.number, name: hexagram[`name_${lang}`] || hexagram.name_en, zh: hexagram.name_zh },
+    j: (hexData?.[`judgment_${lang}`] || hexData?.judgment_en || '').slice(0, 150),
+    i: (hexData?.image?.[`image_${lang}`] || hexData?.image?.image_en || '').slice(0, 150),
+    tu: hexagram.trigramUpper?.zh, tl: hexagram.trigramLower?.zh,
+    dm: bazi?.current?.day?.stem?.zh,
+    dme: elName(bazi?.current?.day?.stem?.element),
+    str: bazi?.current?.strength?.result,
+    lm: astrology?.lunarMansion?.mansion?.zh,
+    lg: astrology?.lifeGua?.number,
+    w: equilibrium?.elements?.wood, f: equilibrium?.elements?.fire,
+    e: equilibrium?.elements?.earth, m: equilibrium?.elements?.metal, wa: equilibrium?.elements?.water,
+    dom: equilibrium?.elements?.dominant ? elName(equilibrium.elements.dominant) : '',
+    def: equilibrium?.elements?.deficient ? elName(equilibrium.elements.deficient) : ''
   };
 
-  const systemPrompt = `You are a Yi Jing master providing a complete, integrated interpretation.
+  const prompt = `Yi Jing reading in ${lang}. Hexagram #${ctx.h.n} ${ctx.h.zh} ${ctx.h.name}.
 
-CRITICAL RULES:
-1. The hexagram's classical texts (Judgment, Image, Lines) are PRIMARY - all interpretation must derive from them
-2. Celestial astrology (Lunar Mansion, Tai Sui) provides cosmic timing context
-3. BaZi (Four Pillars) reveals the querent's destiny pattern and Day Master strength
-4. Five Elements show the energetic landscape
-5. INTEGRATE all layers into a unified narrative - do NOT treat them as separate sections
-6. Answer the querent's specific question directly
-7. Cite classical sources explicitly
-8. Output must be in ${lang} language
+Judgment: ${ctx.j}
+Image: ${ctx.i}
+Trigrams: ${ctx.tu}/${ctx.tl}
+${mLines.length ? `Lines: ${mLines.map((l:any)=>`#${l.p}:${l.t}...`).join(', ')}` : 'Stable'}
 
-OUTPUT FORMAT (JSON):
-{
-  "analysis": "3-4 paragraph integrated narrative in ${lang}",
-  "celestial": "How celestial influences affect this reading (in ${lang})",
-  "elements": "Five Elements dynamics in this context (in ${lang})",
-  "advice": "4-6 specific orientations grounded in classical texts (in ${lang})",
-  "quotedReferences": ["Citation (Source)", ...]
-}`;
+Cosmic: Mansion ${ctx.lm}, LifeGua ${ctx.lg}, DayMaster ${ctx.dm}(${ctx.dme}), Strength ${ctx.str}
+Elements: W${ctx.w}% F${ctx.f}% E${ctx.e}% M${ctx.m}% Wa${ctx.wa}% | Dom:${ctx.dom} Def:${ctx.def}
 
-  const userPrompt = `### HEXAGRAM
-${JSON.stringify(technicalData.hexagram)}
+Question: "${question?.slice(0, 100)}"
 
-### LINES
-${technicalData.lines}
-
-### BAZI (Four Pillars)
-Birth: ${technicalData.bazi.birth}
-Current: ${technicalData.bazi.current}
-
-### FIVE ELEMENTS
-${technicalData.elements}
-
-### CELESTIAL CONTEXT
-Life Gua: ${technicalData.lifeGua}
-Lunar Mansion: ${technicalData.lunarMansion}
-
-### QUESTION
-"${question}"
-
-Provide a complete, integrated interpretation weaving all layers into a coherent reading that directly addresses the question. Output in ${lang}.`;
+Return COMPACT JSON (minimize whitespace, no newlines in values):
+{"c":"CELESTIAL:2-3 paras integrating sky(${ctx.lm})+destiny(${ctx.dm})+timing","e":"ELEMENTS:2-3 paras on ${ctx.tu}/${ctx.tl}+5E(${ctx.dom}dom)","a":"ANALYSIS:4-5 paras weaving all+judgment+${mLines.length?'lines':'stable wisdom'}","d":"ADVICE:4-6 practical steps citing classics","r":["ref1","ref2"]}`;
 
   try {
     const result = await getStructuredInterpretation(
-      userPrompt,
-      2500,
-      { systemPrompt, response_mime_type: "application/json" },
-      ['analysis', 'advice'],
-      2
+      prompt,
+      2000, // Reduced token limit
+      { response_mime_type: "application/json" },
+      ['a', 'd'], // Check analysis and advice exist
+      1 // Single retry
     );
 
+    // Return compact format
     return new Response(
       JSON.stringify(createSuccessResponse({
-        analysis: result.analysis || '',
-        celestial: result.celestial || '',
-        elements: result.elements || '',
-        advice: result.advice || '',
-        quotedReferences: result.quotedReferences || []
+        c: result.c || result.celestial || '',
+        e: result.e || result.elements || '',
+        a: result.a || result.analysis || '',
+        d: result.d || result.advice || '',
+        r: result.r || result.quotedReferences || []
       }, requestId, startTime)),
       { headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     log(4, `[TAB:interpretation] Error: ${error.message}`);
-    throw new AppError(`Interpretation tab generation failed: ${error.message}`, 500, 'INTERPRETATION_TAB_ERROR');
+    throw new AppError(`Interpretation failed: ${error.message}`, 500, 'INTERPRETATION_TAB_ERROR');
   }
 }
 

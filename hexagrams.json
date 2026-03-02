@@ -55,7 +55,9 @@
       "image": {
         "image_zh": "天行健，君子以自強不息。",
         "image_en": "Heaven's movement is full of power. Thus the superior man makes himself strong and untiring.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El movimiento del cielo es lleno de poder. Así el hombre superior se hace fuerte e incansable.",
+        "image_it": "Il movimento del cielo è pieno di potere. Così l'uomo superiore si rende forte e instancabile."
       },
       "tuan": {
         "tuan_zh": "大哉乾元，萬物資始，乃統天。雲行雨施，品物流形。大明終始，六位時成，時乘六龍以御天。乾道變化，各正性命，保合大和，乃利貞。首出庶物，萬國咸寧。",
@@ -124,7 +126,9 @@
       "image": {
         "image_zh": "地勢坤，君子以厚德載物。",
         "image_en": "The earth's condition is receptive devotion. Thus the superior man who has breadth of character carries the outer world.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "La condición de la tierra es la devoción receptiva. Así el hombre superior que tiene amplitud de carácter sostiene al mundo exterior.",
+        "image_it": "La condizione della terra è la devozione ricettiva. Così l'uomo superiore che ha ampiezza di carattere porta il mondo esteriore."
       },
       "tuan": {
         "tuan_zh": "至哉坤元，萬物資生，乃順承天。坤厚載物，德合無疆。含弘光大，品物咸亨。牝馬地類，行地無疆，柔順利貞。君子攸行，先迷失道，後順得常。西南得朋，乃與類行。東北喪朋，乃終有慶。安貞之吉，應地無疆。",
@@ -194,7 +198,9 @@
       "image": {
         "image_zh": "雲雷屯，君子以經綸。",
         "image_en": "Clouds and thunder: The image of Difficulty at the Beginning. Thus the superior man brings order out of confusion.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Las nubes y el trueno: La imagen de la Dificultad en el Comienzo. Así el hombre superior trae orden de la confusión.",
+        "image_it": "Le nuvole e il tuono: L'immagine della Difficoltà all'Inizio. Così l'uomo superiore porta ordine dal caos."
       },
       "lines_zh": [
         "初九：磐桓，利居貞，利建侯。",
@@ -267,7 +273,9 @@
       "image": {
         "image_zh": "山下出泉，蒙。君子以果行育德。",
         "image_en": "A spring wells up at the foot of the mountain: The image of Youth. Thus the superior man fosters his character by thoroughness in all that he does.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Debajo de la montaña brota una fuente: La imagen de la Necedad Juvenil. Así el hombre superior fomenta su carácter por medio de la diligencia en la acción.",
+        "image_it": "Sotto la montagna sgorga una fonte: L'immagine della Fanciullezza. Così l'uomo superiore coltiva il suo carattere mediante la diligenza nell'azione."
       },
       "lines_zh": [
         "初六：發蒙，利用刑人，用說桎梏，以往吝。",
@@ -340,7 +348,9 @@
       "image": {
         "image_zh": "雲上於天，需。君子以飲食宴樂。",
         "image_en": "Clouds rise up to heaven: The image of Waiting. Thus the superior man eats and drinks, is joyous and of good cheer.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Las nubes se elevan hacia el cielo: La imagen de la Espera. Así el hombre superior come y bebe, y es alegre y fuerte.",
+        "image_it": "Le nuvole si elevano verso il cielo: L'immagine dell'Attesa. Così l'uomo superiore mangia e beve, ed è allegro e forte."
       },
       "lines_zh": [
         "初九：需于郊，利用恆，無咎。",
@@ -413,7 +423,9 @@
       "image": {
         "image_zh": "天與水違行，訟。君子以作事謀始。",
         "image_en": "Heaven and water go their opposite ways: The image of Conflict. Thus in all his transactions the superior man carefully considers the beginning.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo y el agua se mueven en direcciones opuestas: La imagen del Conflicto. Así el hombre superior en sus asuntos iniciales tiene cuidado.",
+        "image_it": "Il cielo e l'acqua si muovono in direzioni opposte: L'immagine del Conflitto. Così l'uomo superiore nei suoi affari iniziali è cauto."
       },
       "lines_zh": [
         "初六：不永所事，小有言，終吉。",
@@ -486,7 +498,9 @@
       "image": {
         "image_zh": "地中有水，師。君子以容民畜眾。",
         "image_en": "In the middle of the earth is water: The image of the Army. Thus the superior man increases his masses by generosity toward the people.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Dentro de la tierra está el agua: La imagen del Ejército. Así el hombre superior aumenta sus masas por medio de la generosidad.",
+        "image_it": "Dentro la terra c'è l'acqua: L'immagine dell'Esercito. Così l'uomo superiore aumenta le sue masse mediante la generosità."
       },
       "lines_zh": [
         "初六：師出以律，否臧凶。",
@@ -559,7 +573,9 @@
       "image": {
         "image_zh": "地上有水，比。先王以建萬國，親諸侯。",
         "image_en": "On the earth is water: The image of Holding Together. Thus the kings of old established the various states and maintained friendly relations with their vassals.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Sobre la tierra el agua: La imagen de la Solidaridad. Así los reyes antiguos establecieron los estados y mantuvieron relaciones amistosas con los príncipes.",
+        "image_it": "Sulla terra l'acqua: L'immagine della Solidarietà. Così i re antichi stabilirono gli stati e mantennero relazioni amichevoli con i principi."
       },
       "lines_zh": [
         "初六：有孚比之，無咎。有孚盈缶，終來有它，吉。",
@@ -632,7 +648,9 @@
       "image": {
         "image_zh": "風行天上，小畜。君子以懿文德。",
         "image_en": "The wind drives across heaven: The image of the Taming Power of the Small. Thus the superior man refines the outward aspect of his nature.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El viento sopla sobre el cielo: La imagen de la Domesticación de lo Pequeño. Así el hombre superior refina la forma externa de su naturaleza.",
+        "image_it": "Il vento soffia sul cielo: L'immagine dell'Addomesticamento del Piccolo. Così l'uomo superiore affina la forma esterna della sua natura."
       },
       "lines_zh": [
         "初九：復自道，何其咎，吉。",
@@ -705,7 +723,9 @@
       "image": {
         "image_zh": "上天下澤，履。君子以辨上下，定民志。",
         "image_en": "Heaven above, the lake below: The image of Treading. Thus the superior man discriminates between high and low, and thereby fortifies the thinking of the people.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo sobre el lago: La imagen del Porte del Pie. Así el hombre superior distingue entre lo superior y lo inferior, y así confirma la diferencia entre la voluntad del pueblo.",
+        "image_it": "Il cielo sopra il lago: L'immagine del Passo del Piede. Così l'uomo superiore distingue tra il superiore e l'inferiore, e così conferma la differenza tra la volontà del popolo."
       },
       "lines_zh": [
         "初九：素履，往無咎。",
@@ -778,7 +798,9 @@
       "image": {
         "image_zh": "天地交，泰。后以財成天地之道，輔相天地之宜，以左右民。",
         "image_en": "Heaven and earth unite: The image of Peace. Thus the ruler divides and completes the course of heaven and earth, and so aids the people.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo y la tierra se encuentran: La imagen de la Paz. Así el gobernante divide y completa el curso del cielo y la tierra, y así ayuda al pueblo.",
+        "image_it": "Il cielo e la terra si incontrano: L'immagine della Pace. Così il governatore divide e completa il corso del cielo e della terra, e così aiuta il popolo."
       },
       "tuan": {
         "tuan_zh": "泰，小往大來，吉亨。則是天地交而萬物通也，上下交而其志同也。內陽而外陰，內健而外順，內君子而外小人，君子道長，小人道消也。",
@@ -856,7 +878,9 @@
       "image": {
         "image_zh": "天地不交，否。君子以儉德辟難，不可榮以祿。",
         "image_en": "Heaven and earth do not unite: The image of Standstill. Thus the superior man falls back upon his inner worth in order to escape the difficulties. He does not permit himself to be honored with revenue.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo y la tierra no se encuentran: La imagen del Estancamiento. Así el hombre superior es reservado con sus bienes, y evita la exaltación.",
+        "image_it": "Il cielo e la terra non si incontrano: L'immagine dello Stagnamento. Così l'uomo superiore è riservato con i suoi beni, ed evita l'esaltazione."
       },
       "lines_zh": [
         "初六：拔茅茹，以其彙，貞吉亨。",
@@ -929,7 +953,9 @@
       "image": {
         "image_zh": "天與火，同人。君子以類族辨物。",
         "image_en": "Heaven together with fire: The image of Fellowship with Men. Thus the superior man organizes the clans and makes distinctions between things.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo junto con el fuego: La imagen de la Comunidad con los Hombres. Así el hombre superior organiza los clanes y hace distinciones entre las cosas.",
+        "image_it": "Il cielo insieme al fuoco: L'immagine della Comunità con gli Uomini. Così l'uomo superiore organizza i clan e fa distinzioni tra le cose."
       },
       "lines_zh": [
         "初九：同人于門，無咎。",
@@ -1002,7 +1028,9 @@
       "image": {
         "image_zh": "火在天上，大有。君子以遏惡揚善，順天休命。",
         "image_en": "Fire in heaven above: The image of Possession in Great Measure. Thus the superior man curbs evil and furthers good, and thereby obeys the benevolent will of heaven.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El fuego en el cielo: La imagen de la Posesión de lo Grande. Así el hombre superior reprime el mal y fomenta el bien, obedeciendo con esto la voluntad del cielo.",
+        "image_it": "Il fuoco nel cielo: L'immagine del Possesso del Grande. Così l'uomo superiore reprime il male e promuove il bene, obbedendo con ciò alla volontà del cielo."
       },
       "lines_zh": [
         "初九：無交害，匪咎，艱則無咎。",
@@ -1075,7 +1103,9 @@
       "image": {
         "image_zh": "地中有山，謙。君子以裒多益寡，稱物平施。",
         "image_en": "Within the earth, a mountain: The image of Modesty. Thus the superior man reduces that which is too much, and augments that which is too little. He weighs things and makes them equal.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Dentro de la tierra, una montaña: La imagen de la Humildad. Así el hombre superior reduce lo que está de más y aumenta lo que está disminuido, midiendo con justicia la posesión de las cosas.",
+        "image_it": "Dentro la terra, una montagna: L'immagine dell'Umiltà. Così l'uomo superiore riduce ciò che è in più e aumenta ciò che è diminuito, misurando con giustizia il possesso delle cose."
       },
       "lines_zh": [
         "初六：謙謙君子，用涉大川，吉。",
@@ -1148,7 +1178,9 @@
       "image": {
         "image_zh": "雷出地奮，豫。先王以作樂崇德，殷薦之上帝，以配祖考。",
         "image_en": "Thunder comes resounding out of the earth: The image of Enthusiasm. Thus the ancient kings made music in order to honor merit, and offered it with splendor to the Supreme Deity, inviting their ancestors to be present.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno sale de la tierra: La imagen del Entusiasmo. Así los reyes antiguos hacían música para honrar los méritos, y la presentaban con gloria a Dios, invitando así a sus antepasados a participar.",
+        "image_it": "Il tuono esce dalla terra: L'immagine dell'Entusiasmo. Così i re antichi facevano musica per onorare i meriti, e la presentavano con gloria a Dio, invitando così i loro antenati a partecipare."
       },
       "lines_zh": [
         "初六：鳴豫，凶。",
@@ -1221,7 +1253,9 @@
       "image": {
         "image_zh": "澤中有雷，隨。君子以嚮晦入宴息。",
         "image_en": "Thunder in the middle of the lake: The image of Following. Thus the superior man at nightfall goes indoors for rest and recuperation.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "En el lago, el trueno: La imagen de la Adaptación. Así el hombre superior cuando está en reposo se prepara, y cuando está en movimiento lo decide.",
+        "image_it": "Nel lago, il tuono: L'immagine dell'Adattamento. Così l'uomo superiore quando è in riposo si prepara, e quando è in movimento lo decide."
       },
       "lines_zh": [
         "初九：官有渝，貞吉，出門交有功。",
@@ -1294,7 +1328,9 @@
       "image": {
         "image_zh": "山下有風，蠱。君子以振民育德。",
         "image_en": "The wind blows low on the mountain: The image of Decay. Thus the superior man stirs up the people and strengthens their spirit.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Sobre la montaña, el viento: La imagen del Trabajo en lo Corrompido. Así el hombre superior agita al pueblo y fortalece su espíritu.",
+        "image_it": "Sulla montagna, il vento: L'immagine del Lavoro nel Corrotto. Così l'uomo superiore agita il popolo e fortifica il suo spirito."
       },
       "lines_zh": [
         "初六：幹父之蠱，有子，考無咎，厲終吉。",
@@ -1367,7 +1403,9 @@
       "image": {
         "image_zh": "澤上有地，臨。君子以教思無窮，容保民無疆。",
         "image_en": "The earth above the lake: The image of Approach. Thus the superior man is inexhaustible in his will to teach, and without limits in his tolerance and protection of the people.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Sobre la tierra, el lago: La imagen de la Cercanía. Así el hombre superior es instruido y diligente, en consideración a todas las cosas.",
+        "image_it": "Sulla terra, il lago: L'immagine della Vicinanza. Così l'uomo superiore è istruito e diligente, in considerazione a tutte le cose."
       },
       "lines_zh": [
         "初九：咸臨，貞吉。",
@@ -1440,7 +1478,9 @@
       "image": {
         "image_zh": "風行地上，觀。先王以省方觀民設教。",
         "image_en": "The wind blows over the earth: The image of Contemplation. Thus the kings of old visited the regions of the world, contemplated the people, and gave them instruction.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El viento sopla sobre la tierra: La imagen de la Contemplación. Así los reyes antiguos visitaban las regiones del mundo, contemplaban al pueblo y daban instrucciones.",
+        "image_it": "Il vento soffia sulla terra: L'immagine della Contemplazione. Così i re antichi visitavano le regioni del mondo, contemplavano il popolo e davano istruzioni."
       },
       "lines_zh": [
         "初六：童觀，小人無咎，君子吝。",
@@ -1513,7 +1553,9 @@
       "image": {
         "image_zh": "雷電噬嗑。先王以明罰敕法。",
         "image_en": "Thunder and lightning: The image of Biting Through. Thus the kings of old made firm the laws through clearly defined penalties.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno y el relámpago: La imagen de la Mordedura. Así los reyes antiguos establecían las penas para aclarar las leyes.",
+        "image_it": "Il tuono e il fulmine: L'immagine del Morso. Così i re antichi stabilivano le pene per chiarire le leggi."
       },
       "lines_zh": [
         "初九：屨校滅趾，無咎。",
@@ -1586,7 +1628,9 @@
       "image": {
         "image_zh": "山下有火，賁。君子以明庶政，無敢折獄。",
         "image_en": "Fire at the foot of the mountain: The image of Grace. Thus does the superior man proceed when clearing up current affairs. But he dare not decide controversial issues in this way.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Bajo la montaña, el fuego: La imagen de la Gracia. Así el hombre superior ilumina los asuntos del país, pero no se atreve a juzgar con claridad los asuntos de las cortes.",
+        "image_it": "Sotto la montagna, il fuoco: L'immagine della Grazia. Così l'uomo superiore illumina gli affari del paese, ma non osa giudicare con chiarezza gli affari delle corti."
       },
       "lines_zh": [
         "初九：賁其趾，舍車而徒。",
@@ -1659,7 +1703,9 @@
       "image": {
         "image_zh": "山附於地，剝。上以厚下安宅。",
         "image_en": "The mountain rests on the earth: The image of Splitting Apart. Thus those above can ensure their position only by giving generously to those below.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "La montaña descansa sobre la tierra: La imagen del Desgaste. Así los superiores aseguran su posición favoreciendo a los inferiores.",
+        "image_it": "La montagna riposa sulla terra: L'immagine dello Sfaldamento. Così i superiori assicurano la loro posizione favorendo gli inferiori."
       },
       "lines_zh": [
         "初六：剝床以足，蔑貞凶。",
@@ -1732,7 +1778,9 @@
       "image": {
         "image_zh": "雷在地中，復。先王以至日閉關，商旅不行，后不省方。",
         "image_en": "Thunder within the earth: The image of the Turning Point. Thus the kings of old closed the passes at the time of solstice. Merchants and strangers did not go about, and the ruler did not travel through the provinces.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno dentro de la tierra: La imagen del Retorno. Así los reyes de antaño cerraban los pasos en los momentos de solsticio, y los mercaderes viajeros no salían, y el gobernante no visitaba las regiones.",
+        "image_it": "Il tuono dentro la terra: L'immagine del Ritorno. Così i re di un tempo chiudevano i passi nei momenti di solstizio, e i mercanti viaggiatori non uscivano, e il governatore non visitava le regioni."
       },
       "lines_zh": [
         "初九：不遠復，無祇悔，元吉。",
@@ -1805,7 +1853,9 @@
       "image": {
         "image_zh": "天下雷行，無妄。先王以茂對時育萬物。",
         "image_en": "Under heaven thunder rolls: The image of Innocence. Thus the kings of old, rich in virtue, and in harmony with the time, fostered and nourished all beings.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Bajo el cielo, el trueno: La imagen de la Inocencia. Así el hombre superior se conduce sin discusión, y en su alimentación no busca el disfrute excesivo.",
+        "image_it": "Sotto il cielo, il tuono: L'immagine dell'Innocenza. Così l'uomo superiore si conduce senza discussione, e nel suo nutrimento non cerca il godimento eccessivo."
       },
       "lines_zh": [
         "初九：無妄，往吉。",
@@ -1878,7 +1928,9 @@
       "image": {
         "image_zh": "天在山中，大畜。君子以多識前言往行，以畜其德。",
         "image_en": "Heaven within the mountain: The image of the Taming Power of the Great. Thus the superior man acquaints himself with many sayings of antiquity and many deeds of the past, in order to strengthen his character thereby.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo dentro de la montaña: La imagen del Poder de lo Grande. Así el hombre superior aprende de múltiples ejemplos de lo pasado para así fortalecer su carácter.",
+        "image_it": "Il cielo dentro la montagna: L'immagine del Potere del Grande. Così l'uomo superiore impara da molteplici esempi del passato per così fortificare il suo carattere."
       },
       "lines_zh": [
         "初九：有厲，利已。",
@@ -1951,7 +2003,9 @@
       "image": {
         "image_zh": "山下有雷，頤。君子以慎言語，節飲食。",
         "image_en": "At the foot of the mountain, thunder: The image of Providing Nourishment. Thus the superior man is careful of his words and temperate in eating and drinking.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno bajo la montaña: La imagen de la Alimentación. Así el hombre superior es cuidadoso con sus palabras y moderado en su alimentación y bebida.",
+        "image_it": "Il tuono sotto la montagna: L'immagine del Nutrire. Così l'uomo superiore è cauto con le sue parole e moderato nel suo nutrimento e bevanda."
       },
       "lines_zh": [
         "初九：舍爾靈龜，觀我朵頤，凶。",
@@ -2024,7 +2078,9 @@
       "image": {
         "image_zh": "澤滅木，大過。君子以獨立不懼，遯世無悶。",
         "image_en": "The lake rises above the trees: The image of Preponderance of the Great. Thus the superior man, when he stands alone, is unconcerned, and if he has to renounce the world, he is undaunted.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El lago sube sobre los árboles: La imagen de la Preponderancia de lo Grande. Así el hombre superior cuando está solo no tiene temor, y cuando tiene que renunciar al mundo no se entristece.",
+        "image_it": "Il lago sale sugli alberi: L'immagine della Preponderanza del Grande. Così l'uomo superiore quando è solo non ha timore, e quando deve rinunciare al mondo non si rattrista."
       },
       "lines_zh": [
         "初六：藉用白茅，無咎。",
@@ -2097,7 +2153,9 @@
       "image": {
         "image_zh": "水洊至，習坎。君子以常德行，習教事。",
         "image_en": "Water flows on uninterruptedly: The image of the Abysmal repeated. Thus the superior man walks in lasting virtue and carries on the business of teaching.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El agua fluye hacia abajo incesantemente: La imagen de lo Abismal. Así el hombre superior mantiene constante su virtud, y practica la enseñanza con diligencia.",
+        "image_it": "L'acqua scorre verso il basso incessantemente: L'immagine dell'Abissale. Così l'uomo superiore mantiene costante la sua virtù, e pratica l'insegnamento con diligenza."
       },
       "lines_zh": [
         "初六：習坎，入于坎窞，凶。",
@@ -2170,7 +2228,9 @@
       "image": {
         "image_zh": "明兩作，離。大人以繼明照于四方。",
         "image_en": "That which is bright rises twice: The image of Fire. Thus the great man, by perpetuating this brightness, illumines the four quarters of the world.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "La luminosidad aparece doble: La imagen de lo Adherente. Así el gran hombre fomenta la claridad de la cultura y la luz.",
+        "image_it": "La luminosità appare doppia: L'immagine dell'Aderente. Così il grande uomo promuove la chiarezza della cultura e la luce."
       },
       "lines_zh": [
         "初九：履錯然，敬之無咎。",
@@ -2243,7 +2303,9 @@
       "image": {
         "image_zh": "山上有澤，咸。君子以虛受人。",
         "image_en": "A lake on the mountain: The image of Influence. Thus the superior man encourages people to approach him by his readiness to receive them.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Sobre la montaña, el lago: La imagen de la Influencia. Así el hombre superior abre su corazón para escuchar las palabras de los demás.",
+        "image_it": "Sulla montagna, il lago: L'immagine dell'Influenza. Così l'uomo superiore apre il suo cuore per ascoltare le parole degli altri."
       },
       "lines_zh": [
         "初六：咸其拇。",
@@ -2316,7 +2378,9 @@
       "image": {
         "image_zh": "雷風恆。君子以立不易方。",
         "image_en": "Thunder and wind: The image of Duration. Thus the superior man stands firm and does not change his direction.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno y el viento: La imagen de la Duración. Así el hombre superior permanece y no cambia su camino.",
+        "image_it": "Il tuono e il vento: L'immagine della Durata. Così l'uomo superiore permane e non cambia il suo cammino."
       },
       "lines_zh": [
         "初六：浚恆，貞凶，無攸利。",
@@ -2389,7 +2453,9 @@
       "image": {
         "image_zh": "天下有山，遯。君子以遠小人，不惡而嚴。",
         "image_en": "Mountain under heaven: The image of Retreat. Thus the superior man keeps the inferior man at a distance, not angrily but with reserve.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo sobre la montaña: La imagen del Retiro. Así el hombre superior mantiene lejos al hombre inferior, pero no con odio, sino con dignidad.",
+        "image_it": "Il cielo sopra la montagna: L'immagine del Ritiro. Così l'uomo superiore tiene lontano l'uomo inferiore, ma non con odio, bensì con dignità."
       },
       "lines_zh": [
         "初六：遯尾，厲，勿用有攸往。",
@@ -2462,7 +2528,9 @@
       "image": {
         "image_zh": "雷在天上，大壯。君子以非禮弗履。",
         "image_en": "Thunder in heaven above: The image of the Power of the Great. Thus the superior man does not tread upon paths that do not accord with established order.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno en el cielo: La imagen del Poder de lo Grande. Así el hombre superior no sigue un curso que no conduce a ninguna parte.",
+        "image_it": "Il tuono nel cielo: L'immagine del Potere del Grande. Così l'uomo superiore non segue un corso che non conduce da nessuna parte."
       },
       "lines_zh": [
         "初九：壯于趾，征凶，有孚。",
@@ -2535,7 +2603,9 @@
       "image": {
         "image_zh": "明出地上，晉。君子以自昭明德。",
         "image_en": "The sun rises over the earth: The image of Progress. Thus the superior man himself brightens his bright virtue.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El sol sale sobre la tierra: La imagen del Progreso. Así el hombre superior hace brillante su virtud propia.",
+        "image_it": "Il sole sorge sulla terra: L'immagine del Progresso. Così l'uomo superiore rende luminosa la sua virtù propria."
       },
       "lines_zh": [
         "初六：晉如摧如，貞吉。罔孚，裕無咎。",
@@ -2608,7 +2678,9 @@
       "image": {
         "image_zh": "明入地中，明夷。君子以蒞眾用晦而明。",
         "image_en": "The light has sunk into the earth: The image of Darkening of the Light. Thus does the superior man live with the great mass: He veils his light, yet still shines.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "La luz se hunde en la tierra: La imagen del Oscurecimiento de la Luz. Así el hombre superior en momentos de adversidad administra sus asuntos.",
+        "image_it": "La luce si sprofonda nella terra: L'immagine dell'Offuscamento della Luce. Così l'uomo superiore in momenti di avversità amministra i suoi affari."
       },
       "lines_zh": [
         "初九：明夷于飛，垂其翼。君子于行，三日不食。有攸往，主人有言。",
@@ -2681,7 +2753,9 @@
       "image": {
         "image_zh": "風自火出，家人。君子以言有物而行有恆。",
         "image_en": "Wind comes forth from fire: The image of the Family. Thus the superior man has substance in his words and duration in his way of life.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El viento brota del fuego: La imagen de la Casa del Hombre. Así el hombre superior tiene sustancia en sus palabras, y en su forma de vida constancia.",
+        "image_it": "Il vento spira dal fuoco: L'immagine della Casa dell'Uomo. Così l'uomo superiore ha sostanza nelle sue parole, e nel suo modo di vita costanza."
       },
       "lines_zh": [
         "初九：閑有家，悔亡。",
@@ -2754,7 +2828,9 @@
       "image": {
         "image_zh": "上火下澤，睽。君子以同而異。",
         "image_en": "Above, fire; below, the lake: The image of Opposition. Thus amid all fellowship the superior man retains his individuality.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El fuego sobre el lago: La imagen de la Diversidad. Así el hombre superior busca la unidad en las diferencias.",
+        "image_it": "Il fuoco sul lago: L'immagine della Diversità. Così l'uomo superiore cerca l'unità nelle differenze."
       },
       "lines_zh": [
         "初九：悔亡，喪馬勿逐，自復，見惡人，無咎。",
@@ -2827,7 +2903,9 @@
       "image": {
         "image_zh": "山上有水，蹇。君子以反身修德。",
         "image_en": "Water on the mountain: The image of Obstruction. Thus the superior man turns his attention to himself and molds his character.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El agua sobre la montaña: La imagen de las Dificultades. Así el hombre superior se vuelve a sí mismo para cultivar su virtud.",
+        "image_it": "L'acqua sulla montagna: L'immagine delle Difficoltà. Così l'uomo superiore si volge a sé stesso per coltivare la sua virtù."
       },
       "lines_zh": [
         "初六：往蹇來譽。",
@@ -2900,7 +2978,9 @@
       "image": {
         "image_zh": "雷雨作，解。君子以赦過宥罪。",
         "image_en": "Thunder and rain set in: The image of Deliverance. Thus the superior man pardons mistakes and forgives misdeeds.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno sobre el agua: La imagen de la Liberación. Así el hombre superior perdona los errores y condona las transgresiones.",
+        "image_it": "Il tuono sull'acqua: L'immagine della Liberazione. Così l'uomo superiore perdona gli errori e condona le trasgressioni."
       },
       "lines_zh": [
         "初六：無咎。",
@@ -2973,7 +3053,9 @@
       "image": {
         "image_zh": "山下有澤，損。君子以懲忿窒欲。",
         "image_en": "At the foot of the mountain, the lake: The image of Decrease. Thus the superior man controls his anger and restrains his instincts.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El lago sobre la montaña: La imagen de la Disminución. Así el hombre superior reprime su ira y reprime sus deseos.",
+        "image_it": "Il lago sulla montagna: L'immagine della Diminuzione. Così l'uomo superiore reprime la sua ira e reprime i suoi desideri."
       },
       "lines_zh": [
         "初九：已事遄往，無咎，酌損之。",
@@ -3046,7 +3128,9 @@
       "image": {
         "image_zh": "風雷益。君子以見善則遷，有過則改。",
         "image_en": "Wind and thunder: The image of Increase. Thus the superior man: If he sees good, he imitates it; If he has faults, he rids himself of them.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El truero y el viento: La imagen del Aumento. Así el hombre superior cuando ve el bien lo imita, y cuando tiene errores los corrige.",
+        "image_it": "Il tuono e il vento: L'immagine dell'Aumento. Così l'uomo superiore quando vede il bene lo imita, e quando ha errori li corregge."
       },
       "lines_zh": [
         "初九：利用為大作，元吉，無咎。",
@@ -3119,7 +3203,9 @@
       "image": {
         "image_zh": "澤上於天，夬。君子以施祿及下，居德則忌。",
         "image_en": "The lake has risen up to heaven: The image of Break-through. Thus the superior man dispenses riches downward and refrains from resting on his virtue.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El lago sobre el cielo: La imagen del Desbordamiento. Así el hombre superior distribuye la abundancia a los que ocupan posiciones inferiores, y vigila contra la insolvencia.",
+        "image_it": "Il lago sul cielo: L'immagine dello Straripamento. Così l'uomo superiore distribuisce l'abbondanza a coloro che occupano posizioni inferiori, e vigila contro l'insolvenza."
       },
       "lines_zh": [
         "初九：壯于前趾，往不勝，為咎。",
@@ -3192,7 +3278,9 @@
       "image": {
         "image_zh": "天下有風，姤。后以施命誥四方。",
         "image_en": "Under heaven, wind: The image of Coming to Meet. Thus does the prince act when disseminating his commands and proclaiming them to the four quarters of heaven.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El cielo sobre el lago: La imagen del Acoplamiento. Así el hombre superior proclama sus instrucciones cuando llega el momento, y así evita males.",
+        "image_it": "Il cielo sopra il lago: L'immagine dell'Accoppiamento. Così l'uomo superiore proclama le sue istruzioni quando arriva il momento, e così evita mali."
       },
       "lines_zh": [
         "初六：繫于金柅，貞吉。有攸往，見凶，羸豕孚躑躅。",
@@ -3265,7 +3353,9 @@
       "image": {
         "image_zh": "澤上於地，萃。君子以除戎器，戒不虞。",
         "image_en": "The lake over the earth: The image of Gathering Together. Thus the superior man renews his weapons in order to meet the unforeseen.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El lago sobre la tierra: La imagen de la Reunión. Así el hombre superior arregla sus armas para guardar contra ataques inesperados.",
+        "image_it": "Il lago sulla terra: L'immagine della Riunione. Così l'uomo superiore sistema le sue armi per guardarsi contro attacchi inaspettati."
       },
       "lines_zh": [
         "初六：有孚不終，乃亂乃萃，若號，一握為笑，勿恤，往無咎。",
@@ -3338,7 +3428,9 @@
       "image": {
         "image_zh": "地中生木，升。君子以順德，積小以高大。",
         "image_en": "Within the earth, wood grows: The image of Pushing Upward. Thus the superior man of devoted character heaps up small things in order to achieve something high and great.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El agua dentro de la tierra: La imagen del Ascenso. Así el hombre superior, por medio del respeto, se dedica con todo su corazón a cuidar a las masas.",
+        "image_it": "L'acqua dentro la terra: L'immagine dell'Ascesa. Così l'uomo superiore, mediante il rispetto, si dedica con tutto il cuore a prendersi cura delle masse."
       },
       "lines_zh": [
         "初六：允升，大吉。",
@@ -3411,7 +3503,9 @@
       "image": {
         "image_zh": "澤無水，困。君子以致命遂志。",
         "image_en": "There is no water in the lake: The image of Exhaustion. Thus the superior man stakes his life on following his will.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El lago sobre el agua: La imagen de la Angustia. Así el hombre superior consume su propia vida para realizar su voluntad.",
+        "image_it": "Il lago sull'acqua: L'immagine dell'Angoscia. Così l'uomo superiore consuma la sua propria vita per realizzare la sua volontà."
       },
       "lines_zh": [
         "初六：臀困于株木，入于幽谷，三歲不覿。",
@@ -3484,7 +3578,9 @@
       "image": {
         "image_zh": "木上有水，井。君子以勞民勸相。",
         "image_en": "Water over wood: The image of the Well. Thus the superior man encourages the people at their work, and exhorts them to help one another.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El agua sobre el madera: La imagen del Pozo. Así el hombre superior anima al pueblo en su trabajo y los exhorta a ayudarse mutuamente.",
+        "image_it": "L'acqua sul legno: L'immagine del Pozzo. Così l'uomo superiore anima il popolo nel suo lavoro e li esorta ad aiutarsi a vicenda."
       },
       "lines_zh": [
         "初六：井泥不食，舊井無禽。",
@@ -3557,7 +3653,9 @@
       "image": {
         "image_zh": "澤中有火，革。君子以治曆明時。",
         "image_en": "Fire in the lake: The image of Revolution. Thus the superior man sets the calendar in order and makes the seasons clear.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El lago sobre el fuego: La imagen de la Revolución. Así el hombre superior hace el calendario y clarifica las estaciones.",
+        "image_it": "Il lago sul fuoco: L'immagine della Rivoluzione. Così l'uomo superiore fa il calendario e chiarisce le stagioni."
       },
       "lines_zh": [
         "初九：鞏用黃牛之革。",
@@ -3630,7 +3728,9 @@
       "image": {
         "image_zh": "木上有火，鼎。君子以正位凝命。",
         "image_en": "Fire over wood: The image of the Caldron. Thus the superior man consolidates his fate by making his position correct.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El fuego sobre el madera: La imagen del Caldero. Así el hombre superior consolida su posición para asegurar el destino.",
+        "image_it": "Il fuoco sul legno: L'immagine del Calderone. Così l'uomo superiore consolida la sua posizione per assicurare il destino."
       },
       "lines_zh": [
         "初六：鼎顛趾，利出否，得妾以其子，無咎。",
@@ -3703,7 +3803,9 @@
       "image": {
         "image_zh": "洊雷震。君子以恐懼修省。",
         "image_en": "Thunder repeated: The image of Shock. Thus in fear and trembling the superior man sets his life in order and examines himself.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno se repite: La imagen del Trueno. Así el hombre superior en su temor se pone en guardia y se examina.",
+        "image_it": "Il tuono si ripete: L'immagine del Tuono. Così l'uomo superiore nel suo timore si mette in guardia e si esamina."
       },
       "lines_zh": [
         "初九：震來虩虩，後笑言啞啞，吉。",
@@ -3776,7 +3878,9 @@
       "image": {
         "image_zh": "兼山艮。君子以思不出其位。",
         "image_en": "Mountains standing close together: The image of Keeping Still. Thus the superior man does not permit his thoughts to go beyond his situation.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "La montaña se mantiene quieta: La imagen de la Inmovilidad. Así el hombre superior no piensa en ir más allá de su posición.",
+        "image_it": "La montagna rimane ferma: L'immagine dell'Immobilità. Così l'uomo superiore non pensa di andare oltre la sua posizione."
       },
       "lines_zh": [
         "初六：艮其趾，無咎，利永貞。",
@@ -3849,7 +3953,9 @@
       "image": {
         "image_zh": "山上有木，漸。君子以居賢德善俗。",
         "image_en": "On the mountain, a tree: The image of Development. Thus the superior man abides in dignity and virtue, in order to improve the mores.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Sobre la montaña hay un árbol: La imagen del Desarrollo. Así el hombre superior vive una vida virtuosa y mejora sus modales.",
+        "image_it": "Sulla montagna c'è un albero: L'immagine dello Sviluppo. Così l'uomo superiore vive una vita virtuosa e migliora i suoi modi."
       },
       "lines_zh": [
         "初六：鴻漸于干，小子厲，有言，無咎。",
@@ -3922,7 +4028,9 @@
       "image": {
         "image_zh": "澤上有雷，歸妹。君子以永終知敝。",
         "image_en": "Thunder over the lake: The image of the Marrying Maiden. Thus the superior man understands the transitory in the light of the eternity of the end.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El trueno sobre el lago: La imagen de la Muchacha que se Casa. Así el hombre superior entiende lo transitorio y lo permanente.",
+        "image_it": "Il tuono sul lago: L'immagine della Fanciulla che si Sposa. Così l'uomo superiore comprende il transitorio e il permanente."
       },
       "lines_zh": [
         "初九：歸妹以娣，跛能履，征吉。",
@@ -3995,7 +4103,9 @@
       "image": {
         "image_zh": "雷電皆至，豐。君子以折獄致刑。",
         "image_en": "Both thunder and lightning come: The image of Abundance. Thus the superior man decides lawsuits and carries out punishments.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El truero y el relámpago: La imagen de la Abundancia. Así el hombre superior decide los litigios y ejecuta las penas.",
+        "image_it": "Il tuono e il fulmine: L'immagine dell'Abbondanza. Così l'uomo superiore decide le liti ed esegue le pene."
       },
       "lines_zh": [
         "初九：遇其配主，雖旬無咎，往有尚。",
@@ -4068,7 +4178,9 @@
       "image": {
         "image_zh": "山上有火，旅。君子以明慎用刑而不留獄。",
         "image_en": "Fire on the mountain: The image of the Wanderer. Thus the superior man is clear-minded and cautious in imposing penalties, and protracts no lawsuits.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El fuego sobre la montaña: La imagen del Viajero. Así el hombre superior es claro en sus decisiones y cauteloso en el uso de las penas.",
+        "image_it": "Il fuoco sulla montagna: L'immagine del Viaggiatore. Così l'uomo superiore è chiaro nelle sue decisioni e cauto nell'uso delle pene."
       },
       "lines_zh": [
         "初六：旅瑣瑣，斯其所取災。",
@@ -4141,7 +4253,9 @@
       "image": {
         "image_zh": "隨風巽。君子以申命行事。",
         "image_en": "Winds following one upon the other: The image of the Gently Penetrating. Thus the superior man spreads his commands abroad and carries out his undertakings.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "Sobre el lago, el viento: La imagen de lo Suave. Así el hombre superior difunde sus instrucciones y ejecuta sus asuntos.",
+        "image_it": "Sul lago, il vento: L'immagine del Suave. Così l'uomo superiore diffonde le sue istruzioni ed esegue i suoi affari."
       },
       "lines_zh": [
         "初六：進退，利武人之貞。",
@@ -4214,7 +4328,9 @@
       "image": {
         "image_zh": "麗澤兌。君子以朋友講習。",
         "image_en": "Lakes resting one on the other: The image of the Joyous. Thus the superior man joins with his friends for discussion and practice.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El lago sobre el lago: La imagen de lo Sereno. Así el hombre superior examina a los demás y fortalece su unión.",
+        "image_it": "Il lago sul lago: L'immagine della Serenità. Così l'uomo superiore esamina gli altri e rafforza la loro unione."
       },
       "lines_zh": [
         "初九：和兌，吉。",
@@ -4287,7 +4403,9 @@
       "image": {
         "image_zh": "風行水上，渙。先王以享于帝立廟。",
         "image_en": "The wind drives over the water: The image of Dispersion. Thus the kings of old sacrificed to the Lord and built temples.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El viento sobre el agua: La imagen de la Dispersión. Así el hombre superior ofrece sacrificio a Dios para establecer su voluntad.",
+        "image_it": "Il vento sull'acqua: L'immagine della Dispersione. Così l'uomo superiore offre sacrificio a Dio per stabilire la sua volontà."
       },
       "lines_zh": [
         "初六：用拯馬壯，吉。",
@@ -4360,7 +4478,9 @@
       "image": {
         "image_zh": "澤上有水，節。君子以制數度，議德行。",
         "image_en": "Water over lake: The image of Limitation. Thus the superior man creates number and measure, and examines the nature of virtue and correct conduct.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El agua sobre el lago: La imagen de la Limitación. Así el hombre superior establece medidas y números, y discute la conducta virtuosa.",
+        "image_it": "L'acqua sul lago: L'immagine della Limitazione. Così l'uomo superiore stabilisce misure e numeri, e discute la condotta virtuosa."
       },
       "lines_zh": [
         "初九：不出戶庭，無咎。",
@@ -4433,7 +4553,9 @@
       "image": {
         "image_zh": "澤上有風，中孚。君子以議獄緩死。",
         "image_en": "Wind over lake: The image of Inner Truth. Thus the superior man discusses criminal cases in order to delay executions.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El viento sobre el lago: La imagen de la Verdad Interior. Así el hombre superior discute los casos penales y retrasa las ejecuciones.",
+        "image_it": "Il vento sul lago: L'immagine della Verità Interiore. Così l'uomo superiore discute i casi penali e ritarda le esecuzioni."
       },
       "lines_zh": [
         "初九：虞吉，有它不燕。",
@@ -4506,7 +4628,9 @@
       "image": {
         "image_zh": "山上有雷，小過。君子以行過乎恭，喪過乎哀，用過乎儉。",
         "image_en": "Thunder on the mountain: The image of Preponderance of the Small. Thus in his conduct the superior man gives preponderance to reverence. In bereavement he gives preponderance to grief. In his expenditures he gives preponderance to thrift.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El truero sobre la montaña: La imagen de la Preponderancia de lo Pequeño. Así el hombre superior es respetuoso en su conducta, está triste en su duelo, y usa economía en sus gastos.",
+        "image_it": "Il tuono sulla montagna: L'immagine della Preponderanza del Piccolo. Così l'uomo superiore è rispettoso nella sua condotta, è triste nel suo lutto, e usa economia nei suoi spese."
       },
       "lines_zh": [
         "初六：飛鳥以凶。",
@@ -4579,7 +4703,9 @@
       "image": {
         "image_zh": "水在火上，既濟。君子以思患而豫防之。",
         "image_en": "Water over fire: The image of the condition in After Completion. Thus the superior man takes thought of misfortune and arms himself against it in advance.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El agua sobre el fuego: La imagen del Después del Fin. Así el hombre superior toma precauciones contra la eventualidad.",
+        "image_it": "L'acqua sul fuoco: L'immagine del Dopo la Fine. Così l'uomo superiore prende precauzioni contro l'eventualità."
       },
       "tuan": {
         "tuan_zh": "既濟亨，小者亨也。利貞，剛柔正而位當也。初吉，柔得中也。終止則亂，其道窮也。",
@@ -4657,7 +4783,9 @@
       "image": {
         "image_zh": "火在水上，未濟。君子以慎辨物居方。",
         "image_en": "Fire over water: The image of the condition before transition. Thus the superior man is careful in the differentiation of things, so that each finds its place.",
-        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)"
+        "source": "Xiang Zhuan (象傳 - Image Commentary), Zhou Yi (周易)",
+        "image_es": "El fuego sobre el agua: La imagen del Antes del Fin. Así el hombre superior es cauteloso en la diferenciación de las cosas, para que cada una ocupe su lugar.",
+        "image_it": "Il fuoco sull'acqua: L'immagine del Prima della Fine. Così l'uomo superiore è cauto nella differenziazione delle cose, affinché ciascuna occupi il suo posto."
       },
       "tuan": {
         "tuan_zh": "未濟亨，柔得中也。小狐汔濟，未出中也。濡其尾，无攸利，不續終也。雖不當位，剛柔應也。",

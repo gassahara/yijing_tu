@@ -2831,17 +2831,42 @@ class App {
 
             console.log('[AI:TABS] All tabs fetched successfully');
 
+            // Handle compact format (c,e,a,d,r) or full format (celestial,elements,analysis,advice,quotedReferences)
+            const normalizeInterpretation = (data) => {
+                if (!data) return {};
+                // Compact format
+                if (data.c || data.e || data.a || data.d) {
+                    return {
+                        celestial: data.c || '',
+                        elements: data.e || '',
+                        analysis: data.a || '',
+                        advice: data.d || '',
+                        quotedReferences: data.r || []
+                    };
+                }
+                // Full format
+                return {
+                    celestial: data.celestial || '',
+                    elements: data.elements || '',
+                    analysis: data.analysis || '',
+                    advice: data.advice || '',
+                    quotedReferences: data.quotedReferences || []
+                };
+            };
+            
+            const interp = normalizeInterpretation(interpretationResult);
+
             // Build result in the format expected by the UI
             return {
                 [this.lang]: {
                     // Main interpretation
-                    analysis: interpretationResult.analysis || '',
-                    celestial: interpretationResult.celestial || '',
-                    elements: interpretationResult.elements || '',
-                    advice: interpretationResult.advice || '',
+                    analysis: interp.analysis,
+                    celestial: interp.celestial,
+                    elements: interp.elements,
+                    advice: interp.advice,
                     
                     // Quoted references
-                    quotedReferences: interpretationResult.quotedReferences || []
+                    quotedReferences: interp.quotedReferences
                 },
                 
                 // Remedies - store under current language (dynamic source language support)
@@ -2862,40 +2887,58 @@ class App {
         }
     }
 
-    // Helper to fetch a single tab
-    static async fetchTab(tabName, requestData, timeoutMs) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    // Helper to fetch a single tab with retry logic
+    static async fetchTab(tabName, requestData, timeoutMs, maxRetries = 2) {
+        let lastError;
         
-        try {
-            const response = await fetch(`${CONFIG.HEXAGRAM_FUNCTION_URL}/${tabName}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(requestData),
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            if (attempt > 0) {
+                console.log(`[AI:FETCH] Retry ${attempt}/${maxRetries} for ${tabName}...`);
+                await new Promise(r => setTimeout(r, 1000 * attempt)); // Exponential backoff
             }
             
-            const result = await response.json();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
             
-            if (result.error) {
-                throw new Error(result.error.message || 'Unknown error');
+            try {
+                const response = await fetch(`${CONFIG.HEXAGRAM_FUNCTION_URL}/${tabName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestData),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Unknown error');
+                }
+                
+                return result.data;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                lastError = error;
+                
+                // Don't retry on abort errors (user cancelled)
+                if (error.name === 'AbortError') {
+                    throw error;
+                }
+                
+                console.warn(`[AI:FETCH] Attempt ${attempt + 1} failed for ${tabName}:`, error.message);
             }
-            
-            return result.data;
-        } catch (error) {
-            clearTimeout(timeoutId);
-            throw error;
         }
+        
+        throw lastError;
     }
 
     // Fetch with keep-alive headers for connection reuse
