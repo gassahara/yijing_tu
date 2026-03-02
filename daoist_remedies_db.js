@@ -10,7 +10,7 @@ const DAOIST_REMEDIES_DB = {
   "fulu": [
     {
       "id": "fulu_001",
-      "name": { "zh": "太平符", "en": "Great Peace Talisman", "pinyin": "Taiping Fu" },
+      "name": { "zh": "太平符", "en": "Great Peace Talisman", "es": "Talismán de la Gran Paz", "it": "Talismano della Grande Pace", "pinyin": "Taiping Fu" },
       "description": "One of the most ancient and widely documented Daoist talismans. It represents the primordial condensation of the 'Great Peace' (Taiping) celestial breath, used for restoring primordial harmony and stabilizing the cosmic order within a space.",
       "source": {
         "primary": "Zhengtong Daozang (正統道藏)",
@@ -33,7 +33,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_002",
       "name": {
         "zh": "天師五雷符",
-        "en": "Celestial Master's Five Thunders Talisman",
+        "en": "Celestial Master's Five Thunders Talisman", "es": "Talismán de los Cinco Truenos del Maestro Celestial", "it": "Talismano dei Cinque Tuoni del Maestro Celeste",
         "pinyin": "Tianshi Wulei Fu"
       },
       "description": "An authoritative talisman from the Zhengyi (Celestial Master) lineage invoking the Five Thunders (Wulei). It uses a highly fluid 'cloud script' to command thunder deities for exorcism, protection, and subjugation of malevolent forces. The Bagua header grounds it in cosmic order, while the background dragon represents the dynamic Qi of thunder.",
@@ -94,7 +94,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_003",
-      "name": { "zh": "八景真符", "en": "True Talismans of the Eight Effulgences", "pinyin": "Bajing Zhenfu" },
+      "name": { "zh": "八景真符", "en": "True Talismans of the Eight Effulgences", "es": "Verdaderos Talismanes de las Ocho Efulgencias", "it": "Vere Talismano delle Otto Effulgenze", "pinyin": "Bajing Zhenfu" },
       "description": "Eight superior effulgences used in meditation to illuminate the practitioner's inner landscape.",
       "source": { "primary": "Shangqing Lingbao Dafa", "references": ["CT 219, 43.7b-8a"] },
       "structure": { "type": "meditation_aid", "elements": ["Luminous patterns", "Jade Script (yuzi)", "Thin curves"] },
@@ -106,7 +106,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_004",
-      "name": { "zh": "開心秘忘符", "en": "Talisman to Open the Mind", "pinyin": "Kaixin Biwang Fu" },
+      "name": { "zh": "開心秘忘符", "en": "Talisman to Open the Mind", "es": "Talismán para Abrir la Mente", "it": "Talismano per Aprire la Mente", "pinyin": "Kaixin Biwang Fu" },
       "description": "Talisman for mental clarity and dispelling confusion. Clears the 'clouds' obscuring the spirit.",
       "source": { "primary": "Zhengao (真誥)", "references": ["DZ 1016"] },
       "structure": { "type": "character_composite", "elements": ["Kaixin characters", "Vertical stack", "Cloud seal"] },
@@ -118,7 +118,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_005",
-      "name": { "zh": "北斗第七元君符", "en": "Talisman of the Seventh Lord of the Northern Dipper", "pinyin": "Beidou Diqi Yuanjun Fu" },
+      "name": { "zh": "北斗第七元君符", "en": "Talisman of the Seventh Lord of the Northern Dipper", "es": "Talismán del Séptimo Señor de la Osa Mayor", "it": "Talismano del Settimo Signore del Grande Carro", "pinyin": "Beidou Diqi Yuanjun Fu" },
       "description": "Evokes the Northern Dipper (Ursa Major) for protection. Focuses on the 7 stars plus 2 hidden stars.",
       "source": { "primary": "Beidou Qiyuan Jinxuan", "references": ["DZ 753"] },
       "structure": { "type": "astral_invocation", "elements": ["7 Stars", "Constellation lines", "Pivot star focus"] },
@@ -130,7 +130,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_006",
-      "name": { "zh": "天蓬符", "en": "Heavenly Mound Talisman", "pinyin": "Tianpeng Fu" },
+      "name": { "zh": "天蓬符", "en": "Heavenly Mound Talisman", "es": "Talismán del Montículo Celestial", "it": "Talismano del Tumulo Celeste", "pinyin": "Tianpeng Fu" },
       "description": "Powerful martial exorcism talisman of Marshal Tianpeng. Uses 'Thunder Script' to suppress and subjugate evil spirits through divine authority.",
       "source": { "primary": "Daofa Huiyuan, DZ 1220" },
       "structure": { "type": "marshal_invocation", "elements": ["Thunder V Header", "Character: 雷 (Thunder)", "Trident Footer"] },
@@ -146,7 +146,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_007",
       "name": {
         "zh": "靈寶五符",
-        "en": "Five Talismans of Numinous Treasure",
+        "en": "Five Talismans of Numinous Treasure", "es": "Cinco Talismanes del Tesoro Numinoso", "it": "Cinque Talismani del Tesoro Numinoso",
         "pinyin": "Lingbao Wufu"
       },
       "description": "The foundational talismans of the Lingbao tradition, representing the Five Directions. This specific visual form uses the 'Bird and Worm Seal Script' (Niaochong Zhuan), characterized by dense, undulating vertical lines that mimic the flow of cosmic Qi and the patterns of nature.",
@@ -197,7 +197,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_008",
       "name": {
         "zh": "五芽真文",
-        "en": "Perfect Writs of the Five Sprouts",
+        "en": "Perfect Writs of the Five Sprouts", "es": "Escritos Perfectos de los Cinco Brotes", "it": "Scritti Perfetti dei Cinque Germogli",
         "pinyin": "Wuya Zhenwen"
       },
       "description": "64 graphs representing the Jade Script of the Five Directions. Represents 'Sprouts' of original Qi.",
@@ -215,7 +215,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_009",
       "name": {
         "zh": "赤書五篇真文",
-        "en": "Red Writing on Five Tablets",
+        "en": "Red Writing on Five Tablets", "es": "Escritura Roja en Cinco Tabletas", "it": "Scrittura Rossa su Cinque Tavolette",
         "pinyin": "Chishu Wupian Zhenwen"
       },
       "description": "Prototypical celestial writing in red. The source of Lingbao revelation.",
@@ -231,7 +231,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_010",
-      "name": { "zh": "大梵隱語自然玉字", "en": "Secret Language of Great Brahma", "pinyin": "Dafan Yinyu Ziran Yuzi" },
+      "name": { "zh": "大梵隱語自然玉字", "en": "Secret Language of Great Brahma", "es": "Lenguaje Secreto del Gran Brahma", "it": "Linguaggio Segreto del Grande Brahma", "pinyin": "Dafan Yinyu Ziran Yuzi" },
       "description": "Buddhist-Daoist synthesis script. Vertical Cloud Seals mixed with Sanskrit aesthetics.",
       "source": { "primary": "Zhutian Neiyin", "references": ["DZ 97"] },
       "structure": { "type": "synthesized_celestial", "elements": ["Purple ink", "Hybrid script"] },
@@ -242,7 +242,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_011",
-      "name": { "zh": "都匠符", "en": "Chief Artisan Talisman", "pinyin": "Doujiang Fu" },
+      "name": { "zh": "都匠符", "en": "Chief Artisan Talisman", "es": "Talismán del Jefe Artesano", "it": "Talismano del Capo Artigiano", "pinyin": "Doujiang Fu" },
       "description": "Used in ordination. Contains 'Peaceful Bright Day' symbols.",
       "source": { "primary": "Zhengyi tradition" },
       "structure": { "type": "ordination_seal", "elements": ["Master-disciple symbols"] },
@@ -253,7 +253,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_012",
-      "name": { "zh": "素靈真符", "en": "Plain Numinosity Talisman", "pinyin": "Suling Zhenfu" },
+      "name": { "zh": "素靈真符", "en": "Plain Numinosity Talisman", "es": "Talismán de la Numinosidad Pura", "it": "Talismano della Numinosità Pura", "pinyin": "Suling Zhenfu" },
       "description": "Standard Lingbao ritual talismans recorded by Lu Xiujing.",
       "source": { "primary": "Lingbao scriptures" },
       "structure": { "type": "classical_lingbao", "elements": ["Uncolored numinous characters"] },
@@ -264,7 +264,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_013",
-      "name": { "zh": "三皇符", "en": "Three Sovereigns Talisman", "pinyin": "Sanhuang Fu" },
+      "name": { "zh": "三皇符", "en": "Three Sovereigns Talisman", "es": "Talismán de los Tres Soberanos", "it": "Talismano dei Tre Sovrani", "pinyin": "Sanhuang Fu" },
       "description": "From the Sanhuang tradition, using 'Worm-seal' script.",
       "source": { "primary": "Sanhuang tradition" },
       "structure": { "type": "archaic_seal", "elements": ["Heaven-Earth-Underworld"] },
@@ -277,7 +277,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_014",
       "name": {
         "zh": "八史真符",
-        "en": "True Writs of the Eight Archivists",
+        "en": "True Writs of the Eight Archivists", "es": "Escritos Verdaderos de los Ocho Archiveros", "it": "Scritti Veri degli Otto Archivisti",
         "pinyin": "Bashi Zhenfu"
       },
       "description": "A talismanic diagram that arranges the 'True Writs' (Zhenwen) of the Eight Archivist deities in the eight directions of the Jiugong (Nine Palaces) grid. The center remains empty, representing the pivot of the Tao. This mandala allows access to celestial records and communication with the spirits of the directions to gain comprehensive knowledge.",
@@ -338,7 +338,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_015",
-      "name": { "zh": "九宮符", "en": "Nine Palaces Talisman", "pinyin": "Jiugong Fu" },
+      "name": { "zh": "九宮符", "en": "Nine Palaces Talisman", "es": "Talismán de los Nueve Palacios", "it": "Talismano dei Nove Palazzi", "pinyin": "Jiugong Fu" },
       "description": "3x3 grid used in meditation. Centers the practitioner in the cosmic palace.",
       "source": { "primary": "Shangqing texts", "references": ["DZ 1385"] },
       "structure": { "type": "meditation_palace", "elements": ["3x3 Grid", "Elemental colors"] },
@@ -349,7 +349,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_016",
-      "name": { "zh": "劍符", "en": "Sword Talisman", "pinyin": "Jian Fu" },
+      "name": { "zh": "劍符", "en": "Sword Talisman", "es": "Talismán de la Espada", "it": "Talismano della Spada", "pinyin": "Jian Fu" },
       "description": "Inscribed on ritual swords. Sharp, elongated script.",
       "structure": { "type": "weapon_inscribed", "elements": ["Sword shape", "Thunder symbols"] },
       "generatorParams": { "style": "THUNDER", "chars": ["寶", "劍", "驅", "邪"] },
@@ -359,7 +359,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_017",
-      "name": { "zh": "鏡符", "en": "Mirror Talisman", "pinyin": "Jing Fu" },
+      "name": { "zh": "鏡符", "en": "Mirror Talisman", "es": "Talismán del Espejo", "it": "Talismano dello Specchio", "pinyin": "Jing Fu" },
       "description": "Circular talisman for mirrors. Reveals true forms.",
       "structure": { "type": "divination_tool", "elements": ["Circle", "True Form character"] },
       "generatorParams": { "style": "DEFAULT", "chars": ["照", "魔", "明", "鏡"] },
@@ -370,7 +370,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_018",
-      "name": { "zh": "九鳳破穢符", "en": "Nine-Phoenix Destroyer of Filth", "pinyin": "Jiufeng Pohui Fu" },
+      "name": { "zh": "九鳳破穢符", "en": "Nine-Phoenix Destroyer of Filth", "es": "Destructor de Inmundicia de las Nueve Fénix", "it": "Distruttore di Immondizia delle Nove Fenici", "pinyin": "Jiufeng Pohui Fu" },
       "description": "Purification talisman. Nine stylized crests at top.",
       "structure": { "type": "purification", "elements": ["9 Phoenix crests", "Fire/Red ink"] },
       "generatorParams": { "style": "THUNDER", "chars": ["九", "鳳", "破", "穢"] },
@@ -380,7 +380,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_019",
-      "name": { "zh": "三界符使", "en": "Emissaries of Three Realms", "pinyin": "Sanjie Fushi" },
+      "name": { "zh": "三界符使", "en": "Emissaries of Three Realms", "es": "Emisarios de los Tres Reinos", "it": "Emissari dei Tre Regni", "pinyin": "Sanjie Fushi" },
       "description": "Triangle folded talisman for message delivery.",
       "structure": { "type": "emissary_invocation", "elements": ["Triangle shape", "Black/Red ink"] },
       "generatorParams": { "style": "DEFAULT", "chars": ["三", "界", "使", "者"] },
@@ -390,7 +390,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_020",
-      "name": { "zh": "黃籙齋符", "en": "Yellow Register Talisman", "pinyin": "Huanglu Zhai Fu" },
+      "name": { "zh": "黃籙齋符", "en": "Yellow Register Talisman", "es": "Talismán del Registro Amarillo", "it": "Talismano del Registro Giallo", "pinyin": "Huanglu Zhai Fu" },
       "description": "Salvation of the dead. Elegant vertical lines on yellow.",
       "source": { "primary": "Yellow Register rituals" },
       "structure": { "type": "salvation_ritual", "elements": ["Yellow Register", "Vertical flow"] },
@@ -401,7 +401,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_021",
-      "name": { "zh": "青玄普度符", "en": "Green-Black Universal Salvation", "pinyin": "Qingxuan Pudu Fu" },
+      "name": { "zh": "青玄普度符", "en": "Green-Black Universal Salvation", "es": "Salvación Universal Verde-Negra", "it": "Salvezza Universale Verde-Nera", "pinyin": "Qingxuan Pudu Fu" },
       "description": "Green-black symbols for universal salvation.",
       "source": { "primary": "Lingbao salvation rituals" },
       "structure": { "type": "universal_salvation", "elements": ["Green/Black"] },
@@ -412,7 +412,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fulu_022",
-      "name": { "zh": "玉清溟涬大梵符", "en": "Jade Purity Brahma Talisman", "pinyin": "Yuqing Mingxing Dafan Fu" },
+      "name": { "zh": "玉清溟涬大梵符", "en": "Jade Purity Brahma Talisman", "es": "Talismán Brahma de la Pureza de Jade", "it": "Talismano Brahma della Purezza di Giada", "pinyin": "Yuqing Mingxing Dafan Fu" },
       "description": "Invokes Jade Purity realm. Highest clarity style.",
       "source": { "primary": "Highest Clarity scriptures" },
       "structure": { "type": "celestial_realm", "elements": ["Jade Purity symbols"] },
@@ -425,7 +425,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_023",
       "name": {
         "zh": "化通明符",
-        "en": "Hua Tong Ming Talisman",
+        "en": "Hua Tong Ming Talisman", "es": "Talismán Hua Tong Ming", "it": "Talismano Hua Tong Ming",
         "pinyin": "Hua Tong Ming Fu"
       },
       "description": "A potent folk-Daoist talisman known as the 'Transformer of Sha and Connector of Brightness'. Visually characterized by the 'Imperial Order' (Chiling) header, a prominent Red Nine-Fold Seal background (representing Earth stability), and vertical command script that functions to 'Suppress the House' (Zhen Zhai) and 'Dissolve Negative Energy' (Hua Sha), asserting that protection is 'Heavier than Fate' (Zhong Yu Ming).",
@@ -526,7 +526,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_024",
       "name": {
         "zh": "茅山和合符",
-        "en": "Maoshan Harmony Talisman",
+        "en": "Maoshan Harmony Talisman", "es": "Talismán de la Armonía Maoshan", "it": "Talismano dell'Armonia Maoshan",
         "pinyin": "Maoshan Hehe Fu"
       },
       "description": "A specific talisman from the Maoshan lineage designed to restore and bind romantic relationships. It invokes the Ancestral Master to decree 'Husband and Wife Love' (Fu Qi En Ai) and 'Morning and Night Thoughts of Each Other' (Zhao Si Mu Xiang), binding them eternally with one heart.",
@@ -582,7 +582,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_025",
       "name": {
         "zh": "五路財神符",
-        "en": "Five Roads Wealth God Talisman",
+        "en": "Five Roads Wealth God Talisman", "es": "Talismán del Dios de la Riqueza de los Cinco Caminos", "it": "Talismano del Dio della Ricchezza delle Cinque Strade",
         "pinyin": "Wulu Caishen Fu"
       },
       "description": "A potent wealth-attracting talisman invoking the Five Roads Wealth Gods (Wulu Caishen) led by Marshal Zhao Gongming. It dispatches spiritual forces to the five directions (East, West, South, North, Center) to 'Broadly Open Wealth Roads' (Guangkai Cailu) and ensure 'Fortune Flows Smoothly' (Caiyun Hengtong).",
@@ -639,7 +639,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_026",
       "name": {
         "zh": "鄧天君真形符",
-        "en": "Lord Deng Thunder Deity Talisman",
+        "en": "Lord Deng Thunder Deity Talisman", "es": "Talismán de la Deidad del Trueno del Señor Deng", "it": "Talismano della Divinità del Tuono del Signore Deng",
         "pinyin": "Deng Tianjun Zhenxing Fu"
       },
       "description": "A pictographic invocation depicting the True Form (Zhenxing) of Lord Deng, the commander of the Ministry of Thunder. This talisman acts as a direct deity manifestation, invoking his martial form to strike evil with his divine hammer and chisel.",
@@ -690,7 +690,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_027",
       "name": {
         "zh": "安魂定魄平安符",
-        "en": "Soul Stabilization Peace Talisman",
+        "en": "Soul Stabilization Peace Talisman", "es": "Talismán de Paz para la Estabilización del Alma", "it": "Talismano di Pace per la Stabilizzazione dell'Anima",
         "pinyin": "Anhun Dingpo Pingan Fu"
       },
       "description": "A talisman used to treat shock, anxiety, or spirit loss. It calls upon the Supreme Emperor (Shangdi) to 'Peacefully Stabilize' (An Zhen) the Hun and Po souls. The central command is framed by two undulating pillars with loops, representing the containment and settling of the Three Hun and Seven Po souls within the body.",
@@ -754,7 +754,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_028",
       "name": {
         "zh": "禁口舌符",
-        "en": "Anti-Gossip Talisman",
+        "en": "Anti-Gossip Talisman", "es": "Talismán Anti-Chismes", "it": "Talismano Anti-Pettegolezzi",
         "pinyin": "Jin Koushe Fu"
       },
       "description": "Used to silence rumors, stop slander, and resolve legal or bureaucratic disputes (Guanfei). The calligraphy stylized as a clamped mouth or lock 'Seals the four corners' of speech.",
@@ -794,7 +794,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_029",
       "name": {
         "zh": "天師五雷符",
-        "en": "Celestial Master's Five Thunders Talisman",
+        "en": "Celestial Master's Five Thunders Talisman", "es": "Talismán de los Cinco Truenos del Maestro Celestial", "it": "Talismano dei Cinque Tuoni del Maestro Celeste",
         "pinyin": "Tianshi Wulei Fu"
       },
       "description": "An authoritative system command from the Zhengyi (Celestial Master) lineage for the 'Five Thunder Bureaucracy'. It uses highly fluid 'cloud script' to mobilize thunder deities for bureaucratic exorcism and protection, grounded by the Bagua header in cosmic order.",
@@ -837,7 +837,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_030",
       "name": {
         "zh": "陽平治都功印",
-        "en": "Seal of the Yangping Jurisdiction",
+        "en": "Seal of the Yangping Jurisdiction", "es": "Sello de la Jurisdicción de Yangping", "it": "Sigillo della Giurisdizione di Yangping",
         "pinyin": "Yangping Zhi Dugong Yin"
       },
       "description": "This is a Seal of Authority (印), not a drawn talisman (符). It represents the power to command spirits and registers in the most sacred seal of office in the Celestial Master tradition, the Yangping Jurisdiction Seal. Its complex Nine-Fold Seal Script represents the highest bureaucratic authority.",
@@ -869,7 +869,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_031",
       "name": {
         "zh": "王馬二元帥符",
-        "en": "Talisman of Officers Wang and Ma",
+        "en": "Talisman of Officers Wang and Ma", "es": "Talismán de los Oficiales Wang y Ma", "it": "Talismano degli Ufficiali Wang e Ma",
         "pinyin": "Wang Ma Er Yuanshuai Fu"
       },
       "description": "A military command talisman invoking Officer Wang the Numinous and Marshal Ma for the purpose of dispatching spirit soldiers. It mobilizes 'Earth Soldiers and Water Soldiers' to execute specific exorcistic missions and provide martial protection.",
@@ -909,7 +909,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_032",
       "name": {
         "zh": "殷公把隘符",
-        "en": "Talisman of Duke Yin Guarding the Pass",
+        "en": "Talisman of Duke Yin Guarding the Pass", "es": "Talismán del Duque Yin Guardando el Paso", "it": "Talismano del Duca Yin che Protegge il Passo",
         "pinyin": "Yin Gong Ba Ai Fu"
       },
       "description": "A protective talisman invoking the thunder marshal Duke Yin to guard a specific physical location. It functions as a fortress-like barrier, creating an impassable spiritual seal against demons, intruders, and misfortune under the authority of the Northern Emperor.",
@@ -948,7 +948,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_033",
       "name": {
         "zh": "殷公隔符",
-        "en": "Talisman of Duke Yin for Separation",
+        "en": "Talisman of Duke Yin for Separation", "es": "Talismán del Duque Yin para la Separación", "it": "Talismano del Duca Yin per la Separazione",
         "pinyin": "Yin Gong Ge Fu"
       },
       "description": "A metaphysical screen talisman invoking Duke Yin to sever a connection between a person and a negative influence. Its purpose is to 'separate' (Ge) or screen out malevolent forces, miasmas, or ill intentions, effectively blocking them from reaching the bearer.",
@@ -990,7 +990,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_034",
       "name": {
         "zh": "天師除病符",
-        "en": "Celestial Master Healing Talisman",
+        "en": "Celestial Master Healing Talisman", "es": "Talismán de Sanación del Maestro Celestial", "it": "Talismano di Guarigione del Maestro Celeste",
         "pinyin": "Tianshi Chubing Fu"
       },
       "description": "A powerful healing talisman from the Zhengyi lineage that directly invokes the authority of the first Celestial Master, Zhang Daoling. The text commands his presence to 'eliminate sickness and protect the body' (除病保身). The talisman's structure resembles two gourds or bells, sacred vessels for capturing and transforming pathogenic qi.",
@@ -1027,7 +1027,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_035",
       "name": {
         "zh": "關聖帝君護身符",
-        "en": "Lord Guan's Protection Talisman",
+        "en": "Lord Guan's Protection Talisman", "es": "Talismán de Protección del Señor Guan", "it": "Talismano di Protezione del Signore Guan",
         "pinyin": "Guan Sheng Di Jun Hushen Fu"
       },
       "description": "A powerful personal protection talisman invoking Lord Guan's martial righteousness to guard the bearer's body. The outer gourd-shaped calligraphy acts as a sacred vessel to neutralize negative Qi, while the central command calls upon the deified warrior's supreme authority to ensure safety.",
@@ -1067,7 +1067,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_036",
       "name": {
         "zh": "三霄娘娘制煞符",
-        "en": "Talisman of the Sanxiao Goddesses",
+        "en": "Talisman of the Sanxiao Goddesses", "es": "Talismán de las Diosas Sanxiao", "it": "Talismano delle Dee Sanxiao",
         "pinyin": "Sanxiao Niangniang Zhi Sha Fu"
       },
       "description": "A potent protective talisman invoking the Three Heavenly Goddesses (Sanxiao Niangniang): Qiongxiao, Bixiao, and Yunxiao. They are formidable deities summoned to 'Control and Neutralize Sha Qi' (Zhi Sha Hua Wu), offering powerful protection against curses, spiritual attacks, and general misfortune.",
@@ -1109,7 +1109,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_037",
       "name": {
         "zh": "北斗解除四厄符",
-        "en": "Northern Dipper Talisman for Releasing Misfortunes",
+        "en": "Northern Dipper Talisman for Releasing Misfortunes", "es": "Talismán de la Osa Mayor para Liberar Desgracias", "it": "Talismano del Grande Carro per Liberare le Sventure",
         "pinyin": "Beidou Jiechu Si'e Fu"
       },
       "description": "A specific protective talisman invoking the Seven Primal Lords of the Northern Dipper (Ursa Major). Its function is to 'release' (jiechu) the 'Four Misfortunes' (si'e) — traditionally calamities associated with fire, water, weapons, and legal entanglements.",
@@ -1142,7 +1142,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_038",
       "name": {
         "zh": "天蓬印",
-        "en": "Seal of Marshal Tianpeng",
+        "en": "Seal of Marshal Tianpeng", "es": "Sello del Mariscal Tianpeng", "it": "Sigillo del Marisciallo Tianpeng",
         "pinyin": "Tianpeng Yin"
       },
       "description": "This is a Seal of Authority (印), not a drawn talisman (符). It represents the power to command spirits and thunder deities in the name of Marshal Tianpeng, a paramount exorcistic deity in Daoism. It is used to stamp official commands to spirit-soldiers.",
@@ -1174,7 +1174,7 @@ const DAOIST_REMEDIES_DB = {
       "id": "fulu_039",
       "name": {
         "zh": "斬病除死符",
-        "en": "Talisman for Expelling Sickness and Death",
+        "en": "Talisman for Expelling Sickness and Death", "es": "Talismán para Expulsar la Enfermedad y la Muerte", "it": "Talismano per Scacciare la Malattia e la Morte",
         "pinyin": "Zhan Bing Chu Si Fu"
       },
       "description": "A powerful exorcistic talisman designed to confront and banish the root spirits of illness (病) and death (死). It employs a stark, aggressive form of 'ghost script' to sever a person's connection to pathogenic qi and the forces of decay.",
@@ -1207,7 +1207,7 @@ const DAOIST_REMEDIES_DB = {
   "fuzhou": [
     {
       "id": "fuzhou_001",
-      "name": { "zh": "淨天地神咒", "en": "Divine Incantation for Purifying Heaven and Earth", "pinyin": "Jing Tiandi Shenzhou" },
+      "name": { "zh": "淨天地神咒", "en": "Divine Incantation for Purifying Heaven and Earth", "es": "Encantación Divina para Purificar el Cielo y la Tierra", "it": "Incantesimo Divino per Purificare il Cielo e la Terra", "pinyin": "Jing Tiandi Shenzhou" },
       "description": "Fundamental Daoist incantation used to purify ritual space before ceremonies.",
       "text": {
         "chinese": "天地自然，穢氣分散，洞中玄虛，晃朗太元。八方威神，使我自然。靈寶符命，普告九天；幹羅達那，洞罡太玄；斬妖縛邪，度人萬千。中山神咒，元始玉文，持誦一遍，卻病延年；按行五嶽，八海知聞；魔王束首，侍衛我軒；凶穢消散，道炁常存。",
@@ -1219,7 +1219,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fuzhou_002",
-      "name": { "zh": "金光神咒", "en": "Golden Light Divine Incantation", "pinyin": "Jinguang Shenzhou" },
+      "name": { "zh": "金光神咒", "en": "Golden Light Divine Incantation", "es": "Encantación Divina de la Luz Dorada", "it": "Incantesimo Divino della Luce Dorata", "pinyin": "Jinguang Shenzhou" },
       "description": "Incantation for protection and embodiment of golden light energy.",
       "text": {
         "chinese": "天地玄宗，萬炁本根。廣修億劫，證吾神通。三界內外，惟道獨尊。體有金光，覆映吾身。視之不見，聽之不聞。包羅天地，養育群生. 受持萬遍，身有光明. 三界侍衛，五帝司迎. 萬神朝禮，役使雷霆. 鬼妖喪膽，精怪忘形. 內有霹靂，雷神隱名. 洞慧交徹，五炁騰騰. 金光速現，覆護真人。",
@@ -1231,7 +1231,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fuzhou_006",
-      "name": { "zh": "天蓬咒", "en": "Heavenly Mound Incantation", "pinyin": "Tianpeng Zhou" },
+      "name": { "zh": "天蓬咒", "en": "Heavenly Mound Incantation", "es": "Encantación del Montículo Celestial", "it": "Incantesimo del Tumulo Celeste", "pinyin": "Tianpeng Zhou" },
       "description": "Incantation of Marshal Tianpeng, powerful exorcistic invocation.",
       "text": {
         "chinese": "天蓬天蓬，九元煞童。五丁都司，高刁北翁。七政八靈，太上皓凶。長顱巨獸，手把帝鍾。素梟三神，嚴駕夔龍. 威劍神王，斬邪滅踪. 紫氣乘天，丹霞赫衝. 吞魔食鬼，橫身飲風. 蒼舌綠齒，四目老翁. 天丁力士，威南御凶. 天騶激戾，威北銜鋒. 三十萬兵，衛我九重. 劈屍千里，掃卻不祥。",
@@ -1246,7 +1246,7 @@ const DAOIST_REMEDIES_DB = {
   "fengshui": [
     {
       "id": "fs_001",
-      "name": { "zh": "宅經鎮宅法", "en": "Zhaijing Residence Stabilization", "pinyin": "Zhaijing Zhenzhai Fa" },
+      "name": { "zh": "宅經鎮宅法", "en": "Zhaijing Residence Stabilization", "es": "Estabilización de la Residencia Zhaijing", "it": "Stabilizzazione della Residenza Zhaijing", "pinyin": "Zhaijing Zhenzhai Fa" },
       "description": "Classical environmental remedy for stabilizing the energetic flow of a residence and protecting against negative directional influences (Sha Qi).",
       "source": { "primary": "Zhengtong Daozang", "textTitle": "Huangdi Zhaijing", "references": ["DZ 1024"] },
       "usage": ["environmental_stabilization", "protection", "prosperity", "home_harmony"],
@@ -1255,7 +1255,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "fs_002",
-      "name": { "zh": "葬書五行氣脈法", "en": "Five Element Qi-Vein Stabilization", "pinyin": "Zangshu Wuxing Qimai Fa" },
+      "name": { "zh": "葬書五行氣脈法", "en": "Five Element Qi-Vein Stabilization", "es": "Estabilización del Qi-Vena de los Cinco Elementos", "it": "Stabilizzazione del Qi-Vena dei Cinque Elementi", "pinyin": "Zangshu Wuxing Qimai Fa" },
       "description": "Rooted in the foundational text of Feng Shui, focusing on the accumulation of vital Qi through environmental alignment.",
       "source": { "primary": "Zhengtong Daozang", "textTitle": "Zangshu", "references": ["DZ 1019"] },
       "usage": ["qi_accumulation", "vitality", "wealth_retention", "environmental_harmony"],
@@ -1265,7 +1265,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_S",
-      "name": { "zh": "離宮風水法 — 南方", "en": "Li Palace Feng Shui — South (Fame & Reputation)", "pinyin": "Li Gong Fengshui Fa — Nan Fang" },
+      "name": { "zh": "離宮風水法 — 南方", "en": "Li Palace Feng Shui — South (Fame & Reputation)", "es": "Feng Shui del Palacio Li — Sur (Fama y Reputación)", "it": "Feng Shui del Palazzo Li — Sud (Fama e Reputazione)", "pinyin": "Li Gong Fengshui Fa — Nan Fang" },
       "bagua": {
         "trigram": "Li", "trigram_zh": "離", "binary": "101",
         "direction": "S", "angle_canvas_deg": -90,
@@ -1303,7 +1303,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_SW",
-      "name": { "zh": "坤宮風水法 — 西南", "en": "Kun Palace Feng Shui — Southwest (Love & Relationships)", "pinyin": "Kun Gong Fengshui Fa — Xi Nan" },
+      "name": { "zh": "坤宮風水法 — 西南", "en": "Kun Palace Feng Shui — Southwest (Love & Relationships)", "es": "Feng Shui del Palacio Kun — Suroeste (Amor y Relaciones)", "it": "Feng Shui del Palazzo Kun — Sudovest (Amore e Relazioni)", "pinyin": "Kun Gong Fengshui Fa — Xi Nan" },
       "bagua": {
         "trigram": "Kun", "trigram_zh": "坤", "binary": "000",
         "direction": "SW", "angle_canvas_deg": -135,
@@ -1340,7 +1340,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_W",
-      "name": { "zh": "兌宮風水法 — 西方", "en": "Dui Palace Feng Shui — West (Children & Creativity)", "pinyin": "Dui Gong Fengshui Fa — Xi Fang" },
+      "name": { "zh": "兌宮風水法 — 西方", "en": "Dui Palace Feng Shui — West (Children & Creativity)", "es": "Feng Shui del Palacio Dui — Oeste (Hijos y Creatividad)", "it": "Feng Shui del Palazzo Dui — Ovest (Figli e Creatività)", "pinyin": "Dui Gong Fengshui Fa — Xi Fang" },
       "bagua": {
         "trigram": "Dui", "trigram_zh": "兌", "binary": "011",
         "direction": "W", "angle_canvas_deg": 180,
@@ -1376,7 +1376,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_NW",
-      "name": { "zh": "乾宮風水法 — 西北", "en": "Qian Palace Feng Shui — Northwest (Helpful People & Travel)", "pinyin": "Qian Gong Fengshui Fa — Xi Bei" },
+      "name": { "zh": "乾宮風水法 — 西北", "en": "Qian Palace Feng Shui — Northwest (Helpful People & Travel)", "es": "Feng Shui del Palacio Qian — Noroeste (Personas Ayudantes y Viajes)", "it": "Feng Shui del Palazzo Qian — Nordovest (Persone Utili e Viaggi)", "pinyin": "Qian Gong Fengshui Fa — Xi Bei" },
       "bagua": {
         "trigram": "Qian", "trigram_zh": "乾", "binary": "111",
         "direction": "NW", "angle_canvas_deg": 135,
@@ -1411,7 +1411,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_N",
-      "name": { "zh": "坎宮風水法 — 北方", "en": "Kan Palace Feng Shui — North (Career & Life Path)", "pinyin": "Kan Gong Fengshui Fa — Bei Fang" },
+      "name": { "zh": "坎宮風水法 — 北方", "en": "Kan Palace Feng Shui — North (Career & Life Path)", "es": "Feng Shui del Palacio Kan — Norte (Carrera y Camino de Vida)", "it": "Feng Shui del Palazzo Kan — Nord (Carriera e Percorso di Vita)", "pinyin": "Kan Gong Fengshui Fa — Bei Fang" },
       "bagua": {
         "trigram": "Kan", "trigram_zh": "坎", "binary": "010",
         "direction": "N", "angle_canvas_deg": 90,
@@ -1446,7 +1446,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_NE",
-      "name": { "zh": "艮宮風水法 — 東北", "en": "Gen Palace Feng Shui — Northeast (Knowledge & Wisdom)", "pinyin": "Gen Gong Fengshui Fa — Dong Bei" },
+      "name": { "zh": "艮宮風水法 — 東北", "en": "Gen Palace Feng Shui — Northeast (Knowledge & Wisdom)", "es": "Feng Shui del Palacio Gen — Noreste (Conocimiento y Sabiduría)", "it": "Feng Shui del Palazzo Gen — Nordest (Conoscenza e Saggezza)", "pinyin": "Gen Gong Fengshui Fa — Dong Bei" },
       "bagua": {
         "trigram": "Gen", "trigram_zh": "艮", "binary": "100",
         "direction": "NE", "angle_canvas_deg": 45,
@@ -1481,7 +1481,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_E",
-      "name": { "zh": "震宮風水法 — 東方", "en": "Zhen Palace Feng Shui — East (Family & Health)", "pinyin": "Zhen Gong Fengshui Fa — Dong Fang" },
+      "name": { "zh": "震宮風水法 — 東方", "en": "Zhen Palace Feng Shui — East (Family & Health)", "es": "Feng Shui del Palacio Zhen — Este (Familia y Salud)", "it": "Feng Shui del Palazzo Zhen — Est (Famiglia e Salute)", "pinyin": "Zhen Gong Fengshui Fa — Dong Fang" },
       "bagua": {
         "trigram": "Zhen", "trigram_zh": "震", "binary": "001",
         "direction": "E", "angle_canvas_deg": 0,
@@ -1517,7 +1517,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_SE",
-      "name": { "zh": "巽宮風水法 — 東南", "en": "Xun Palace Feng Shui — Southeast (Wealth & Abundance)", "pinyin": "Xun Gong Fengshui Fa — Dong Nan" },
+      "name": { "zh": "巽宮風水法 — 東南", "en": "Xun Palace Feng Shui — Southeast (Wealth & Abundance)", "es": "Feng Shui del Palacio Xun — Sureste (Riqueza y Abundancia)", "it": "Feng Shui del Palazzo Xun — Sudest (Ricchezza e Abbondanza)", "pinyin": "Xun Gong Fengshui Fa — Dong Nan" },
       "bagua": {
         "trigram": "Xun", "trigram_zh": "巽", "binary": "110",
         "direction": "SE", "angle_canvas_deg": -45,
@@ -1554,7 +1554,7 @@ const DAOIST_REMEDIES_DB = {
 
     {
       "id": "fs_bagua_CENTER",
-      "name": { "zh": "太極中宮風水法 — 中央", "en": "Taiji Central Palace Feng Shui — Center (Health & Unity)", "pinyin": "Taiji Zhong Gong Fengshui Fa — Zhong Yang" },
+      "name": { "zh": "太極中宮風水法 — 中央", "en": "Taiji Central Palace Feng Shui — Center (Health & Unity)", "es": "Feng Shui del Palacio Central Taiji — Centro (Salud y Unidad)", "it": "Feng Shui del Palazzo Centrale Taiji — Centro (Salute e Unità)", "pinyin": "Taiji Zhong Gong Fengshui Fa — Zhong Yang" },
       "bagua": {
         "trigram": "Taiji", "trigram_zh": "太極", "binary": "N/A",
         "direction": "Center", "angle_canvas_deg": null,
@@ -1592,7 +1592,7 @@ const DAOIST_REMEDIES_DB = {
   "medicine": [
     {
       "id": "med_001",
-      "name": { "zh": "坎離水火既濟法", "en": "Kan-Li Fire and Water Balancing (Golden Elixir)", "pinyin": "Kan Li Shui Huo Ji Ji Fa" },
+      "name": { "zh": "坎離水火既濟法", "en": "Kan-Li Fire and Water Balancing (Golden Elixir)", "es": "Equilibrio de Fuego y Agua Kan-Li (Elixir Dorado)", "it": "Equilibrio Fuoco e Acqua Kan-Li (Elisir d'Oro)", "pinyin": "Kan Li Shui Huo Ji Ji Fa" },
       "description": "Core Neidan (Internal Alchemy) practice for harmonizing the Heart-Fire and Kidney-Water, preventing alchemical imbalance and promoting longevity.",
       "source": { "primary": "Zhengtong Daozang", "textTitle": "Zhouyi Cantong Qi", "references": ["DZ 999"] },
       "usage": ["internal_alchemy", "longevity", "vitality", "heart_kidney_harmony"],
@@ -1600,7 +1600,7 @@ const DAOIST_REMEDIES_DB = {
     },
     {
       "id": "med_002",
-      "name": { "zh": "五臟六腑調和法", "en": "Harmonizing the Five Organs and Six Fu", "pinyin": "Wuzang Liufu Tiaohe Fa" },
+      "name": { "zh": "五臟六腑調和法", "en": "Harmonizing the Five Organs and Six Fu", "es": "Armonización de los Cinco Órganos y las Seis Fu", "it": "Armonizzazione dei Cinque Organi e dei Sei Fu", "pinyin": "Wuzang Liufu Tiaohe Fa" },
       "description": "Daoist medical discipline for regulating the internal organ systems through Bagua and Five Element correspondences.",
       "source": { "primary": "Common Daoist Medical Canon", "textTitle": "Huangdi Neijing" },
       "usage": ["organ_health", "five_elements_medicine", "healing", "preventive_care"],

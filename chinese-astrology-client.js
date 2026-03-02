@@ -61,13 +61,37 @@ const CHINESE_ASTROLOGY_API = {
  */
 const ChineseAstrologyDisplay = {
     
+    // Current language (set by render)
+    lang: 'en',
+    
+    // I18N helper - checks AstrologyI18N first (detailed astrology labels), then I18N from data.js
+    t(key) {
+        // Priority 1: AstrologyI18N (dedicated astrology translations for all languages)
+        if (typeof AstrologyI18N !== 'undefined' && AstrologyI18N.translations?.[this.lang]?.[key]) {
+            return AstrologyI18N.translations[this.lang][key];
+        }
+        // Priority 2: I18N from data.js (general UI translations)
+        if (typeof I18N !== 'undefined' && I18N[this.lang]?.[key]) {
+            return I18N[this.lang][key];
+        }
+        // Fallback: AstrologyI18N English, then I18N English, then key
+        if (typeof AstrologyI18N !== 'undefined' && AstrologyI18N.translations?.en?.[key]) {
+            return AstrologyI18N.translations.en[key];
+        }
+        if (typeof I18N !== 'undefined' && I18N['en']?.[key]) {
+            return I18N['en'][key];
+        }
+        return key;
+    },
+    
     /**
      * Main render function - routes to appropriate sections
      */
-    render(data, container, hexagramTrigrams = null) {
+    render(data, container, hexagramTrigrams = null, lang = 'en') {
+        this.lang = lang || 'en';
         container.innerHTML = '';
         if (!data?.data) {
-            container.innerHTML = '<div class="error">No astrology data available</div>';
+            container.innerHTML = `<div class="error">${this.t('noAstrologyData')}</div>`;
             return;
         }
         const d = data.data;
@@ -113,18 +137,18 @@ const ChineseAstrologyDisplay = {
         const div = document.createElement('div');
         div.className = 'section ayanamsa';
         div.innerHTML = `
-            <h3>📍 Ayanamsa (Longitude Correction) <span class="zh">經度修正</span></h3>
+            <h3>📍 ${this.t('ayanamsa')} <span class="zh">經度修正</span></h3>
             <div class="ayanamsa-grid">
                 <div class="info-card">
-                    <span class="label">Reference Meridian</span>
+                    <span class="label">${this.t('referenceMeridian')}</span>
                     <span class="value">${a.referenceMeridian}°E</span>
                 </div>
                 <div class="info-card">
-                    <span class="label">Time Correction</span>
+                    <span class="label">${this.t('timeCorrection')}</span>
                     <span class="value">${a.timeDifference}</span>
                 </div>
                 <div class="info-card highlight">
-                    <span class="label">True Solar Time</span>
+                    <span class="label">${this.t('trueSolarTime')}</span>
                     <span class="value">${new Date(a.trueSolarTime).toLocaleTimeString()}</span>
                 </div>
             </div>`;
@@ -139,7 +163,7 @@ const ChineseAstrologyDisplay = {
         div.className = 'section bazi current';
         div.innerHTML = `
             <div class="section-header">
-                <h3>⚡ Current Sky (BaZi) <span class="zh">天時八字</span></h3>
+                <h3>⚡ ${this.t('currentSky')} <span class="zh">天時八字</span></h3>
                 <div class="time-badge">${new Date().toLocaleString()}</div>
             </div>
             <div class="bazi-grid">
@@ -157,8 +181,8 @@ const ChineseAstrologyDisplay = {
         div.className = 'section bazi birth';
         div.innerHTML = `
             <div class="section-header">
-                <h3>🏛️ Birth Chart (BaZi) <span class="zh">命盤八字</span></h3>
-                <div class="birth-badge">Natal Chart</div>
+                <h3>🏛️ ${this.t('birthChart')} <span class="zh">命盤八字</span></h3>
+                <div class="birth-badge">${this.t('natalChart')}</div>
             </div>
             <div class="bazi-grid">
                 ${this.renderPillarsTable(bazi, current)}
@@ -179,13 +203,13 @@ const ChineseAstrologyDisplay = {
         };
         const pillars = ['hour', 'day', 'month', 'year'];
         const labels = { 
-            hour: '<span class="pillar-zh">時柱</span><span class="pillar-en">Hour</span>', 
-            day: '<span class="pillar-zh">日柱</span><span class="pillar-en">Day</span>', 
-            month: '<span class="pillar-zh">月柱</span><span class="pillar-en">Month</span>', 
-            year: '<span class="pillar-zh">年柱</span><span class="pillar-en">Year</span>' 
+            hour: `<span class="pillar-zh">時柱</span><span class="pillar-en">${this.t('hour')}</span>`, 
+            day: `<span class="pillar-zh">日柱</span><span class="pillar-en">${this.t('day')}</span>`, 
+            month: `<span class="pillar-zh">月柱</span><span class="pillar-en">${this.t('month')}</span>`, 
+            year: `<span class="pillar-zh">年柱</span><span class="pillar-en">${this.t('year')}</span>` 
         };
         
-        let html = '<div class="pillars-table"><table><thead><tr><th>Pillar</th><th>Heavenly Stem<br><span class="sub">天干</span></th><th>Earthly Branch<br><span class="sub">地支</span></th><th>Hidden Stems<br><span class="sub">藏干</span></th></tr></thead><tbody>';
+        let html = `<div class="pillars-table"><table><thead><tr><th>${this.t('pillar')}</th><th>${this.t('heavenlyStem')}<br><span class="sub">天干</span></th><th>${this.t('earthlyBranch')}<br><span class="sub">地支</span></th><th>${this.t('hiddenStems')}<br><span class="sub">藏干</span></th></tr></thead><tbody>`;
         
         pillars.forEach(p => {
             const data = bazi[p];
@@ -231,14 +255,14 @@ const ChineseAstrologyDisplay = {
         
         let starsHtml = '';
         if (showStars && bazi.shenSha) {
-            starsHtml = '<div class="stars-panel"><h4>Symbolic Stars <span class="zh">神煞</span></h4><div class="stars-grid">';
+            starsHtml = `<div class="stars-panel"><h4>${this.t('symbolicStars')} <span class="zh">神煞</span></h4><div class="stars-grid">`;
             const starOrder = ['noblePerson', 'peachBlossom', 'academicStar', 'travellingHorse', 'goatBlade'];
             const starNames = {
-                noblePerson: { zh: '天乙', name: 'Noble Person' },
-                peachBlossom: { zh: '桃花', name: 'Peach Blossom' },
-                academicStar: { zh: '文昌', name: 'Academic' },
-                travellingHorse: { zh: '驛馬', name: 'Travelling' },
-                goatBlade: { zh: '羊刃', name: 'Goat Blade' }
+                noblePerson: { zh: '天乙', name: this.t('noblePerson') },
+                peachBlossom: { zh: '桃花', name: this.t('peachBlossom') },
+                academicStar: { zh: '文昌', name: this.t('academicStar') },
+                travellingHorse: { zh: '驛馬', name: this.t('travellingHorse') },
+                goatBlade: { zh: '羊刃', name: this.t('goatBlade') }
             };
             
             starOrder.forEach(key => {
@@ -260,7 +284,7 @@ const ChineseAstrologyDisplay = {
         return `<div class="daymaster-panel">
             <div class="dm-card" data-element="${dm.element}">
                 <div class="dm-header">
-                    <h4>Day Master <span class="zh">日主</span></h4>
+                    <h4>${this.t('dayMaster')} <span class="zh">日主</span></h4>
                     <span class="element-tag ${dm.element?.toLowerCase()}">${dm.element}</span>
                 </div>
                 <div class="dm-display">
@@ -272,12 +296,12 @@ const ChineseAstrologyDisplay = {
                 </div>
                 <div class="strength-bar">
                     <div class="st-header">
-                        <span class="st-label">Strength <span class="zh">強弱</span></span>
+                        <span class="st-label">${this.t('strength')} <span class="zh">強弱</span></span>
                         <span class="st-result ${st.result?.toLowerCase().replace(/\s+/g, '-')}">${st.result || 'Unknown'}</span>
                     </div>
                     <div class="st-meter"><div class="st-fill" style="width:${Math.min(100, Math.max(0, 50+(st.score||0)))}%"></div></div>
                     <div class="yong-shen">
-                        <span class="ys-label">Useful God <span class="zh">用神</span>:</span>
+                        <span class="ys-label">${this.t('yongShen')} <span class="zh">用神</span>:</span>
                         <span class="ys-element ${st.yongShen?.toLowerCase()}">${st.yongShen || 'N/A'}</span>
                     </div>
                 </div>
@@ -314,21 +338,21 @@ const ChineseAstrologyDisplay = {
         
         div.innerHTML = `
             <div class="bagua-main-header">
-                <h3>☯ Bagua (Eight Trigrams) <span class="zh">八卦</span></h3>
-                <p class="bagua-subtitle">Hexagram Trigrams in Pre-Heaven & Post-Heaven Arrangements</p>
+                <h3>☯ ${this.t('bagua')} <span class="zh">八卦</span></h3>
+                <p class="bagua-subtitle">${this.t('baguaSubtitle')}</p>
             </div>
             
             <!-- Selected Hexagram Trigrams Display -->
             <div class="selected-hexagram-trigrams">
                 <div class="trigrams-title">
                     <span class="title-icon">◈</span>
-                    <span>Selected Hexagram Trigrams</span>
+                    <span>${this.t('selectedHexagramTrigrams')}</span>
                     <span class="title-zh">本卦兩儀</span>
                 </div>
                 <div class="trigrams-pair-display">
                     <div class="trig-display upper-trigram">
                         <div class="trig-label">
-                            <span class="label-en">UPPER TRIGRAM</span>
+                            <span class="label-en">${this.t('upperTrigram')}</span>
                             <span class="label-zh">上卦 (外卦)</span>
                         </div>
                         <div class="trig-content">
@@ -343,13 +367,13 @@ const ChineseAstrologyDisplay = {
                     
                     <div class="trigrams-divider">
                         <span class="divider-line"></span>
-                        <span class="divider-text">over</span>
+                        <span class="divider-text">${this.t('over')}</span>
                         <span class="divider-line"></span>
                     </div>
                     
                     <div class="trig-display lower-trigram">
                         <div class="trig-label">
-                            <span class="label-en">LOWER TRIGRAM</span>
+                            <span class="label-en">${this.t('lowerTrigram')}</span>
                             <span class="label-zh">下卦 (内卦)</span>
                         </div>
                         <div class="trig-content">
@@ -372,8 +396,8 @@ const ChineseAstrologyDisplay = {
                     <div class="arrangement-header">
                         <div class="header-icon">☯</div>
                         <div class="header-titles">
-                            <h4>Xian Tian <span class="zh">先天八卦</span></h4>
-                            <span class="arrangement-desc">Fu Xi Arrangement · Primordial Nature</span>
+                            <h4>${this.t('xiantian')} <span class="zh">先天八卦</span></h4>
+                            <span class="arrangement-desc">${this.t('xiantianDesc')}</span>
                         </div>
                     </div>
                     
@@ -383,7 +407,7 @@ const ChineseAstrologyDisplay = {
                         <div class="selected-trigrams-info">
                             <div class="trig-info-card upper" data-element="${upperXT?.e}">
                                 <div class="card-header">
-                                    <span class="position-label">Upper Position</span>
+                                    <span class="position-label">${this.t('upperPosition')}</span>
                                     <span class="direction-badge">${upperXT ? this.getXianTianDirection(upperXT.n) : ''}</span>
                                 </div>
                                 <div class="card-body">
@@ -392,13 +416,13 @@ const ChineseAstrologyDisplay = {
                                         <span class="zh">${upperXT?.z}</span>
                                         <span class="en">${upperXT?.n}</span>
                                     </div>
-                                    <div class="nature">${upperXT?.nature || ''}</div>
+                                    <div class="nature">${upperXT ? this.getNature(upperXT.nature) : ''}</div>
                                 </div>
                             </div>
                             
                             <div class="trig-info-card lower" data-element="${lowerXT?.e}">
                                 <div class="card-header">
-                                    <span class="position-label">Lower Position</span>
+                                    <span class="position-label">${this.t('lowerPosition')}</span>
                                     <span class="direction-badge">${lowerXT ? this.getXianTianDirection(lowerXT.n) : ''}</span>
                                 </div>
                                 <div class="card-body">
@@ -407,14 +431,14 @@ const ChineseAstrologyDisplay = {
                                         <span class="zh">${lowerXT?.z}</span>
                                         <span class="en">${lowerXT?.n}</span>
                                     </div>
-                                    <div class="nature">${lowerXT?.nature || ''}</div>
+                                    <div class="nature">${lowerXT ? this.getNature(lowerXT.nature) : ''}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="arrangement-meaning">
-                        <strong>Xian Tian Meaning:</strong> Represents primordial nature, congenital tendencies, and spiritual essence before manifesting in the physical world.
+                        <strong>${this.t('xiantianMeaningTitle')}</strong> ${this.t('xiantianMeaning')}
                     </div>
                 </div>
                 
@@ -423,8 +447,8 @@ const ChineseAstrologyDisplay = {
                     <div class="arrangement-header">
                         <div class="header-icon">☯</div>
                         <div class="header-titles">
-                            <h4>Hou Tian <span class="zh">后天八卦</span></h4>
-                            <span class="arrangement-desc">King Wen Arrangement · Manifest World</span>
+                            <h4>${this.t('houtian')} <span class="zh">后天八卦</span></h4>
+                            <span class="arrangement-desc">${this.t('houtianDesc')}</span>
                         </div>
                     </div>
                     
@@ -434,7 +458,7 @@ const ChineseAstrologyDisplay = {
                         <div class="selected-trigrams-info">
                             <div class="trig-info-card upper" data-element="${upperHT?.e}">
                                 <div class="card-header">
-                                    <span class="position-label">Upper Position</span>
+                                    <span class="position-label">${this.t('upperPosition')}</span>
                                     <span class="direction-badge">${upperHT ? this.getHouTianDirection(upperHT.n) : ''}</span>
                                 </div>
                                 <div class="card-body">
@@ -443,13 +467,13 @@ const ChineseAstrologyDisplay = {
                                         <span class="zh">${upperHT?.z}</span>
                                         <span class="en">${upperHT?.n}</span>
                                     </div>
-                                    <div class="season">${upperHT?.season || ''}</div>
+                                    <div class="season">${upperHT ? this.getSeason(upperHT.season) : ''}</div>
                                 </div>
                             </div>
                             
                             <div class="trig-info-card lower" data-element="${lowerHT?.e}">
                                 <div class="card-header">
-                                    <span class="position-label">Lower Position</span>
+                                    <span class="position-label">${this.t('lowerPosition')}</span>
                                     <span class="direction-badge">${lowerHT ? this.getHouTianDirection(lowerHT.n) : ''}</span>
                                 </div>
                                 <div class="card-body">
@@ -458,14 +482,14 @@ const ChineseAstrologyDisplay = {
                                         <span class="zh">${lowerHT?.z}</span>
                                         <span class="en">${lowerHT?.n}</span>
                                     </div>
-                                    <div class="season">${lowerHT?.season || ''}</div>
+                                    <div class="season">${lowerHT ? this.getSeason(lowerHT.season) : ''}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="arrangement-meaning">
-                        <strong>Hou Tian Meaning:</strong> Represents manifested reality, temporal influences, seasonal cycles, and practical application in daily life.
+                        <strong>${this.t('houtianMeaningTitle')}</strong> ${this.t('houtianMeaning')}
                     </div>
                 </div>
                 
@@ -476,13 +500,13 @@ const ChineseAstrologyDisplay = {
                 <div class="hexagram-title">
                     <span class="hx-number">${hx.hexagramNumber || '?'}</span>
                     <span class="hx-name-zh">${hx.hexagramName?.split(' ')[0] || ''}</span>
-                    <span class="hx-name-en">${hx.hexagramName?.split(' ').slice(1).join(' ') || 'Hexagram'}</span>
+                    <span class="hx-name-en">${hx.hexagramName?.split(' ').slice(1).join(' ') || this.t('hexagram') || 'Hexagram'}</span>
                 </div>
                 <div class="hexagram-lines-display">
                     ${(hx.lines || [1,1,1,1,1,1]).slice().reverse().map((l, i) => 
                         `<div class="hx-line ${l?'yang':'yin'} ${i<3?'lower':'upper'}">
                             <span class="line-visual">${l?'━━━━━━━':'━━   ━━'}</span>
-                            <span class="line-position">${['6th','5th','4th','3rd','2nd','1st'][i]}</span>
+                            <span class="line-position">${this.getOrdinal(i)}</span>
                         </div>`
                     ).join('')}
                 </div>
@@ -710,8 +734,8 @@ const ChineseAstrologyDisplay = {
         
         div.innerHTML = `
             <div class="hetu-header">
-                <h3>🌊 He Tu <span class="zh">河图</span></h3>
-                <span class="hetu-subtitle">River Map · Generation Sequence</span>
+                <h3>🌊 ${this.t('hetu')} <span class="zh">河图</span></h3>
+                <span class="hetu-subtitle">${this.t('hetuSubtitle')}</span>
             </div>
             <div class="hetu-container">
                 <div class="hetu-diagram">
@@ -750,24 +774,24 @@ const ChineseAstrologyDisplay = {
                 </div>
                 <div class="hetu-data">
                     <div class="hetu-numbers-card">
-                        <h4>Personal Numbers <span class="zh">個人數字</span></h4>
+                        <h4>${this.t('personalNumbers')} <span class="zh">個人數字</span></h4>
                         <div class="numbers-grid">
-                            <div class="num-item year"><span class="label">Year</span><span class="value">${pn.yearNumber || '-'}</span></div>
-                            <div class="num-item month"><span class="label">Month</span><span class="value">${pn.monthNumber || '-'}</span></div>
-                            <div class="num-item day"><span class="label">Day</span><span class="value">${pn.dayNumber || '-'}</span></div>
-                            <div class="num-item hour"><span class="label">Hour</span><span class="value">${pn.hourNumber || '-'}</span></div>
-                            <div class="num-item life highlight"><span class="label">Life</span><span class="value">${pn.lifeNumber || '-'}</span></div>
-                            <div class="num-item destiny highlight"><span class="label">Destiny</span><span class="value">${pn.destinyNumber || '-'}</span></div>
+                            <div class="num-item year"><span class="label">${this.t('yearLabel')}</span><span class="value">${pn.yearNumber || '-'}</span></div>
+                            <div class="num-item month"><span class="label">${this.t('monthLabel')}</span><span class="value">${pn.monthNumber || '-'}</span></div>
+                            <div class="num-item day"><span class="label">${this.t('dayLabel')}</span><span class="value">${pn.dayNumber || '-'}</span></div>
+                            <div class="num-item hour"><span class="label">${this.t('hourLabel')}</span><span class="value">${pn.hourNumber || '-'}</span></div>
+                            <div class="num-item life highlight"><span class="label">${this.t('lifeLabel')}</span><span class="value">${pn.lifeNumber || '-'}</span></div>
+                            <div class="num-item destiny highlight"><span class="label">${this.t('destinyLabel')}</span><span class="value">${pn.destinyNumber || '-'}</span></div>
                         </div>
                     </div>
                     <div class="hetu-flow-card">
-                        <h4>Elemental Flow <span class="zh">五行流通</span></h4>
-                        <div class="flow-sequence">${(hetu.elementalFlow?.sequence || []).map((e,i,a) => 
+                        <h4>${this.t('elementalFlow')} <span class="zh">五行流通</span></h4>
+                        <div class="flow-sequence">${(hetu.elementalFlow?.sequence || []).map((e,i,a) =>
                             `<span class="flow-item ${e.toLowerCase()}">${e} ${this.getElementZh(e)}</span>${i<a.length-1?'<span class="flow-arrow">→</span>':''}`
                         ).join('')}</div>
                         <div class="flow-analysis">
-                            <div class="dominant"><span class="label">Dominant:</span><span class="value ${hetu.elementalFlow?.dominant?.toLowerCase()}">${hetu.elementalFlow?.dominant || 'N/A'}</span></div>
-                            <div class="deficient"><span class="label">Deficient:</span><span class="value ${hetu.elementalFlow?.deficient?.toLowerCase()}">${hetu.elementalFlow?.deficient || 'N/A'}</span></div>
+                            <div class="dominant"><span class="label">${this.t('dominant')}:</span><span class="value ${hetu.elementalFlow?.dominant?.toLowerCase()}">${hetu.elementalFlow?.dominant || 'N/A'}</span></div>
+                            <div class="deficient"><span class="label">${this.t('deficient')}:</span><span class="value ${hetu.elementalFlow?.deficient?.toLowerCase()}">${hetu.elementalFlow?.deficient || 'N/A'}</span></div>
                         </div>
                     </div>
                 </div>
@@ -797,8 +821,8 @@ const ChineseAstrologyDisplay = {
         
         div.innerHTML = `
             <div class="luoshu-header">
-                <h3>🔢 Luo Shu <span class="zh">洛书</span></h3>
-                <span class="luoshu-subtitle">Magic Square · Nine Palaces</span>
+                <h3>🔢 ${this.t('luoshu')} <span class="zh">洛书</span></h3>
+                <span class="luoshu-subtitle">${this.t('luoshuSubtitle')}</span>
             </div>
             <div class="luoshu-container">
                 <div class="magic-square-container">
@@ -819,12 +843,12 @@ const ChineseAstrologyDisplay = {
                             <div class="cell metal" data-num="6"><b>6</b><span>NW</span></div>
                         </div>
                     </div>
-                    <div class="luoshu-note">All lines sum to 15</div>
+                    <div class="luoshu-note">${this.t('magicSquareNote')}</div>
                 </div>
                 <div class="luoshu-info">
                     ${mg.number ? `
                     <div class="minggua-card" style="background: ${style.bg}; border-color: ${style.border}">
-                        <h4>Life Gua <span class="zh">命卦</span></h4>
+                        <h4>${this.t('lifeGua')} <span class="zh">命卦</span></h4>
                         <div class="gua-display">
                             <div class="gua-number">${mg.number}</div>
                             <div class="gua-details">
@@ -836,33 +860,33 @@ const ChineseAstrologyDisplay = {
                     </div>` : ''}
                     ${fd.shengQi ? `
                     <div class="fav-dirs-card">
-                        <h4>Favorable Directions <span class="zh">吉方</span></h4>
+                        <h4>${this.t('favorableDirections')} <span class="zh">吉方</span></h4>
                         <div class="dirs-grid">
                             <div class="dir-item shengqi">
                                 <span class="dir-icon">✦</span>
                                 <div class="dir-info">
-                                    <span class="dir-name">Sheng Qi <span class="zh">生氣</span></span>
+                                    <span class="dir-name">${this.t('shengQi')} <span class="zh">生氣</span></span>
                                     <span class="dir-value">${fd.shengQi}</span>
                                 </div>
                             </div>
                             <div class="dir-item tianyi">
                                 <span class="dir-icon">✦</span>
                                 <div class="dir-info">
-                                    <span class="dir-name">Tian Yi <span class="zh">天醫</span></span>
+                                    <span class="dir-name">${this.t('tianYi')} <span class="zh">天醫</span></span>
                                     <span class="dir-value">${fd.tianYi}</span>
                                 </div>
                             </div>
                             <div class="dir-item yannian">
                                 <span class="dir-icon">✦</span>
                                 <div class="dir-info">
-                                    <span class="dir-name">Yan Nian <span class="zh">延年</span></span>
+                                    <span class="dir-name">${this.t('yanNian')} <span class="zh">延年</span></span>
                                     <span class="dir-value">${fd.yanNian}</span>
                                 </div>
                             </div>
                             <div class="dir-item fuwei">
                                 <span class="dir-icon">○</span>
                                 <div class="dir-info">
-                                    <span class="dir-name">Fu Wei <span class="zh">伏位</span></span>
+                                    <span class="dir-name">${this.t('fuWei')} <span class="zh">伏位</span></span>
                                     <span class="dir-value">${fd.fuWei || 'N/A'}</span>
                                 </div>
                             </div>
@@ -893,7 +917,7 @@ const ChineseAstrologyDisplay = {
         
         div.innerHTML = `
             <div class="lunar-header-bar" style="background: linear-gradient(90deg, ${colors.bg} 0%, ${colors.accent} 100%)">
-                <h3>🌙 Lunar Mansion <span class="zh">二十八宿</span></h3>
+                <h3>🌙 ${this.t('lunarMansion')} <span class="zh">二十八宿</span></h3>
                 <span class="lunar-number">${mn.num || '?'}/28</span>
             </div>
             <div class="lunar-card">
@@ -909,12 +933,12 @@ const ChineseAstrologyDisplay = {
                     <div class="lunar-animal">${mn.animal || ''}</div>
                 </div>
                 <div class="lunar-details">
-                    <div class="detail-item"><span class="label">Element</span><span class="value ${mn.element?.toLowerCase()}">${mn.element || ''}</span></div>
-                    <div class="detail-item"><span class="label">Direction</span><span class="value">${mn.direction || ''}</span></div>
-                    <div class="detail-item"><span class="label">Degrees</span><span class="value">${(m.degree || 0).toFixed(1)}°</span></div>
-                    <div class="detail-item"><span class="label">Day Ruler</span><span class="value">${m.dayRuler || ''}</span></div>
-                    <div class="detail-item"><span class="label">Hour Ruler</span><span class="value">${m.hourRuler || ''}</span></div>
-                    <div class="detail-item longitude"><span class="label">Longitude</span><span class="value">${(m.exactLongitude || 0).toFixed(2)}°</span></div>
+                    <div class="detail-item"><span class="label">${this.t('element')}</span><span class="value ${mn.element?.toLowerCase()}">${mn.element || ''}</span></div>
+                    <div class="detail-item"><span class="label">${this.t('direction')}</span><span class="value">${mn.direction || ''}</span></div>
+                    <div class="detail-item"><span class="label">${this.t('degrees')}</span><span class="value">${(m.degree || 0).toFixed(1)}°</span></div>
+                    <div class="detail-item"><span class="label">${this.t('dayRuler')}</span><span class="value">${m.dayRuler || ''}</span></div>
+                    <div class="detail-item"><span class="label">${this.t('hourRuler')}</span><span class="value">${m.hourRuler || ''}</span></div>
+                    <div class="detail-item longitude"><span class="label">${this.t('longitude')}</span><span class="value">${(m.exactLongitude || 0).toFixed(2)}°</span></div>
                 </div>
             </div>`;
         return div;
@@ -930,8 +954,8 @@ const ChineseAstrologyDisplay = {
         
         div.innerHTML = `
             <div class="taisui-header">
-                <h3>👑 Tai Sui <span class="zh">太歲</span></h3>
-                <span class="taisui-year">Grand Duke of the Year</span>
+                <h3>👑 ${this.t('taiSui')} <span class="zh">太歲</span></h3>
+                <span class="taisui-year">${this.t('grandDukeOfYear')}</span>
             </div>
             <div class="taisui-grid">
                 <div class="taisui-position">
@@ -947,20 +971,20 @@ const ChineseAstrologyDisplay = {
                     <div class="warning-card sansha">
                         <div class="warning-icon">⚠️</div>
                         <div class="warning-content">
-                            <b>San Sha 三煞</b>
-                            <span>${t.sanSha?.description || 'Avoid construction in conflicting directions'}</span>
+                            <b>${this.t('sanSha')} 三煞</b>
+                            <span>${t.sanSha?.description || this.t('avoidConstruction')}</span>
                         </div>
                     </div>
                     <div class="warning-card suipo">
                         <div class="warning-icon">⚡</div>
                         <div class="warning-content">
-                            <b>Sui Po 歲破</b>
-                            <span>Opposite: ${t.suiPo?.branch || ''} ${t.suiPo?.zh || ''}</span>
+                            <b>${this.t('suiPo')} 歲破</b>
+                            <span>${this.t('opposite')}: ${t.suiPo?.branch || ''} ${t.suiPo?.zh || ''}</span>
                         </div>
                     </div>
                     ${t.annualTaiSui ? `
                     <div class="annual-note">
-                        <span class="note-label">Annual:</span>
+                        <span class="note-label">${this.t('annual')}:</span>
                         <span class="note-text">${t.annualTaiSui.text || ''}</span>
                     </div>` : ''}
                 </div>
@@ -976,6 +1000,36 @@ const ChineseAstrologyDisplay = {
     getElementZh(element) {
         const map = { 'Wood': '木', 'Fire': '火', 'Earth': '土', 'Metal': '金', 'Water': '水' };
         return map[element] || '';
+    },
+
+    getOrdinal(reverseIndex) {
+        const ordinals = {
+            en: ['6th','5th','4th','3rd','2nd','1st'],
+            es: ['6ª','5ª','4ª','3ª','2ª','1ª'],
+            it: ['6ª','5ª','4ª','3ª','2ª','1ª'],
+            zh: ['六','五','四','三','二','初']
+        };
+        return (ordinals[this.lang] || ordinals.en)[reverseIndex] || '';
+    },
+
+    getNature(nature) {
+        const map = {
+            en: { Heaven: 'Heaven', Lake: 'Lake', Fire: 'Fire', Thunder: 'Thunder', Wind: 'Wind', Water: 'Water', Mountain: 'Mountain', Earth: 'Earth' },
+            es: { Heaven: 'Cielo', Lake: 'Lago', Fire: 'Fuego', Thunder: 'Trueno', Wind: 'Viento', Water: 'Agua', Mountain: 'Montaña', Earth: 'Tierra' },
+            it: { Heaven: 'Cielo', Lake: 'Lago', Fire: 'Fuoco', Thunder: 'Tuono', Wind: 'Vento', Water: 'Acqua', Mountain: 'Montagna', Earth: 'Terra' },
+            zh: { Heaven: '天', Lake: '澤', Fire: '火', Thunder: '雷', Wind: '風', Water: '水', Mountain: '山', Earth: '地' }
+        };
+        return (map[this.lang] || map.en)[nature] || nature;
+    },
+
+    getSeason(season) {
+        const map = {
+            en: { Summer: 'Summer', 'Late Summer': 'Late Summer', Autumn: 'Autumn', Winter: 'Winter', Spring: 'Spring' },
+            es: { Summer: 'Verano', 'Late Summer': 'Fin de Verano', Autumn: 'Otoño', Winter: 'Invierno', Spring: 'Primavera' },
+            it: { Summer: 'Estate', 'Late Summer': 'Fine Estate', Autumn: 'Autunno', Winter: 'Inverno', Spring: 'Primavera' },
+            zh: { Summer: '夏', 'Late Summer': '長夏', Autumn: '秋', Winter: '冬', Spring: '春' }
+        };
+        return (map[this.lang] || map.en)[season] || season;
     }
 };
 

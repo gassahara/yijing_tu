@@ -141,6 +141,16 @@
                 <line x1="4" y1="18" x2="10" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
                 <line x1="14" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
             </symbol>
+
+            <!-- Scroll/Document Symbol (for Read Mode) -->
+            <symbol id="icon-scroll" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    points="14 2 14 8 20 8" />
+                <line x1="8" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <line x1="8" y1="17" x2="16" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </symbol>
         </defs>
     </svg>
 </head>
@@ -261,6 +271,12 @@
                                 <use href="#icon-yinyang" />
                             </svg>
                         </button>
+                        <button class="acc-btn" id="singleReadToggle" onclick="App.toggleSingleReadMode()"
+                            title="Single Read Mode (No Tabs)" aria-label="Toggle single read mode">
+                            <svg class="icon">
+                                <use href="#icon-scroll" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 <div class="control-group lang-selector-wrapper">
@@ -325,6 +341,12 @@
                 <button class="acc-btn" onclick="App.toggleHighContrast()">
                     <svg class="icon">
                         <use href="#icon-yinyang" />
+                    </svg>
+                </button>
+                <button class="acc-btn" id="singleReadToggleMobile" onclick="App.toggleSingleReadMode()"
+                    title="Read Mode (No Tabs)" aria-label="Toggle single read mode">
+                    <svg class="icon">
+                        <use href="#icon-scroll" />
                     </svg>
                 </button>
             </div>
@@ -672,6 +694,29 @@
         </div>
     </main>
 
+    <!-- =====================================================================
+         ENVIRONMENT CONFIGURATION
+         Change these URLs to switch between Supabase projects / environments.
+         These values are picked up by data.js (window.YIJINGTU_CONFIG takes
+         priority over the hard-coded defaults inside data.js).
+         ===================================================================== -->
+    <script>
+    window.YIJINGTU_CONFIG = {
+        // Supabase project base URL (change this to point at a different project)
+        SUPABASE_BASE: "https://vflkhntzwfovnuyccxow.supabase.co",
+
+        // Storage bucket path for the hexagrams JSON dataset
+        HEXAGRAMS_BUCKET_PATH: "/storage/v1/object/public/bucket/hexagrams.json",
+
+        // Edge Function endpoints — derived from SUPABASE_BASE by default.
+        // Override individually if you deploy functions to a different project.
+        HEXAGRAM_FUNCTION_URL:  null,   // default: SUPABASE_BASE + /functions/v1/yijingtu
+        TRANSLATE_FUNCTION_URL: null,   // default: SUPABASE_BASE + /functions/v1/yijingtu-translate
+        ASTROLOGY_FUNCTION_URL: null,   // default: SUPABASE_BASE + /functions/v1/bazi-astrol
+        EXPORT_FUNCTION_URL:    null,   // default: SUPABASE_BASE + /functions/v1/yijing-export
+    };
+    </script>
+
     <!-- Library Modules (General Purpose) -->
     <script src="lib/fdl/fdl-core.js"></script>
     <script src="lib/bagua/bagua-core.js"></script>
@@ -679,6 +724,12 @@
     <script src="lib/fdl/fdl-integration.js"></script>
     <script src="lib/index.js"></script>
     
+    <!-- Hexagram Utilities -->
+    <script src="lib/hexagram-utils.js"></script>
+    
+    <!-- Internationalization -->
+    <script src="lib/astrology-i18n.js"></script>
+
     <!-- Application Modules (Ad-hoc Usage) -->
     <script src="data.js?v=2"></script>
     <script src="chinese_metaphysics_literature.js"></script>
@@ -690,7 +741,7 @@
     <script src="translation-workflow-manager.js"></script>
     <script src="feng-shui-dgl-spec.js"></script>
     <script src="ui.js?v=5"></script>
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
 </body>
 
 </html>

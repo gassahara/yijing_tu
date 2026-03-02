@@ -21,7 +21,7 @@ class SigilTools {
             }
             elem = elem.parentElement;
         }
-        
+
         if (isHidden) {
             console.log(`[SigilTools.draw] Canvas ${canvasId} is hidden, waiting for visibility...`);
             // Wait longer and check less frequently
@@ -35,7 +35,7 @@ class SigilTools {
             setTimeout(() => this.draw(canvasId, sigilData, verbosity), 200);
             return;
         }
-        
+
         console.log(`[SigilTools.draw] Canvas ${canvasId} size: ${rect.width}x${rect.height}`);
 
         const dpr = window.devicePixelRatio || 1;
@@ -132,10 +132,10 @@ class SigilTools {
         if (!color || typeof color !== 'string') return null;
         const hex = color.replace('#', '');
         if (hex.length === 3) {
-            return [parseInt(hex[0]+hex[0], 16), parseInt(hex[1]+hex[1], 16), parseInt(hex[2]+hex[2], 16)];
+            return [parseInt(hex[0] + hex[0], 16), parseInt(hex[1] + hex[1], 16), parseInt(hex[2] + hex[2], 16)];
         }
         if (hex.length >= 6) {
-            return [parseInt(hex.substring(0,2), 16), parseInt(hex.substring(2,4), 16), parseInt(hex.substring(4,6), 16)];
+            return [parseInt(hex.substring(0, 2), 16), parseInt(hex.substring(2, 4), 16), parseInt(hex.substring(4, 6), 16)];
         }
         return null;
     }
@@ -168,14 +168,14 @@ class SigilTools {
         if (!fdl?.layers) return;
         const MIN_RATIO = 3.0;
         const fixColor = (color) => {
-            if (!color || color === 'transparent') return color;
+            if (!color || color === 'transparent' || color === 'none') return color;
             return this._contrastRatio(color, bg) < MIN_RATIO ? stroke : color;
         };
         fdl.layers.forEach(layer => {
             if (!layer.commands) return;
             layer.commands.forEach(cmd => {
                 if (cmd.style) {
-                    if (cmd.style.color)  cmd.style.color  = fixColor(cmd.style.color);
+                    if (cmd.style.color) cmd.style.color = fixColor(cmd.style.color);
                     if (cmd.style.stroke) cmd.style.stroke = fixColor(cmd.style.stroke);
                     // Don't override transparent/semi-transparent fills (sector highlights)
                     if (cmd.style.fill && !cmd.style.fill.endsWith('40') && !cmd.style.fill.endsWith('30')) {
@@ -759,8 +759,9 @@ class SigilTools {
                 const my = cmd.y !== undefined ? sy(cmd.y) : cy - baseSize * 0.35;
                 const mSize = cmd.size ? sx(cmd.size) : baseSize * 0.15;
                 ctx.save();
-                ctx.strokeStyle = stroke;
-                ctx.lineWidth = 2;
+                const mStyle = cmd.style || {};
+                ctx.strokeStyle = mStyle.color || stroke;
+                ctx.lineWidth = mStyle.width ? mStyle.width : (baseSize > 400 ? 4 : 2);
                 ctx.beginPath();
                 ctx.moveTo(mx - mSize, my + mSize / 2);
                 ctx.lineTo(mx - mSize / 2, my - mSize / 2);
@@ -777,9 +778,10 @@ class SigilTools {
                 const ty = cmd.y !== undefined ? sy(cmd.y) : cy;
                 const tSize = cmd.size ? sx(cmd.size) : baseSize * 0.1;
                 ctx.save();
-                ctx.strokeStyle = stroke;
-                ctx.fillStyle = stroke;
-                ctx.lineWidth = 2;
+                const tStyle = cmd.style || {};
+                ctx.strokeStyle = tStyle.color || stroke;
+                ctx.fillStyle = tStyle.color || stroke;
+                ctx.lineWidth = tStyle.width ? tStyle.width : (baseSize > 400 ? 4 : 2);
                 ctx.beginPath();
                 ctx.arc(tx, ty, tSize, 0, Math.PI * 2);
                 ctx.stroke();
@@ -832,7 +834,7 @@ class SigilTools {
                 ctx.save();
                 ctx.strokeStyle = rStyle.color || stroke;
                 ctx.lineWidth = rStyle.width || 2;
-                if (rStyle.fill) { ctx.fillStyle = rStyle.fill; ctx.fillRect(rx - rw / 2, ry - rh / 2, rw, rh); }
+                if (rStyle.fill && rStyle.fill !== 'none') { ctx.fillStyle = rStyle.fill; ctx.fillRect(rx - rw / 2, ry - rh / 2, rw, rh); }
                 ctx.strokeRect(rx - rw / 2, ry - rh / 2, rw, rh);
                 ctx.restore();
                 break;
@@ -846,7 +848,7 @@ class SigilTools {
                 ctx.save();
                 ctx.strokeStyle = cStyle.color || stroke;
                 ctx.lineWidth = cStyle.width || 2;
-                if (cStyle.fill) { ctx.fillStyle = cStyle.fill; ctx.beginPath(); ctx.arc(ccx, ccy, cr, 0, Math.PI * 2); ctx.fill(); }
+                if (cStyle.fill && cStyle.fill !== 'none') { ctx.fillStyle = cStyle.fill; ctx.beginPath(); ctx.arc(ccx, ccy, cr, 0, Math.PI * 2); ctx.fill(); }
                 ctx.beginPath(); ctx.arc(ccx, ccy, cr, 0, Math.PI * 2); ctx.stroke();
                 ctx.restore();
                 break;
@@ -1123,15 +1125,15 @@ class SigilTools {
             case 'text': {
                 // Support both backend format (content) and frontend format (text)
                 const text = cmd.text || cmd.content || '';
-                const tx = cmd.x !== undefined ? sx(cmd.x) : 
-                           cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
-                const ty = cmd.y !== undefined ? sy(cmd.y) : 
-                           cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
+                const tx = cmd.x !== undefined ? sx(cmd.x) :
+                    cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
+                const ty = cmd.y !== undefined ? sy(cmd.y) :
+                    cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
                 const tStyle = cmd.style || {};
                 // Support backend font sizes - scale them properly
                 const fontSize = (tStyle.fontSize || cmd.size || 16) * (baseSize / 400);
                 const textColor = tStyle.color || stroke;
-                console.log(`[drawFDL:text] Drawing "${text.substring(0,15)}..." at ${Math.round(tx)},${Math.round(ty)} size:${Math.round(fontSize)} color:${textColor} canvas:${w}x${h}`);
+                console.log(`[drawFDL:text] Drawing "${text.substring(0, 15)}..." at ${Math.round(tx)},${Math.round(ty)} size:${Math.round(fontSize)} color:${textColor} canvas:${w}x${h}`);
                 ctx.save();
                 ctx.fillStyle = textColor;
                 ctx.font = `${tStyle.bold ? 'bold ' : ''}${fontSize}px "Noto Serif SC", serif`;
@@ -1144,21 +1146,22 @@ class SigilTools {
 
             case 'mountain': {
                 // Draw mountain symbol (three peaks) at top
-                const mx = cmd.x !== undefined ? sx(cmd.x) : 
-                           cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
-                const my = cmd.y !== undefined ? sy(cmd.y) : 
-                           cmd.position?.y !== undefined ? sy(cmd.position.y) : cy - baseSize * 0.35;
+                const mx = cmd.x !== undefined ? sx(cmd.x) :
+                    cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
+                const my = cmd.y !== undefined ? sy(cmd.y) :
+                    cmd.position?.y !== undefined ? sy(cmd.position.y) : cy - baseSize * 0.35;
                 const mSize = cmd.size || baseSize * 0.15;
                 ctx.save();
-                ctx.strokeStyle = stroke;
-                ctx.lineWidth = 2;
+                const mStyle = cmd.style || {};
+                ctx.strokeStyle = mStyle.color || stroke;
+                ctx.lineWidth = mStyle.width || 3;
                 ctx.beginPath();
                 // Three peaks
-                ctx.moveTo(mx - mSize, my + mSize/2);
-                ctx.lineTo(mx - mSize/2, my - mSize/2);
-                ctx.lineTo(mx, my + mSize/4);
-                ctx.lineTo(mx + mSize/2, my - mSize/2);
-                ctx.lineTo(mx + mSize, my + mSize/2);
+                ctx.moveTo(mx - mSize, my + mSize / 2);
+                ctx.lineTo(mx - mSize / 2, my - mSize / 2);
+                ctx.lineTo(mx, my + mSize / 4);
+                ctx.lineTo(mx + mSize / 2, my - mSize / 2);
+                ctx.lineTo(mx + mSize, my + mSize / 2);
                 ctx.stroke();
                 ctx.restore();
                 break;
@@ -1166,32 +1169,33 @@ class SigilTools {
 
             case 'taijitu': {
                 // Draw simplified taijitu (yin-yang) symbol
-                const tx = cmd.x !== undefined ? sx(cmd.x) : 
-                           cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
-                const ty = cmd.y !== undefined ? sy(cmd.y) : 
-                           cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
+                const tx = cmd.x !== undefined ? sx(cmd.x) :
+                    cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
+                const ty = cmd.y !== undefined ? sy(cmd.y) :
+                    cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
                 const tSize = (cmd.size || 80) * (baseSize / 1000);
                 ctx.save();
-                ctx.strokeStyle = stroke;
-                ctx.fillStyle = stroke;
-                ctx.lineWidth = 2;
+                const tStyle = cmd.style || {};
+                ctx.strokeStyle = tStyle.color || stroke;
+                ctx.fillStyle = tStyle.color || stroke;
+                ctx.lineWidth = tStyle.width || 3;
                 // Outer circle
                 ctx.beginPath();
                 ctx.arc(tx, ty, tSize, 0, Math.PI * 2);
                 ctx.stroke();
                 // S-curve divider
                 ctx.beginPath();
-                ctx.arc(tx, ty - tSize/2, tSize/2, 0, Math.PI * 2);
+                ctx.arc(tx, ty - tSize / 2, tSize / 2, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.beginPath();
-                ctx.arc(tx, ty + tSize/2, tSize/2, 0, Math.PI * 2);
+                ctx.arc(tx, ty + tSize / 2, tSize / 2, 0, Math.PI * 2);
                 ctx.stroke();
                 // Center dots
                 ctx.beginPath();
-                ctx.arc(tx, ty - tSize/2, tSize/8, 0, Math.PI * 2);
+                ctx.arc(tx, ty - tSize / 2, tSize / 8, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.arc(tx, ty + tSize/2, tSize/8, 0, Math.PI * 2);
+                ctx.arc(tx, ty + tSize / 2, tSize / 8, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.restore();
                 break;
@@ -1200,10 +1204,10 @@ class SigilTools {
             case 'seal_char': {
                 // Draw seal characters in a grid
                 const chars = cmd.chars || ['符', '咒'];
-                const scx = cmd.x !== undefined ? sx(cmd.x) : 
-                           cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
-                const scy = cmd.y !== undefined ? sy(cmd.y) : 
-                           cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
+                const scx = cmd.x !== undefined ? sx(cmd.x) :
+                    cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
+                const scy = cmd.y !== undefined ? sy(cmd.y) :
+                    cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
                 const scSize = (cmd.size || 60) * (baseSize / 1000);
                 const scStyle = cmd.style || {};
                 const cols = cmd.cols || Math.min(chars.length, 2);
@@ -1225,10 +1229,10 @@ class SigilTools {
             }
 
             case 'rect': {
-                const rx = cmd.x !== undefined ? sx(cmd.x) : 
-                           cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
-                const ry = cmd.y !== undefined ? sy(cmd.y) : 
-                           cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
+                const rx = cmd.x !== undefined ? sx(cmd.x) :
+                    cmd.position?.x !== undefined ? sx(cmd.position.x) : cx;
+                const ry = cmd.y !== undefined ? sy(cmd.y) :
+                    cmd.position?.y !== undefined ? sy(cmd.position.y) : cy;
                 // Support both backend (w/h) and frontend (width/height) formats
                 const rw = cmd.w ? sx(cmd.w) : cmd.width ? sx(cmd.width) - sx(0) : baseSize * 0.2;
                 const rh = cmd.h ? sy(cmd.h) : cmd.height ? sy(cmd.height) - sy(0) : baseSize * 0.1;
@@ -1238,9 +1242,9 @@ class SigilTools {
                 ctx.lineWidth = rStyle.width || 2;
                 if (rStyle.fill) {
                     ctx.fillStyle = rStyle.fill;
-                    ctx.fillRect(rx - rw/2, ry - rh/2, rw, rh);
+                    ctx.fillRect(rx - rw / 2, ry - rh / 2, rw, rh);
                 }
-                ctx.strokeRect(rx - rw/2, ry - rh/2, rw, rh);
+                ctx.strokeRect(rx - rw / 2, ry - rh / 2, rw, rh);
                 ctx.restore();
                 break;
             }
@@ -1394,34 +1398,34 @@ class SigilTools {
         const cx = w / 2;
         const cy = h / 2;
         const size = Math.min(w, h) * 0.4;
-        
+
         // Draw a simple talisman shape
         ctx.strokeStyle = stroke;
         ctx.lineWidth = 2;
         ctx.globalAlpha = 0.5;
-        
+
         // Outer rectangle (talisman shape)
-        ctx.strokeRect(cx - size/2, cy - size * 0.6, size, size * 1.2);
-        
+        ctx.strokeRect(cx - size / 2, cy - size * 0.6, size, size * 1.2);
+
         // Inner decorative lines
         ctx.beginPath();
-        ctx.moveTo(cx - size/3, cy - size * 0.4);
-        ctx.lineTo(cx + size/3, cy - size * 0.4);
-        ctx.moveTo(cx - size/3, cy + size * 0.4);
-        ctx.lineTo(cx + size/3, cy + size * 0.4);
+        ctx.moveTo(cx - size / 3, cy - size * 0.4);
+        ctx.lineTo(cx + size / 3, cy - size * 0.4);
+        ctx.moveTo(cx - size / 3, cy + size * 0.4);
+        ctx.lineTo(cx + size / 3, cy + size * 0.4);
         ctx.stroke();
-        
+
         // Center circle (Taijitu placeholder)
         ctx.beginPath();
         ctx.arc(cx, cy, size * 0.15, 0, Math.PI * 2);
         ctx.stroke();
-        
+
         // Text
         ctx.fillStyle = stroke;
         ctx.font = `bold ${size * 0.12}px serif`;
         ctx.textAlign = 'center';
         ctx.fillText('符', cx, cy - size * 0.5);
-        
+
         ctx.globalAlpha = 1;
     }
 
@@ -1588,7 +1592,8 @@ class SigilTools {
                 activeTrigrams: houtianActive,
                 label: showLabels ? '後天 Houtian' : null,
                 stroke,
-                highlightColor
+                highlightColor,
+                translateDirection: options.translateDirection
             });
 
             // Right: Xiantian (Early Heaven)
@@ -1597,7 +1602,8 @@ class SigilTools {
                 activeTrigrams: xiantianActive,
                 label: showLabels ? '先天 Xiantian' : null,
                 stroke,
-                highlightColor
+                highlightColor,
+                translateDirection: options.translateDirection
             });
 
         } else {
@@ -1607,7 +1613,8 @@ class SigilTools {
                 activeTrigrams: arrangement === 'houtian' ? houtianActive : xiantianActive,
                 label: showLabels ? (arrangement === 'houtian' ? '後天 Houtian' : '先天 Xiantian') : null,
                 stroke,
-                highlightColor
+                highlightColor,
+                translateDirection: options.translateDirection
             });
         }
 
@@ -1620,7 +1627,8 @@ class SigilTools {
             activeTrigrams = [],
             label = null,
             stroke = '#d4af37',
-            highlightColor = '#00FF00'
+            highlightColor = '#00FF00',
+            translateDirection = (d) => d
         } = options;
 
         ctx.save();
@@ -1760,7 +1768,7 @@ class SigilTools {
             ctx.font = `${size * 0.04}px sans-serif`;
             const dirX = cx + Math.cos(t.angle) * (r * 1.1);
             const dirY = cy + Math.sin(t.angle) * (r * 1.1);
-            ctx.fillText(t.dir, dirX, dirY);
+            ctx.fillText(translateDirection(t.dir), dirX, dirY);
         });
 
         // Draw title label

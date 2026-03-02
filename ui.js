@@ -3,7 +3,7 @@ class UI {
         // Support both old panel and new tabbed layout
         const panel = document.getElementById('lunarMansionPanel');
         const contentArea = document.getElementById('lunarMansionContent');
-        
+
         if (!mansion) {
             if (panel) panel.style.display = 'none';
             return;
@@ -50,7 +50,7 @@ class UI {
             panel.innerHTML = html;
             panel.style.display = 'block';
         }
-        
+
         if (contentArea) {
             contentArea.innerHTML = html;
         }
@@ -153,12 +153,12 @@ class UI {
                 </div>
             </div>
         `;
-        
+
         if (panel) {
             panel.innerHTML = html;
             panel.style.display = 'block';
         }
-        
+
         if (contentArea) {
             contentArea.innerHTML = html;
         }
@@ -275,14 +275,14 @@ class UI {
 
             <!-- Bagua Display - Shows hexagram trigrams in both arrangements -->
             <div class="bagua-section-wrapper">
-                <h3 class="bagua-section-title">☯ Bagua (Eight Trigrams) <span class="zh">八卦</span></h3>
-                <p class="bagua-section-subtitle">${upper?.name?.en || ''} over ${lower?.name?.en || ''} — Xian Tian & Hou Tian Arrangements</p>
+                <h3 class="bagua-section-title">☯ ${t.bagua || 'Bagua (Eight Trigrams)'} <span class="zh">八卦</span></h3>
+                <p class="bagua-section-subtitle">${upper?.name?.[App.lang] || upper?.name?.en || ''} ${t.over || 'over'} ${lower?.name?.[App.lang] || lower?.name?.en || ''} — ${t.xiantian || 'Xian Tian'} & ${t.houtian || 'Hou Tian'}</p>
                 
                 <div class="bagua-arrangements-wrapper" id="baguaDisplay">
                     <!-- Xian Tian (Pre-Heaven) -->
                     <div class="bagua-arrangement xiantian">
-                        <h4 class="arrangement-title">Xian Tian <span class="zh">先天八卦</span></h4>
-                        <p class="arrangement-desc">Fu Xi Arrangement · Primordial Nature</p>
+                        <h4 class="arrangement-title">${t.xiantian || 'Xian Tian'} <span class="zh">先天八卦</span></h4>
+                        <p class="arrangement-desc">${t.xiantianDesc || 'Fu Xi Arrangement · Primordial Nature'}</p>
                         <div class="trigrams-display">
                             ${this.renderArrangementTrigrams('xiantian', upperKey, lowerKey)}
                         </div>
@@ -290,8 +290,8 @@ class UI {
                     
                     <!-- Hou Tian (Post-Heaven) -->
                     <div class="bagua-arrangement houtian">
-                        <h4 class="arrangement-title">Hou Tian <span class="zh">后天八卦</span></h4>
-                        <p class="arrangement-desc">King Wen Arrangement · Manifest World</p>
+                        <h4 class="arrangement-title">${t.houtian || 'Hou Tian'} <span class="zh">后天八卦</span></h4>
+                        <p class="arrangement-desc">${t.houtianDesc || 'King Wen Arrangement · Manifest World'}</p>
                         <div class="trigrams-display">
                             ${this.renderArrangementTrigrams('houtian', upperKey, lowerKey)}
                         </div>
@@ -350,10 +350,10 @@ class UI {
                             <div class="analysis-cta-content">
                                 <p>${t.seeAnalysisTab || 'Detailed astrology and technical data available in the Analysis tab:'}</p>
                                 <ul>
-                                    <li>⚡ Moment Influence (Current Sky / BaZi)</li>
-                                    <li>🌙 Lunar Mansion</li>
-                                    <li>⚖️ Yin-Yang Balance</li>
-                                    <li>☯️ Complete Chinese Astrology</li>
+                                    <li>⚡ ${t.momentInfluenceTab || 'Moment Influence'} (${t.currentSky || 'Current Sky'} / BaZi)</li>
+                                    <li>🌙 ${t.lunarMansion || 'Lunar Mansion'}</li>
+                                    <li>⚖️ ${t.yinYangBalance || 'Yin-Yang Balance'}</li>
+                                    <li>☯️ ${t.analysisDesc || 'Complete Chinese Astrology'}</li>
                                 </ul>
                                 <button class="btn-goto-analysis" onclick="App.switchMainTab('analysis')">
                                     ${t.goToAnalysis || 'View Analysis'}
@@ -393,7 +393,7 @@ class UI {
                 <!-- Bagua Medicine Tab -->
                 <div id="tab-medicine" class="reading-tab-panel" role="tabpanel">
                     <div id="baguaMedicine-content-area">
-                        <div class="loading"></div> ${t.loading || 'Loading Bagua Medicine...'}
+                        <div class="loading"></div> ${t.loading || 'Loading...'} ${t.baguaMedicineTitle || 'Bagua Medicine'}
                     </div>
                 </div>
             </div>
@@ -499,24 +499,55 @@ class UI {
             });
         }
 
+        // Helper: Check if text is actually translated (not just English or Chinese echoed back)
+        // Compares against English AND Chinese sources to detect untranslated/echoed content
+        const isActuallyTranslated = (text, englishSource, chineseSource) => {
+            if (!text || !englishSource) return !!text;
+            if (lang === 'en') return true;
+            const normalizeWS = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
+            const normalizedText = normalizeWS(text);
+            // Reject if identical to English (API echoed English back)
+            if (normalizedText === normalizeWS(englishSource)) return false;
+            // Reject if identical to Chinese source (API echoed Chinese back untranslated)
+            if (chineseSource && normalizedText === normalizeWS(chineseSource)) return false;
+            return true;
+        };
+
+        // English and Chinese sources for comparison
+        const enJudgment = hexData.judgment_en || apiTranslations?.en?.judgment || '';
+        const enImage = hexData.image?.image_en || apiTranslations?.en?.image || '';
+        const zhJudgment = hexData.judgment_zh || '';
+        const zhImage = hexData.image?.image_zh || '';
+
         // Get judgment for current language with fallback
         let judgment = hexData[`judgment_${lang}`];
         console.log(`JSON judgment_${lang}:`, judgment?.substring(0, 50));
-        // Use API translation if JSON is missing
+        // Use API translation if JSON is missing — but verify it's actually translated
         if (!judgment && apiTranslations?.[lang]?.judgment) {
-            judgment = apiTranslations[lang].judgment;
-            console.log('Using API judgment for', lang);
+            const candidate = apiTranslations[lang].judgment;
+            if (isActuallyTranslated(candidate, enJudgment, zhJudgment)) {
+                judgment = candidate;
+                console.log(`[renderTranslation] Using API judgment for ${lang} (verified translated)`);
+            } else {
+                console.warn(`[renderTranslation] API judgment for ${lang} is identical to English or Chinese source, skipping`);
+            }
         }
+        // Fallback: English then Chinese
         if (!judgment && lang !== 'en') judgment = hexData.judgment_en;
         if (!judgment) judgment = hexData.judgment_zh;
         judgment = this.ensureString(judgment);
 
         // Get image for current language with fallback (nested object structure)
         let image = hexData.image?.[`image_${lang}`];
-        // Use API translation if JSON is missing
+        // Use API translation if JSON is missing — but verify it's actually translated
         if (!image && apiTranslations?.[lang]?.image) {
-            image = apiTranslations[lang].image;
-            console.log('Using API image for', lang);
+            const candidate = apiTranslations[lang].image;
+            if (isActuallyTranslated(candidate, enImage, zhImage)) {
+                image = candidate;
+                console.log(`[renderTranslation] Using API image for ${lang} (verified translated)`);
+            } else {
+                console.warn(`[renderTranslation] API image for ${lang} is identical to English or Chinese source, skipping`);
+            }
         }
         if (!image && lang !== 'en') image = hexData.image?.image_en;
         if (!image) image = hexData.image?.image_zh;
@@ -524,14 +555,14 @@ class UI {
 
         // Get lines for current language with fallback
         let lines = hexData[`lines_${lang}`] || [];
-        
+
         // Helper to check if lines are valid (not empty, not pending placeholders)
         const isValidLines = (arr) => {
             if (!Array.isArray(arr) || arr.length === 0) return false;
             const firstLine = String(arr[0] || '').toLowerCase();
             return firstLine.length > 0 && !firstLine.includes('pending') && !firstLine.includes('placeholder');
         };
-        
+
         // Helper to check if lines are pending
         const isPending = (arr) => {
             if (!Array.isArray(arr) || arr.length === 0) return true;
@@ -539,19 +570,44 @@ class UI {
             return firstLine.includes('pending') || firstLine.includes('placeholder') || firstLine === '';
         };
 
+        // Helper to check if translated lines differ from English source
+        const areLinesTranslated = (translatedLines, englishLines) => {
+            if (!Array.isArray(translatedLines) || !Array.isArray(englishLines)) return true;
+            if (lang === 'en') return true;
+            // Check first non-empty line
+            for (let i = 0; i < translatedLines.length; i++) {
+                const tl = String(translatedLines[i] || '').trim().toLowerCase();
+                const el = String(englishLines[i] || '').trim().toLowerCase();
+                if (tl && el && tl !== el) return true; // Found a difference
+            }
+            return false; // All lines identical to English
+        };
+
+        const enLines = hexData.lines_en || apiTranslations?.en?.lines || [];
+
         console.log(`[renderTranslation] Initial lines_${lang}:`, lines?.length, 'isValid:', isValidLines(lines));
 
-        // Try API translations if JSON lines are missing or pending
+        // Try API translations if JSON lines are missing or pending — with translation verification
         if (!isValidLines(lines) && apiTranslations?.[lang]?.lines?.length > 0) {
-            lines = apiTranslations[lang].lines;
-            console.log('[renderTranslation] Using API lines for', lang, 'count:', lines.length);
+            const candidate = apiTranslations[lang].lines;
+            if (areLinesTranslated(candidate, enLines)) {
+                lines = candidate;
+                console.log(`[renderTranslation] Using API lines for ${lang} (verified translated), count:`, lines.length);
+            } else {
+                console.warn(`[renderTranslation] API lines for ${lang} identical to English, skipping`);
+            }
         }
         // Also check lineTexts key (used by lines section endpoint)
         if (!isValidLines(lines) && apiTranslations?.[lang]?.lineTexts?.length > 0) {
-            lines = apiTranslations[lang].lineTexts;
-            console.log('[renderTranslation] Using API lineTexts for', lang, 'count:', lines.length);
+            const candidate = apiTranslations[lang].lineTexts;
+            if (areLinesTranslated(candidate, enLines)) {
+                lines = candidate;
+                console.log(`[renderTranslation] Using API lineTexts for ${lang} (verified translated), count:`, lines.length);
+            } else {
+                console.warn(`[renderTranslation] API lineTexts for ${lang} identical to English, skipping`);
+            }
         }
-        
+
         // For non-English languages, fallback to English API translations
         if (!isValidLines(lines) && lang !== 'en') {
             if (apiTranslations?.en?.lines?.length > 0) {
@@ -565,7 +621,7 @@ class UI {
                 console.log('[renderTranslation] Falling back to JSON lines_en');
             }
         }
-        
+
         // Final fallback to Chinese if still no valid lines
         if (!isValidLines(lines)) {
             if (isValidLines(hexData.lines_zh)) {
@@ -575,7 +631,7 @@ class UI {
                 lines = [];
             }
         }
-        
+
         // Ensure lines is an array of strings
         if (lines) {
             lines = lines.map(l => this.ensureString(l));
@@ -636,7 +692,7 @@ class UI {
 
         const r = result[lang] || result.en;
         if (!r) {
-            container.innerHTML = '<div style="color: var(--text-dim); padding: 20px;">Interpretation unavailable</div>';
+            container.innerHTML = `<div style="color: var(--text-dim); padding: 20px;">${I18N[lang]?.unavailable ? I18N[lang].unavailable : 'Interpretation unavailable'}</div>`;
             return;
         }
 
@@ -648,31 +704,31 @@ class UI {
             const technicalKey = key + 'Technical';
             const colloquialKey = key + 'Colloquial';
             const dataKey = key + 'Data'; // Raw technical JSON data
-            
+
             // Layer 2: Technical Analysis (classical interpretation)
             let technicalAnalysis = r[technicalKey] || r[key + 'Analysis'];
             // Layer 3: Colloquial Analysis (modern interpretation)
             let colloquialData = r[colloquialKey];
             // Layer 1: Raw Technical Data (JSON)
             let technicalData = r[dataKey] || r[key + 'Data'];
-            
+
             // Legacy: check if main section contains technical analysis
             if (!technicalAnalysis && r[key] && typeof r[key] === 'string' && r[key].length > 50) {
                 technicalAnalysis = r[key];
             }
-            
+
             // For houtou section, check multiple possible data keys
             if (key === 'houtou') {
                 technicalAnalysis = r.houtou || r.houtouTechnical || r.houtouColloquial || technicalAnalysis;
             }
-            
+
             // Only render if we have at least one layer
             if (technicalAnalysis || colloquialData || technicalData) {
                 const title = t[key] || key;
-                
+
                 html += `<div class="interp-section" data-section="${key}">
                     <div class="interp-title">${title}</div>`;
-                
+
                 // Layer 1: Technical Data (JSON) - collapsible, shown first
                 if (technicalData) {
                     const techString = typeof technicalData === 'string' ? technicalData : JSON.stringify(technicalData, null, 2);
@@ -681,13 +737,13 @@ class UI {
                         <div class="interp-tech-box"><pre style="white-space: pre-wrap; font-size: 0.8em; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; overflow-x: auto; max-height: 300px; overflow-y: auto;">${techString}</pre></div>
                     </details>`;
                 }
-                
+
                 // Layer 2: Technical Analysis (classical) - main content
                 if (technicalAnalysis) {
                     const techString = typeof technicalAnalysis === 'string' ? technicalAnalysis : JSON.stringify(technicalAnalysis);
                     html += `<div class="interp-text interp-technical" style="margin-bottom: 8px;">${this.formatParagraphs ? this.formatParagraphs(techString) : techString}</div>`;
                 }
-                
+
                 // Layer 3: Colloquial/Modern Interpretation - collapsible
                 if (colloquialData) {
                     const collString = typeof colloquialData === 'string' ? colloquialData : JSON.stringify(colloquialData);
@@ -696,7 +752,7 @@ class UI {
                         <div class="interp-coll-box interp-colloquial">${this.formatParagraphs ? this.formatParagraphs(collString) : collString}</div>
                     </details>`;
                 }
-                
+
                 // Houtou-specific sub-sections
                 if (key === 'houtou') {
                     if (r.emperorAnalysis) {
@@ -712,7 +768,7 @@ class UI {
                         </div>`;
                     }
                 }
-                
+
                 html += `</div>`; // Close interp-section
             }
         });
@@ -760,7 +816,10 @@ class UI {
     }
 
     static cleanRawText(text) {
-        if (!text || typeof text !== 'string') return text;
+        if (!text) return '';
+        if (typeof text !== 'string') {
+            text = typeof text === 'object' ? JSON.stringify(text) : String(text);
+        }
         return text
             .replace(/\\n/g, '\n')
             .replace(/\\t/g, ' ')
@@ -860,6 +919,10 @@ class UI {
 
     static formatParagraphs(text, options = {}) {
         if (!text) return '';
+        // Defensive: coerce non-string values (objects, arrays) to string
+        if (typeof text !== 'string') {
+            text = typeof text === 'object' ? JSON.stringify(text) : String(text);
+        }
         text = this.cleanRawText(text);
 
         // Remove bracket headers globally
@@ -923,7 +986,7 @@ class UI {
 
         lines.forEach((line, index) => {
             const trimmed = line.trim();
-            
+
             // Check for numbered list item (1., 2., etc.)
             const numMatch = trimmed.match(/^(\d+)\.\s*(.+)$/);
             // Check for bullet point
@@ -942,7 +1005,7 @@ class UI {
             } else if (numMatch || bulletMatch) {
                 const content = numMatch ? numMatch[2] : bulletMatch[1];
                 if (!inList) inList = true;
-                
+
                 // Check for bold text at start of item
                 const itemContent = this.formatMarkdownInline(content);
                 currentList.push(`<li class="advice-item">${itemContent}</li>`);
@@ -1113,12 +1176,12 @@ class UI {
             panel.innerHTML = html;
             panel.classList.add('bazi-comparison-view');
         }
-        
+
         if (contentArea) {
             contentArea.innerHTML = html;
         }
         panel.style.display = 'block';
-        
+
         // Render enhanced Bazi diagram with active component highlighting
         if (birthBaziExtended || currentBaziExtended) {
             console.log(`[UI.renderBaziComparison] Calling renderBaziEnhanced`, birthBaziExtended ? 'has birth data' : 'no birth', currentBaziExtended ? 'has current data' : 'no current');
@@ -1222,9 +1285,9 @@ class UI {
         const arr = arrangement === 'xiantian' ? BaguaCore.XIANTIAN : BaguaCore.HOUTIAN;
         const upperTrigram = arr.trigrams.find(t => t.binary === upperKey);
         const lowerTrigram = arr.trigrams.find(t => t.binary === lowerKey);
-        
+
         if (!upperTrigram || !lowerTrigram) return '';
-        
+
         const getElementClass = (element) => {
             if (!element) return '';
             const e = element.toLowerCase();
@@ -1235,7 +1298,7 @@ class UI {
             if (e.includes('earth')) return 'earth';
             return '';
         };
-        
+
         return `
             <div class="arr-trigram upper ${getElementClass(upperTrigram.element)}" data-trigram="${upperTrigram.name}">
                 <div class="trig-header">
@@ -1250,10 +1313,10 @@ class UI {
                     </div>
                 </div>
                 <div class="trig-meaning">
-                    ${arrangement === 'xiantian' 
-                        ? `<span class="meaning-label">Spiritual:</span> <span class="meaning-value">${upperTrigram.spiritual}</span>`
-                        : `<span class="meaning-label">Life Area:</span> <span class="meaning-value">${upperTrigram.lifeArea}</span>`
-                    }
+                    ${arrangement === 'xiantian'
+                ? `<span class="meaning-label">Spiritual:</span> <span class="meaning-value">${upperTrigram.spiritual}</span>`
+                : `<span class="meaning-label">Life Area:</span> <span class="meaning-value">${upperTrigram.lifeArea}</span>`
+            }
                 </div>
             </div>
             
@@ -1277,24 +1340,24 @@ class UI {
                 </div>
                 <div class="trig-meaning">
                     ${arrangement === 'xiantian'
-                        ? `<span class="meaning-label">Spiritual:</span> <span class="meaning-value">${lowerTrigram.spiritual}</span>`
-                        : `<span class="meaning-label">Life Area:</span> <span class="meaning-value">${lowerTrigram.lifeArea}</span>`
-                    }
+                ? `<span class="meaning-label">Spiritual:</span> <span class="meaning-value">${lowerTrigram.spiritual}</span>`
+                : `<span class="meaning-label">Life Area:</span> <span class="meaning-value">${lowerTrigram.lifeArea}</span>`
+            }
                 </div>
             </div>
         `;
     }
-    
+
     static getTrigramLinesHtml(binary) {
         // Binary is stored bottom-to-top (line 1, line 2, line 3)
         // But we display top-to-bottom (line 3, line 2, line 1)
         const reversed = binary.split('').reverse();
         return `<svg class="trigram-lines-svg" viewBox="0 0 60 54" width="60" height="54">
-            ${reversed.map((bit, i) => 
-                bit === '1' 
-                    ? `<line x1="5" y1="${9 + i * 18}" x2="55" y2="${9 + i * 18}" stroke="currentColor" stroke-width="4" stroke-linecap="round" />`
-                    : `<line x1="5" y1="${9 + i * 18}" x2="25" y2="${9 + i * 18}" stroke="currentColor" stroke-width="4" stroke-linecap="round" /><line x1="35" y1="${9 + i * 18}" x2="55" y2="${9 + i * 18}" stroke="currentColor" stroke-width="4" stroke-linecap="round" />`
-            ).join('')}
+            ${reversed.map((bit, i) =>
+            bit === '1'
+                ? `<line x1="5" y1="${9 + i * 18}" x2="55" y2="${9 + i * 18}" stroke="currentColor" stroke-width="4" stroke-linecap="round" />`
+                : `<line x1="5" y1="${9 + i * 18}" x2="25" y2="${9 + i * 18}" stroke="currentColor" stroke-width="4" stroke-linecap="round" /><line x1="35" y1="${9 + i * 18}" x2="55" y2="${9 + i * 18}" stroke="currentColor" stroke-width="4" stroke-linecap="round" />`
+        ).join('')}
         </svg>`;
     }
 
@@ -1402,11 +1465,11 @@ class UI {
         // Render ONLY to the Analysis tab Astrology sub-panel
         const analysisAstroContent = document.getElementById('analysisAstrologyContent');
         const analysisAstroLoading = document.getElementById('analysisAstrologyLoading');
-        
+
         if (analysisAstroContent) {
             analysisAstroContent.innerHTML = '';
             if (analysisAstroLoading) analysisAstroLoading.style.display = 'none';
-            
+
             if (typeof ChineseAstrologyDisplay !== 'undefined') {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'astrology-wrapper';
@@ -1415,8 +1478,8 @@ class UI {
                     upper: hexagramInfo.upper?.name || hexagramInfo.upperTrigram,
                     lower: hexagramInfo.lower?.name || hexagramInfo.lowerTrigram
                 } : null;
-                
-                ChineseAstrologyDisplay.render(displayData, wrapper, trigrams);
+
+                ChineseAstrologyDisplay.render(displayData, wrapper, trigrams, lang);
                 analysisAstroContent.appendChild(wrapper);
                 console.log('[UI.renderChineseAstrologyComplete] Rendered to Analysis tab > Astrology');
             }
@@ -1440,6 +1503,26 @@ class UI {
         const remedyList = remedies[displayLang].remedies;
         const fuluContentList = remedies.fuluContentList || [];
 
+        // Helper to translate remedy content asynchronously (for legacy renderer)
+        const translateRemedyContentLegacy = async (remedy, lang) => {
+            if (lang === 'en' || !window.translationService) return remedy;
+            
+            const fieldsToTranslate = ['relevance', 'description', 'instructions'];
+            for (const field of fieldsToTranslate) {
+                if (remedy[field] && typeof remedy[field] === 'string') {
+                    try {
+                        const translated = await window.translationService.translateText(remedy[field], lang, 'ui_content');
+                        if (translated && translated !== remedy[field]) {
+                            remedy[field] = translated;
+                        }
+                    } catch (err) {
+                        console.warn(`[UI] Failed to translate remedy ${field}:`, err);
+                    }
+                }
+            }
+            return remedy;
+        };
+
         remedyList.forEach((remedy, index) => {
             const isTalisman = remedy.type === 'fulu';
             const isFengShui = remedy.type === 'fengshui';
@@ -1451,21 +1534,53 @@ class UI {
             const typeLabel = isTalisman ? t.talisman : isFengShui ? t.fengshui : t.medicine;
             const icon = isTalisman ? '符' : isFengShui ? '風' : '丹';
             const accentClass = isTalisman ? 'talisman-section' : isFengShui ? 'fengshui-section' : 'medicine-section';
+            
+            // Get translated remedy name
+            const remedyName = this._resolveRemedyName(remedy, displayLang);
+            const remedyNameZh = typeof remedy.name === 'object' ? (remedy.name.zh || '') : (remedy.nameZh || '');
+            
+            // Kick off async translation for remedy content if not English
+            if (displayLang !== 'en' && window.translationService) {
+                translateRemedyContentLegacy(remedy, displayLang).then(updatedRemedy => {
+                    // Update DOM with translated content
+                    const items = document.querySelectorAll('.remedy-item-wrapper');
+                    items.forEach(item => {
+                        const titleDiv = item.querySelector('.remedy-name-title .en');
+                        if (titleDiv && titleDiv.textContent === remedyName) {
+                            // Update relevance
+                            const relevanceBox = item.querySelector('.remedy-relevance-box p');
+                            if (relevanceBox && updatedRemedy.relevance) {
+                                relevanceBox.innerHTML = this.formatMarkdownInline(updatedRemedy.relevance);
+                            }
+                            // Update description
+                            const descText = item.querySelector('.remedy-description-text');
+                            if (descText && updatedRemedy.description) {
+                                descText.innerHTML = this.formatParagraphs(updatedRemedy.description);
+                            }
+                            // Update instructions
+                            const instructionsBox = item.querySelector('.remedy-instructions-box p');
+                            if (instructionsBox && updatedRemedy.instructions) {
+                                instructionsBox.innerHTML = this.formatMarkdownInline(updatedRemedy.instructions);
+                            }
+                        }
+                    });
+                }).catch(err => console.error('[UI] Failed to translate remedy content:', err));
+            }
 
             html += `<div class="remedy-item-wrapper ${accentClass}">
                 <div class="remedy-type-header"><span class="remedy-icon-circle">${icon}</span><h3>${typeLabel}</h3></div>
                 <div class="remedy-relevance-box"><span class="relevance-label">${t.relevance || 'Relevance'}:</span><p>${this.formatMarkdownInline(remedy.relevance || remedy.description || t.noRelevanceAvailable || 'This remedy supports energetic balance based on the hexagram wisdom.')}</p></div>
                 <div class="remedy-layout-grid">
                     ${hasVisual ? `<div class="remedy-visual-side">
-                        ${hasImage ? `<div class="fulu-image-container">${imageUrls.map(url => `<img src="${url}" class="fulu-reference-image" onclick="UI.openImageModal('${url}', '${remedy.name}')" loading="lazy" crossorigin="anonymous" />`).join('')}</div>` : ''}
+                        ${hasImage ? `<div class="fulu-image-container">${imageUrls.map(url => `<img src="${url}" class="fulu-reference-image" onclick="UI.openImageModal('${url}', '${remedyName.replace(/'/g, "\\'")}')" loading="lazy" crossorigin="anonymous" />`).join('')}</div>` : ''}
                         <div class="fulu-canvas-container"><canvas id="fuluCanvas_${index}" width="400" height="400"></canvas></div>
                     </div>` : ''}
                     <div class="remedy-info-side">
-                        <div class="remedy-name-title"><span class="zh">${remedy.nameZh || ''}</span><span class="pinyin">(${remedy.pinyin || ''})</span><div class="en">${remedy.name}</div></div>
+                        <div class="remedy-name-title"><span class="zh">${remedyNameZh}</span>${remedyNameZh ? `<span class="pinyin">(${remedy.pinyin || ''})</span>` : ''}<div class="en">${remedyName}</div></div>
                         <div class="remedy-description-text">${this.formatParagraphs(remedy.description)}</div>
                         ${remedy.application ? `<div class="remedy-detail-block"><strong>${t.application}:</strong><p>${this.formatMarkdownInline(remedy.application)}</p></div>` : ''}
                         ${remedy.instructions ? `<div class="remedy-instructions-box"><strong>${t.instructions}:</strong><p>${this.formatMarkdownInline(remedy.instructions)}</p></div>` : ''}
-                        <div class="remedy-source-footer"><strong>${t.source}:</strong> ${this.formatMarkdownInline(remedy.source)} <span class="verif-tag">${remedy.verification}</span></div>
+                        <div class="remedy-source-footer"><strong>${t.source}:</strong> ${this._formatSource(remedy.source)}${remedy.verification ? ` <span class="verif-tag">${remedy.verification}</span>` : ''}</div>
                     </div>
                 </div>
                 ${remedy.charm ? this.renderCharm(remedy.charm, t) : ''}
@@ -1510,7 +1625,7 @@ class UI {
                             ...fuluContent,
                             name: fuluContent.name || remedy.name || '',
                             sealChars: fuluContent.sealChars || fuluContent.seal_characters ||
-                                       (remedy.nameZh ? [...remedy.nameZh].slice(0, 4) : undefined)
+                                (remedy.nameZh ? [...remedy.nameZh].slice(0, 4) : undefined)
                         }, lang);
                     }
 
@@ -1523,13 +1638,12 @@ class UI {
                             bgColor = '#f4f4f9';
                             strokeCol = '#0a0a1a'; // Darker ink for better contrast
                         } else {
-                            // Fulu (talisman) - use FDL background, then explicit override, then rice paper default
-                            bgColor = fdlData?.background || fuluContent.backgroundColor || '#f5f5dc';
-                            strokeCol = SigilTools.contrastColor(bgColor) || '#4a0000';
-                            // Enhanced contrast - ensure deep cinnabar red for light backgrounds
-                            if (strokeCol === '#000000' || strokeCol === '#8b0000') strokeCol = '#4a0000';
+                            // Fulu (talisman) - use FDL background, then explicit override, then more robust golden paper default
+                            bgColor = fdlData?.background || fuluContent.backgroundColor || '#fceec1';
+                            // Talismans usually use cinnabar red ink deeply
+                            strokeCol = '#a91b0d';
                         }
-                        
+
                         SigilTools.draw(canvasId, {
                             fuluContent,
                             fdl: fdlData,
@@ -1588,12 +1702,46 @@ class UI {
         if (typeof FENG_SHUI_DGL_SPEC !== 'undefined' && content?.instructions) {
             try {
                 const instructions = Array.isArray(content.instructions) ? content.instructions : [content.instructions];
-                return {
-                    version: "1.0",
-                    background: "#f4f4f9",
-                    source: "fengshui_generator",
-                    layers: FENG_SHUI_DGL_SPEC.helpers.generateDiagram(instructions, { lang }).layers
-                };
+                const generated = FENG_SHUI_DGL_SPEC.helpers.generateDiagram(instructions, { lang });
+
+                // Check if the generated diagram has actual highlight/instruction commands (not just annotations)
+                const hasHighlights = generated.layers?.some(l =>
+                    l.name === 'sector_highlights' && l.commands?.length > 0
+                );
+                const hasInstructionMarkers = generated.layers?.some(l =>
+                    l.name === 'instruction_overlay' && l.commands?.length > 0
+                );
+
+                if (hasHighlights || hasInstructionMarkers) {
+                    return {
+                        version: "1.0",
+                        background: "#f4f4f9",
+                        source: "fengshui_generator",
+                        layers: generated.layers
+                    };
+                }
+
+                // If FENG_SHUI_DGL_SPEC produced no highlights, try enriching with DB data
+                console.log('[UI.generateFengShuiFDL] FENG_SHUI_DGL_SPEC produced no highlights, enriching with DB data...');
+                const dbInstructions = this._getFengShuiDBInstructions(content);
+                if (dbInstructions) {
+                    const enriched = FENG_SHUI_DGL_SPEC.helpers.generateDiagram(
+                        Array.isArray(dbInstructions) ? dbInstructions : [dbInstructions],
+                        { lang }
+                    );
+                    const enrichedHasContent = enriched.layers?.some(l =>
+                        (l.name === 'sector_highlights' || l.name === 'instruction_overlay') && l.commands?.length > 0
+                    );
+                    if (enrichedHasContent) {
+                        return {
+                            version: "1.0",
+                            background: "#f4f4f9",
+                            source: "fengshui_generator_enriched",
+                            layers: enriched.layers
+                        };
+                    }
+                }
+                // Fall through to generic fallback
             } catch (e) {
                 console.warn('[UI.generateFengShuiFDL] FENG_SHUI_DGL_SPEC failed, falling back to generic:', e);
             }
@@ -1601,7 +1749,7 @@ class UI {
         // Fallback: generate a generic Bagua-based FDL for Feng Shui
         // Support multiple data formats from backend
         let favorable = content.favorableDirections || content.favorable || content.directions || [];
-        
+
         // If no directions found, try to extract from bagua.direction or sector
         if (favorable.length === 0 && content.bagua?.direction) {
             favorable = [content.bagua.direction];
@@ -1609,7 +1757,17 @@ class UI {
         if (favorable.length === 0 && content.sector) {
             favorable = [content.sector];
         }
-        
+
+        // Try to look up sector from DB using remedy ID
+        if (favorable.length === 0 && content.remedy?.id && typeof DAOIST_REMEDIES_DB !== 'undefined' && DAOIST_REMEDIES_DB.fengshui) {
+            const localFS = DAOIST_REMEDIES_DB.fengshui.find(f => f.id === content.remedy.id);
+            if (localFS?.fdl?.sector) {
+                favorable = [localFS.fdl.sector];
+            } else if (localFS?.bagua?.direction) {
+                favorable = [localFS.bagua.direction];
+            }
+        }
+
         // If still no directions, try to parse from instructions text (content or remedy)
         const instructionsSource = content.instructions || content.remedy?.instructions;
         if (favorable.length === 0 && instructionsSource) {
@@ -1617,18 +1775,36 @@ class UI {
             // Match patterns like "North (Kan)", "Southeast (Xun)", "South (Li)", etc.
             const directionMatches = instructions.match(/\b(North|South|East|West|Southeast|Southwest|Northeast|Northwest)\s*\([A-Z][a-z]+\)/g);
             if (directionMatches) {
-                const dirMap = { 'North': 'N', 'South': 'S', 'East': 'E', 'West': 'W', 
-                                'Southeast': 'SE', 'Southwest': 'SW', 'Northeast': 'NE', 'Northwest': 'NW' };
+                const dirMap = {
+                    'North': 'N', 'South': 'S', 'East': 'E', 'West': 'W',
+                    'Southeast': 'SE', 'Southwest': 'SW', 'Northeast': 'NE', 'Northwest': 'NW'
+                };
                 favorable = directionMatches.map(match => {
                     const dirName = match.split('(')[0].trim();
                     return dirMap[dirName];
                 }).filter(Boolean);
             }
         }
-        
+
+        // Last resort: parse bare direction names without parenthesized trigram name
+        if (favorable.length === 0 && instructionsSource) {
+            const instructions = Array.isArray(instructionsSource) ? instructionsSource.join(' ') : instructionsSource;
+            const dirMap = {
+                'Northwest': 'NW', 'Northeast': 'NE', 'Southwest': 'SW', 'Southeast': 'SE',
+                'North': 'N', 'South': 'S', 'East': 'E', 'West': 'W'
+            };
+            // Check longest names first to avoid partial matches
+            for (const [dirName, dirCode] of Object.entries(dirMap)) {
+                const regex = new RegExp(`\\b${dirName}\\b`, 'i');
+                if (regex.test(instructions) && !favorable.includes(dirCode)) {
+                    favorable.push(dirCode);
+                }
+            }
+        }
+
         console.log(`[UI.generateFengShuiFDL] Content keys:`, Object.keys(content));
         console.log(`[UI.generateFengShuiFDL] Favorable directions:`, favorable);
-        
+
         // Build highlight commands for favorable directions
         const highlightCommands = favorable.map(dir => {
             const trigram = this._directionToTrigram(dir);
@@ -1639,7 +1815,7 @@ class UI {
                 style: { fill: "#00FF0040", stroke: "#00FF00", strokeWidth: 3, glow: true, glowColor: "#00FF00" }
             };
         }).filter(Boolean);
-        
+
         return {
             version: "2.0",
             background: "#f4f4f9",
@@ -1661,43 +1837,209 @@ class UI {
             ]
         };
     }
-    
+
     static _directionToTrigram(dir) {
         const map = { 'S': 'Li', 'SE': 'Xun', 'E': 'Zhen', 'NE': 'Gen', 'N': 'Kan', 'NW': 'Qian', 'W': 'Dui', 'SW': 'Kun' };
         return map[dir] || null;
+    }
+
+    // Look up the static DB instructions for a fengshui remedy (which contain direction keywords)
+    static _getFengShuiDBInstructions(content) {
+        const remedyId = content.remedy?.id || content.id;
+        if (!remedyId || typeof DAOIST_REMEDIES_DB === 'undefined' || !DAOIST_REMEDIES_DB.fengshui) return null;
+        const dbEntry = DAOIST_REMEDIES_DB.fengshui.find(f => f.id === remedyId);
+        return dbEntry?.instructions || null;
+    }
+
+    // Remedy name translations for common remedies
+        static REMEDY_NAME_TRANSLATIONS = {
+        'Anti-Gossip Talisman': { es: 'Talismán Anti-Chismes', it: 'Talismano Anti-Pettegolezzi' },
+        'Celestial Master Healing Talisman': { es: 'Talismán de Sanación del Maestro Celestial', it: 'Talismano di Guarigione del Maestro Celeste' },
+        'Celestial Master\'s Five Thunders Talisman': { es: 'Talismán de los Cinco Truenos del Maestro Celestial', it: 'Talismano dei Cinque Tuoni del Maestro Celeste' },
+        'Chief Artisan Talisman': { es: 'Talismán del Jefe Artesano', it: 'Talismano del Capo Artigiano' },
+        'Divine Incantation for Purifying Heaven and Earth': { es: 'Encantación Divina para Purificar el Cielo y la Tierra', it: 'Incantesimo Divino per Purificare il Cielo e la Terra' },
+        'Dui Palace Feng Shui — West (Children & Creativity)': { es: 'Feng Shui del Palacio Dui — Oeste (Hijos y Creatividad)', it: 'Feng Shui del Palazzo Dui — Ovest (Figli e Creatività)' },
+        'Emissaries of Three Realms': { es: 'Emisarios de los Tres Reinos', it: 'Emissari dei Tre Regni' },
+        'Five Element Qi-Vein Stabilization': { es: 'Estabilización del Qi-Vena de los Cinco Elementos', it: 'Stabilizzazione del Qi-Vena dei Cinque Elementi' },
+        'Five Roads Wealth God Talisman': { es: 'Talismán del Dios de la Riqueza de los Cinco Caminos', it: 'Talismano del Dio della Ricchezza delle Cinque Strade' },
+        'Five Talismans of Numinous Treasure': { es: 'Cinco Talismanes del Tesoro Numinoso', it: 'Cinque Talismani del Tesoro Numinoso' },
+        'Gen Palace Feng Shui — Northeast (Knowledge & Wisdom)': { es: 'Feng Shui del Palacio Gen — Noreste (Conocimiento y Sabiduría)', it: 'Feng Shui del Palazzo Gen — Nordest (Conoscenza e Saggezza)' },
+        'Golden Light Divine Incantation': { es: 'Encantación Divina de la Luz Dorada', it: 'Incantesimo Divino della Luce Dorata' },
+        'Great Peace Talisman': { es: 'Talismán de la Gran Paz', it: 'Talismano della Grande Pace' },
+        'Green-Black Universal Salvation': { es: 'Salvación Universal Verde-Negra', it: 'Salvezza Universale Verde-Nera' },
+        'Harmonizing the Five Organs and Six Fu': { es: 'Armonización de los Cinco Órganos y las Seis Fu', it: 'Armonizzazione dei Cinque Organi e dei Sei Fu' },
+        'Heavenly Mound Incantation': { es: 'Encantación del Montículo Celestial', it: 'Incantesimo del Tumulo Celeste' },
+        'Heavenly Mound Talisman': { es: 'Talismán del Montículo Celestial', it: 'Talismano del Tumulo Celeste' },
+        'Hua Tong Ming Talisman': { es: 'Talismán Hua Tong Ming', it: 'Talismano Hua Tong Ming' },
+        'Jade Purity Brahma Talisman': { es: 'Talismán Brahma de la Pureza de Jade', it: 'Talismano Brahma della Purezza di Giada' },
+        'Kan Palace Feng Shui — North (Career & Life Path)': { es: 'Feng Shui del Palacio Kan — Norte (Carrera y Camino de Vida)', it: 'Feng Shui del Palazzo Kan — Nord (Carriera e Percorso di Vita)' },
+        'Kan-Li Fire and Water Balancing (Golden Elixir)': { es: 'Equilibrio de Fuego y Agua Kan-Li (Elixir Dorado)', it: 'Equilibrio Fuoco e Acqua Kan-Li (Elisir d\'Oro)' },
+        'Kun Palace Feng Shui — Southwest (Love & Relationships)': { es: 'Feng Shui del Palacio Kun — Suroeste (Amor y Relaciones)', it: 'Feng Shui del Palazzo Kun — Sudovest (Amore e Relazioni)' },
+        'Li Palace Feng Shui — South (Fame & Reputation)': { es: 'Feng Shui del Palacio Li — Sur (Fama y Reputación)', it: 'Feng Shui del Palazzo Li — Sud (Fama e Reputazione)' },
+        'Lord Deng Thunder Deity Talisman': { es: 'Talismán de la Deidad del Trueno del Señor Deng', it: 'Talismano della Divinità del Tuono del Signore Deng' },
+        'Lord Guan\'s Protection Talisman': { es: 'Talismán de Protección del Señor Guan', it: 'Talismano di Protezione del Signore Guan' },
+        'Maoshan Harmony Talisman': { es: 'Talismán de la Armonía Maoshan', it: 'Talismano dell\'Armonia Maoshan' },
+        'Mirror Talisman': { es: 'Talismán del Espejo', it: 'Talismano dello Specchio' },
+        'Nine Palaces Talisman': { es: 'Talismán de los Nueve Palacios', it: 'Talismano dei Nove Palazzi' },
+        'Nine-Phoenix Destroyer of Filth': { es: 'Destructor de Inmundicia de las Nueve Fénix', it: 'Distruttore di Immondizia delle Nove Fenici' },
+        'Northern Dipper Talisman for Releasing Misfortunes': { es: 'Talismán de la Osa Mayor para Liberar Desgracias', it: 'Talismano del Grande Carro per Liberare le Sventure' },
+        'Perfect Writs of the Five Sprouts': { es: 'Escritos Perfectos de los Cinco Brotes', it: 'Scritti Perfetti dei Cinque Germogli' },
+        'Plain Numinosity Talisman': { es: 'Talismán de la Numinosidad Pura', it: 'Talismano della Numinosità Pura' },
+        'Qian Palace Feng Shui — Northwest (Helpful People & Travel)': { es: 'Feng Shui del Palacio Qian — Noroeste (Personas Ayudantes y Viajes)', it: 'Feng Shui del Palazzo Qian — Nordovest (Persone Utili e Viaggi)' },
+        'Red Writing on Five Tablets': { es: 'Escritura Roja en Cinco Tabletas', it: 'Scrittura Rossa su Cinque Tavolette' },
+        'Seal of Marshal Tianpeng': { es: 'Sello del Mariscal Tianpeng', it: 'Sigillo del Marisciallo Tianpeng' },
+        'Seal of the Yangping Jurisdiction': { es: 'Sello de la Jurisdicción de Yangping', it: 'Sigillo della Giurisdizione di Yangping' },
+        'Secret Language of Great Brahma': { es: 'Lenguaje Secreto del Gran Brahma', it: 'Linguaggio Segreto del Grande Brahma' },
+        'Soul Stabilization Peace Talisman': { es: 'Talismán de Paz para la Estabilización del Alma', it: 'Talismano di Pace per la Stabilizzazione dell\'Anima' },
+        'Sword Talisman': { es: 'Talismán de la Espada', it: 'Talismano della Spada' },
+        'Taiji Central Palace Feng Shui — Center (Health & Unity)': { es: 'Feng Shui del Palacio Central Taiji — Centro (Salud y Unidad)', it: 'Feng Shui del Palazzo Centrale Taiji — Centro (Salute e Unità)' },
+        'Talisman for Expelling Sickness and Death': { es: 'Talismán para Expulsar la Enfermedad y la Muerte', it: 'Talismano per Scacciare la Malattia e la Morte' },
+        'Talisman of Duke Yin Guarding the Pass': { es: 'Talismán del Duque Yin Guardando el Paso', it: 'Talismano del Duca Yin che Protegge il Passo' },
+        'Talisman of Duke Yin for Separation': { es: 'Talismán del Duque Yin para la Separación', it: 'Talismano del Duca Yin per la Separazione' },
+        'Talisman of Officers Wang and Ma': { es: 'Talismán de los Oficiales Wang y Ma', it: 'Talismano degli Ufficiali Wang e Ma' },
+        'Talisman of the Sanxiao Goddesses': { es: 'Talismán de las Diosas Sanxiao', it: 'Talismano delle Dee Sanxiao' },
+        'Talisman of the Seventh Lord of the Northern Dipper': { es: 'Talismán del Séptimo Señor de la Osa Mayor', it: 'Talismano del Settimo Signore del Grande Carro' },
+        'Talisman to Open the Mind': { es: 'Talismán para Abrir la Mente', it: 'Talismano per Aprire la Mente' },
+        'Three Sovereigns Talisman': { es: 'Talismán de los Tres Soberanos', it: 'Talismano dei Tre Sovrani' },
+        'True Talismans of the Eight Effulgences': { es: 'Verdaderos Talismanes de las Ocho Efulgencias', it: 'Vere Talismano delle Otto Effulgenze' },
+        'True Writs of the Eight Archivists': { es: 'Escritos Verdaderos de los Ocho Archiveros', it: 'Scritti Veri degli Otto Archivisti' },
+        'Xun Palace Feng Shui — Southeast (Wealth & Abundance)': { es: 'Feng Shui del Palacio Xun — Sureste (Riqueza y Abundancia)', it: 'Feng Shui del Palazzo Xun — Sudest (Ricchezza e Abbondanza)' },
+        'Yellow Register Talisman': { es: 'Talismán del Registro Amarillo', it: 'Talismano del Registro Giallo' },
+        'Zhaijing Residence Stabilization': { es: 'Estabilización de la Residencia Zhaijing', it: 'Stabilizzazione della Residenza Zhaijing' },
+        'Zhen Palace Feng Shui — East (Family & Health)': { es: 'Feng Shui del Palacio Zhen — Este (Familia y Salud)', it: 'Feng Shui del Palazzo Zhen — Est (Famiglia e Salute)' },
+    };
+
+    // Resolve remedy name from object {zh, en, pinyin} to a display string
+    static _resolveRemedyName(remedy, lang) {
+        if (!remedy?.name) return 'Unknown Remedy';
+        // Object form: { zh, en, pinyin, es, it... }
+        if (typeof remedy.name === 'object') {
+            // Direct language match
+            if (remedy.name[lang]) return remedy.name[lang];
+            // Fallback: check REMEDY_NAME_TRANSLATIONS using the English name
+            const enName = remedy.name.en || '';
+            if (enName && lang !== 'en') {
+                const translation = this.REMEDY_NAME_TRANSLATIONS[enName]?.[lang];
+                if (translation) return translation;
+            }
+            return enName || remedy.name.zh || remedy.name.pinyin || 'Unknown Remedy';
+        }
+        // String form - check translation map
+        if (typeof remedy.name === 'string') {
+            const translation = this.REMEDY_NAME_TRANSLATIONS[remedy.name]?.[lang];
+            return translation || remedy.name;
+        }
+        return String(remedy.name);
+    }
+
+    // Format source object or string for display
+    static _formatSource(source) {
+        if (!source) return '';
+        // If it's already a string, return it cleaned
+        if (typeof source === 'string') {
+            return this.formatMarkdownInline(source);
+        }
+        // If it's an object, format it nicely
+        if (typeof source === 'object') {
+            const parts = [];
+            if (source.textTitle || source.title) {
+                parts.push(`<em>${source.textTitle || source.title}</em>`);
+            }
+            if (source.primary) {
+                parts.push(source.primary);
+            }
+            if (source.references && Array.isArray(source.references)) {
+                parts.push(`[${source.references.join(', ')}]`);
+            }
+            return parts.join(', ') || JSON.stringify(source);
+        }
+        return String(source);
+    }
+
+    // Generate a Five Elements / Yin-Yang medicine diagram — NOT a fulu talisman
+    static generateMedicineFDL(content, lang) {
+        const t = I18N[lang] || I18N['en'];
+        return {
+            version: "2.0",
+            background: "#1a1a2e",
+            source: "medicine_generator",
+            type: "medicine_diagram",
+            layers: [
+                {
+                    name: "base",
+                    type: "base_layer",
+                    commands: [
+                        // Central Taijitu (Yin-Yang symbol)
+                        { type: "taijitu", x: 500, y: 500, size: 200 },
+                        // Five Element ring labels around the taijitu
+                        { type: "text", content: "火 Fire", x: 500, y: 200, size: 28, style: { color: "#F44336", font: "NotoSerifSC" } },
+                        { type: "text", content: "水 Water", x: 500, y: 800, size: 28, style: { color: "#2196F3", font: "NotoSerifSC" } },
+                        { type: "text", content: "木 Wood", x: 850, y: 500, size: 28, style: { color: "#4CAF50", font: "NotoSerifSC" } },
+                        { type: "text", content: "金 Metal", x: 150, y: 500, size: 28, style: { color: "#FFC107", font: "NotoSerifSC" } },
+                        { type: "text", content: "土 Earth", x: 500, y: 500, size: 24, style: { color: "#FFB74D", font: "NotoSerifSC" } }
+                    ]
+                },
+                {
+                    name: "connections",
+                    type: "overlay_layer",
+                    commands: [
+                        // Generating cycle arrows (simplified as lines)
+                        { type: "text", content: "丹", x: 500, y: 130, size: 50, style: { color: "#d4af37", font: "NotoSerifSC" } },
+                        { type: "text", content: "— 內丹 Internal Alchemy —", x: 500, y: 900, size: 18, style: { color: "#d4af37AA" } }
+                    ]
+                }
+            ]
+        };
     }
 
     static generateFuluFDL(content, lang) {
         // Generate basic FDL for talisman (Fulu) rendering
         const sealChars = content.sealChars || content.seal_characters || ['符', '咒'];
         const t = I18N[lang] || I18N['en'];
-        
+
+        const instText = content.instructions || content.remedy?.instructions;
+        const numChars = sealChars.length;
+        const mainY = numChars > 2 ? 600 : 640;
+
+        const layers = [
+            {
+                name: "base",
+                type: "base_layer",
+                commands: [
+                    // Mountain at top (y=150)
+                    { type: "mountain", x: 500, y: 150, size: 120, style: { color: "#a91b0d", width: 6 } },
+                    // Taijitu in center
+                    { type: "taijitu", x: 500, y: 380, size: 140, style: { color: "#a91b0d", width: 6 } },
+                    // Seal characters below center
+                    { type: "seal_char", chars: sealChars, x: 500, y: mainY, size: numChars > 2 ? 60 : 100, style: { color: "#a91b0d" } }
+                ]
+            },
+            {
+                name: "title",
+                type: "text_layer",
+                commands: [
+                    // Title at top
+                    { type: "text", text: content.name || t.talisman || 'Fulu', x: 500, y: 60, style: { fontSize: 36, color: "#a91b0d", bold: true } }
+                ]
+            }
+        ];
+
+        if (instText) {
+            const displayInst = typeof instText === 'string' ? instText : (Array.isArray(instText) ? instText.join(' ') : 'Usage Instructions');
+            layers.push({
+                name: "instructions",
+                type: "text_layer",
+                commands: [
+                    { type: "text", text: displayInst.substring(0, 44) + (displayInst.length > 44 ? '...' : ''), x: 500, y: 920, style: { fontSize: 24, color: "#444444" } }
+                ]
+            });
+        }
+
         return {
             version: "2.0",
-            background: content.backgroundColor || "#f5f5dc", // Rice paper color
+            background: content.backgroundColor || "#fceec1", // robust golden yellow paper
             source: "fulu_generator",
-            layers: [
-                {
-                    name: "base",
-                    type: "base_layer",
-                    commands: [
-                        // Mountain at top (y=150)
-                        { type: "mountain", x: 500, y: 150, size: 100 },
-                        // Taijitu in center
-                        { type: "taijitu", x: 500, y: 400, size: 120 },
-                        // Seal characters below center
-                        { type: "seal_char", chars: sealChars, x: 500, y: 650, size: 80, style: { color: "#8b0000" } }
-                    ]
-                },
-                {
-                    name: "title",
-                    type: "text_layer",
-                    commands: [
-                        // Title at top
-                        { type: "text", text: content.name || t.talisman || 'Fulu', x: 500, y: 80, style: { fontSize: 32, color: "#8b0000", bold: true } }
-                    ]
-                }
-            ]
+            layers: layers
         };
     }
 
@@ -1721,25 +2063,56 @@ class UI {
     static renderRemediesLoading(lang) {
         const container = document.getElementById('remedies-content-area');
         if (container) {
-            container.innerHTML = `<div class="loading-placeholder"><div class="loading"></div> ${I18N[lang]?.loading || 'Loading remedies...'}</div>`;
+            container.innerHTML = `<div class="loading-placeholder"><div class="loading"></div> ${I18N[lang]?.loading || 'Loading...'} ${I18N[lang]?.remedies || 'Remedies'}</div>`;
         }
     }
 
     static renderRemediesError(lang) {
         const container = document.getElementById('remedies-content-area');
-        if (container) container.innerHTML = `<div class="error-placeholder">Remedies unavailable</div>`;
+        const t = I18N[lang] || I18N['en'];
+        if (container) container.innerHTML = `<div class="error-placeholder">${t.remedies || 'Remedies'} ${t.unavailable || 'unavailable'}</div>`;
     }
 
     static renderBaguaMedicineLoading(lang) {
         const container = document.getElementById('baguaMedicine-content-area');
         if (container) {
-            container.innerHTML = `<div class="loading-placeholder"><div class="loading"></div> ${I18N[lang]?.loading || 'Loading Bagua Medicine...'}</div>`;
+            container.innerHTML = `<div class="loading-placeholder"><div class="loading"></div> ${I18N[lang]?.loading || 'Loading...'} ${I18N[lang]?.baguaMedicineTitle || 'Bagua Medicine'}</div>`;
         }
     }
 
     static renderBaguaMedicineError(lang) {
         const container = document.getElementById('baguaMedicine-content-area');
         if (container) container.innerHTML = `<div class="error-placeholder">Bagua Medicine unavailable</div>`;
+    }
+
+    static _translateDirection(dir, lang) {
+        if (!dir) return '';
+        const t = I18N[lang] || I18N['en'];
+        let d = dir.trim();
+        // Standardize input mostly (it comes in as N, S, NE, SW or North, South)
+        const match = d.match(/^(North|South|East|West|NE|NW|SE|SW|N|S|E|W)(\s*.*)?$/i);
+        if (match) {
+            const key = match[1].toUpperCase();
+            const rest = match[2] || '';
+            const map = {
+                'NORTH': 'N', 'N': 'N',
+                'SOUTH': 'S', 'S': 'S',
+                'EAST': 'E', 'E': 'E',
+                'WEST': 'W', 'W': 'W',
+                'NORTHEAST': 'NE', 'NE': 'NE',
+                'NORTHWEST': 'NW', 'NW': 'NW',
+                'SOUTHEAST': 'SE', 'SE': 'SE',
+                'SOUTHWEST': 'SW', 'SW': 'SW'
+            };
+            const stdKey = map[key];
+            if (stdKey && t.directions && t.directions[stdKey]) {
+                return t.directions[stdKey] + rest;
+            }
+            // Fallback translations if t.directions missing
+            const fallbackEs = { 'N': 'Norte', 'S': 'Sur', 'E': 'Este', 'W': 'Oeste', 'NE': 'Noreste', 'NW': 'Noroeste', 'SE': 'Sureste', 'SW': 'Suroeste' };
+            if (lang === 'es' && fallbackEs[stdKey]) return fallbackEs[stdKey] + rest;
+        }
+        return d;
     }
 
     static renderBaguaMedicine(data, lang) {
@@ -1753,7 +2126,7 @@ class UI {
             console.warn(`[UI.renderBaguaMedicine] No data provided`);
             return;
         }
-        
+
         const content = data[lang] || data.en || data;
         if (!content) {
             console.warn(`[UI.renderBaguaMedicine] No content available for lang ${lang}`);
@@ -1763,7 +2136,7 @@ class UI {
 
         // Generate unique canvas IDs for houtian and xiantian diagrams
         const ts = Date.now();
-        const canvasId  = 'baguaMedicineDiagram_hou_' + ts;
+        const canvasId = 'baguaMedicineDiagram_hou_' + ts;
         const canvasId2 = 'baguaMedicineDiagram_xia_' + ts;
 
         let html = `<div class="remedy-item-wrapper medicine-section interp-item-wrapper">
@@ -1785,36 +2158,72 @@ class UI {
                 </div>
                 <div class="remedy-info-side">`;
 
+        const translatedFavorable = content.fengShui?.favorable ? content.fengShui.favorable.map(dir => this._translateDirection(dir, lang)) : null;
+        const translatedUnfavorable = content.fengShui?.unfavorable ? content.fengShui.unfavorable.map(dir => this._translateDirection(dir, lang)) : null;
+
         if (content.fengShui) {
             html += `<div class="bagua-med-block feng-shui-block">
-                <h3 class="bagua-med-title">${t.fengShui}</h3>
-                ${content.fengShui.favorable ? `<div class="feng-directions"><div class="feng-favorable"><strong>${t.favorable}:</strong> ${content.fengShui.favorable.join(', ')}</div></div>` : ''}
-                ${content.fengShui.unfavorable ? `<div class="feng-directions"><div class="feng-unfavorable"><strong>${t.unfavorable || 'Unfavorable'}:</strong> ${content.fengShui.unfavorable.join(', ')}</div></div>` : ''}
-                ${content.fengShui.guidance ? `<div class="feng-guidance">${this.formatParagraphs(content.fengShui.guidance)}</div>` : ''}
-            </div>`;
+                <h3 class="bagua-med-title">${t.fengShui}</h3>`;
+            // Format A: bagua-medicine endpoint (favorable/unfavorable arrays + guidance)
+            if (translatedFavorable) {
+                html += `<div class="feng-directions"><div class="feng-favorable"><strong>${t.favorable}:</strong> ${translatedFavorable.join(', ')}</div></div>`;
+            }
+            if (translatedUnfavorable) {
+                html += `<div class="feng-directions"><div class="feng-unfavorable"><strong>${t.unfavorable || 'Unfavorable'}:</strong> ${translatedUnfavorable.join(', ')}</div></div>`;
+            }
+            if (content.fengShui.guidance) {
+                html += `<div class="feng-guidance">${this.formatParagraphs(content.fengShui.guidance)}</div>`;
+            }
+            // Format B: fengshui-medicine-tab endpoint (directions/sectors/timing strings)
+            if (content.fengShui.directions) {
+                html += `<div class="feng-guidance">${this.formatParagraphs(content.fengShui.directions)}</div>`;
+            }
+            if (content.fengShui.sectors) {
+                html += `<div class="feng-guidance">${this.formatParagraphs(content.fengShui.sectors)}</div>`;
+            }
+            if (content.fengShui.timing) {
+                html += `<div class="feng-guidance"><em>${this.formatParagraphs(content.fengShui.timing)}</em></div>`;
+            }
+            html += `</div>`;
         }
 
         if (content.medicine) {
             html += `<div class="bagua-med-block medicine-block"><h3 class="bagua-med-title">${t.medicine}</h3>`;
             if (Array.isArray(content.medicine)) {
+                // Format A: Array of remedy objects
                 content.medicine.forEach(m => {
-                    html += `<div class="medicine-item"><strong>${m.name}</strong> (${m.element}): ${m.description}</div>`;
+                    html += `<div class="medicine-item"><strong>${m.name || ''}</strong>${m.element ? ' (' + m.element + ')' : ''}: ${m.description || m.application || ''}</div>`;
                 });
+            } else if (typeof content.medicine === 'object') {
+                // Format B: Object with recommendations/dietary/practices
+                if (content.medicine.recommendations) {
+                    html += `<div class="medicine-item">${this.formatParagraphs(content.medicine.recommendations)}</div>`;
+                }
+                if (content.medicine.dietary) {
+                    html += `<div class="medicine-item">${this.formatParagraphs(content.medicine.dietary)}</div>`;
+                }
+                if (content.medicine.practices) {
+                    html += `<div class="medicine-item">${this.formatParagraphs(content.medicine.practices)}</div>`;
+                }
+            } else if (typeof content.medicine === 'string') {
+                html += `<div class="medicine-item">${this.formatParagraphs(content.medicine)}</div>`;
             }
             html += `</div>`;
         }
 
         html += `</div></div></div>`;
-        
+
         // Only render to tabbed container
         tabContentArea.innerHTML = html;
 
-        // Check if Medicine tab is visible
+        // Check if Medicine tab is visible or in read mode
         const medicineTab = document.getElementById('tab-medicine');
-        const isVisible = medicineTab && medicineTab.classList.contains('active');
-        
-        console.log(`[UI.renderBaguaMedicine] Tab visible: ${isVisible}`);
-        
+        const isTabActive = medicineTab && medicineTab.classList.contains('active');
+        const isReadMode = document.body.classList.contains('single-read-mode');
+        const isVisible = isTabActive || isReadMode;
+
+        console.log(`[UI.renderBaguaMedicine] Tab visible: ${isVisible}, read mode: ${isReadMode}`);
+
         // Store both canvas IDs for deferred rendering
         this._pendingBaguaMedicineRender = {
             canvasId,
@@ -1854,7 +2263,7 @@ class UI {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
-        
+
         if (rect.width === 0 || rect.height === 0) return;
 
         canvas.width = rect.width * dpr;
@@ -1956,7 +2365,8 @@ class UI {
                 ctx.font = `bold ${size * 0.045}px sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(t.dir, x, y);
+                const translatedDir = typeof UI !== 'undefined' && UI._translateDirection ? UI._translateDirection(t.dir, lang) : t.dir;
+                ctx.fillText(translatedDir, x, y);
             }
         });
     }
@@ -1979,7 +2389,7 @@ class UI {
             return;
         }
 
-        canvas.width  = rect.width  * dpr;
+        canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
 
@@ -1989,19 +2399,19 @@ class UI {
         ctx.fillStyle = '#1a1a2e';
         ctx.fillRect(0, 0, w, h);
 
-        const cx   = w / 2;
-        const cy   = h / 2;
+        const cx = w / 2;
+        const cy = h / 2;
         const size = Math.min(w, h) * 0.88;
 
         // Xiantian direction → trigram mapping (Earlier Heaven arrangement)
         const xiantianDirMap = {
-            'S': 'Qian', 'SE': 'Dui',  'E': 'Li',  'NE': 'Zhen',
-            'N': 'Kun',  'NW': 'Gen',  'W': 'Kan', 'SW': 'Xun',
-            'South': 'Qian', 'Southeast': 'Dui', 'East': 'Li',   'Northeast': 'Zhen',
-            'North': 'Kun',  'Northwest': 'Gen', 'West': 'Kan',  'Southwest': 'Xun'
+            'S': 'Qian', 'SE': 'Dui', 'E': 'Li', 'NE': 'Zhen',
+            'N': 'Kun', 'NW': 'Gen', 'W': 'Kan', 'SW': 'Xun',
+            'South': 'Qian', 'Southeast': 'Dui', 'East': 'Li', 'Northeast': 'Zhen',
+            'North': 'Kun', 'Northwest': 'Gen', 'West': 'Kan', 'Southwest': 'Xun'
         };
 
-        const activeTrigrams  = [];
+        const activeTrigrams = [];
         const highlightColors = {};
 
         (fengShuiData.favorable || []).forEach(dir => {
@@ -2019,13 +2429,14 @@ class UI {
             activeTrigrams,
             label: null,
             stroke: '#d4af37',
-            highlightColor: Object.values(highlightColors)[0] || '#4CAF50'
+            highlightColor: Object.values(highlightColors)[0] || '#4CAF50',
+            translateDirection: (dir) => typeof UI !== 'undefined' && UI._translateDirection ? UI._translateDirection(dir, lang) : dir
         });
 
         // Overlay colored rings for each highlighted trigram
         const xiantianAngles = {
-            'Qian': -Math.PI / 2,   'Dui': -Math.PI / 4, 'Li': 0,          'Zhen': Math.PI / 4,
-            'Kun':  Math.PI / 2,    'Gen':  3 * Math.PI / 4, 'Kan': Math.PI, 'Xun': -3 * Math.PI / 4
+            'Qian': -Math.PI / 2, 'Dui': -Math.PI / 4, 'Li': 0, 'Zhen': Math.PI / 4,
+            'Kun': Math.PI / 2, 'Gen': 3 * Math.PI / 4, 'Kan': Math.PI, 'Xun': -3 * Math.PI / 4
         };
         Object.entries(highlightColors).forEach(([tg, color]) => {
             const angle = xiantianAngles[tg];
@@ -2035,10 +2446,10 @@ class UI {
             const y = cy + Math.sin(angle) * r;
             ctx.beginPath();
             ctx.arc(x, y, size * 0.12, 0, Math.PI * 2);
-            ctx.fillStyle   = color + '30';
+            ctx.fillStyle = color + '30';
             ctx.fill();
             ctx.strokeStyle = color;
-            ctx.lineWidth   = 2;
+            ctx.lineWidth = 2;
             ctx.stroke();
         });
     }
@@ -2049,16 +2460,16 @@ class UI {
             // Create section if it doesn't exist
             this.createXiantianSection();
         }
-        
+
         const section = document.getElementById('xiantianSection');
         const content = document.getElementById('xiantianContent');
         if (!section || !content) return;
-        
+
         const t = I18N[lang] || I18N['en'];
         const interp = data.interpretation || {};
-        
+
         const canvasId = 'xiantianDiagram_' + Date.now();
-        
+
         let html = `
             <div class="xiantian-layout">
                 <div class="xiantian-diagram-container">
@@ -2071,45 +2482,45 @@ class UI {
                     </div>
                 </div>
                 <div class="xiantian-content">`;
-        
+
         if (interp.spiritualEssence) {
             html += `<div class="xiantian-section">
                 <h4>${t.spiritualEssence || 'Spiritual Essence'}</h4>
                 <p>${interp.spiritualEssence}</p>
             </div>`;
         }
-        
+
         if (interp.innerAlchemy) {
             html += `<div class="xiantian-section">
                 <h4>${t.innerAlchemy || 'Inner Alchemy'}</h4>
                 <p>${interp.innerAlchemy}</p>
             </div>`;
         }
-        
+
         if (interp.cultivationAdvice) {
             html += `<div class="xiantian-section">
                 <h4>${t.cultivationAdvice || 'Cultivation Advice'}</h4>
                 <p>${interp.cultivationAdvice}</p>
             </div>`;
         }
-        
+
         html += `</div></div>`;
-        
+
         content.innerHTML = html;
         // Note: Xiantian section is now integrated into the Medicine tab
         // section.style.display = 'block';
-        
+
         // Render the Xiantian diagram
         requestAnimationFrame(() => {
             this.renderXiantianDiagram(canvasId, data.fdl, data.trigrams);
         });
     }
-    
+
     static createXiantianSection() {
         // Find the results content section and add Xiantian section before it
         const resultsContent = document.getElementById('resultsContent');
         if (!resultsContent) return;
-        
+
         const section = document.createElement('div');
         section.id = 'xiantianSection';
         section.className = 'xiantian-section-wrapper';
@@ -2121,14 +2532,14 @@ class UI {
             </div>
             <div id="xiantianContent" class="xiantian-body"></div>
         `;
-        
+
         resultsContent.parentNode.insertBefore(section, resultsContent.nextSibling);
     }
-    
+
     static renderXiantianDiagram(canvasId, fdlData, trigrams) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
-        
+
         // Use FDLRenderer if available, otherwise fall back to SigilTools
         if (typeof FDLRenderer !== 'undefined' && fdlData) {
             FDLRenderer.render(canvasId, fdlData);
@@ -2137,28 +2548,28 @@ class UI {
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
-            
+
             if (rect.width === 0) return;
-            
+
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
             ctx.scale(dpr, dpr);
-            
+
             ctx.fillStyle = '#0a0a1a';
             ctx.fillRect(0, 0, rect.width, rect.height);
-            
+
             // Draw using SigilTools with xiantian flag if supported
             const cx = rect.width / 2;
             const cy = rect.height / 2;
             const size = Math.min(rect.width, rect.height) * 0.8;
-            
+
             // Try to use FDL-style rendering through SigilTools
             if (SigilTools.drawFDL && fdlData) {
                 SigilTools.drawFDL(ctx, rect.width, rect.height, fdlData, '#D4AF37');
             } else if (SigilTools.drawBagua) {
                 // Last resort: draw Houtian and note the limitation
                 SigilTools.drawBagua(ctx, cx, cy, size, { activeTrigrams: trigrams ? [trigrams.upper, trigrams.lower] : [] }, '#D4AF37');
-                
+
                 // Add label noting this is Xiantian
                 ctx.fillStyle = '#FFD700';
                 ctx.font = '14px sans-serif';
@@ -2241,27 +2652,27 @@ class UI {
     static renderBaguaStrip(lang) {
         const strip = document.getElementById('baguaHexStrip');
         if (!strip || typeof TRIGRAMS === 'undefined') return;
-        
+
         // Houtian (Later Heaven) order - clockwise from South (top)
         // This matches the traditional Bagua arrangement
         const houtianOrder = ['101', '000', '011', '111', '010', '100', '001', '110'];
         // Corresponds to: Fire(S), Earth(SW), Lake(W), Heaven(NW), Water(N), Mountain(NE), Thunder(E), Wind(SE)
-        
+
         strip.innerHTML = houtianOrder.map((key) => {
             const tg = TRIGRAMS[key];
             if (!tg) return '';
-            
+
             // Build trigram SVG visualization
             const lines = key.split('').map((bit, i) => {
                 const y = 8 + i * 6;
-                return bit === '1' 
+                return bit === '1'
                     ? `<line x1="2" y1="${y}" x2="22" y2="${y}" stroke="currentColor" stroke-width="2" />`
                     : `<line x1="2" y1="${y}" x2="9" y2="${y}" stroke="currentColor" stroke-width="2" /><line x1="15" y1="${y}" x2="22" y2="${y}" stroke="currentColor" stroke-width="2" />`;
             }).join('');
-            
+
             const name = tg.name[lang] || tg.name.en;
             const trigramId = tg.name.en.toLowerCase();
-            
+
             return `<div class="bagua-strip-item hex-${trigramId}" data-trigram="${trigramId}"
                  onclick="UI.handleTrigramClick('${trigramId}', event)" role="listitem">
                 <div class="bagua-strip-symbol">
@@ -2274,61 +2685,62 @@ class UI {
         }).join('');
     }
 
-    static showBaguaDiagram() {
+    static showBaguaDiagram(lang = 'en') {
+        const t = I18N[lang] || I18N['en'];
         const instructions = [
-            "Activate South for Fire energy",
-            "Balance West for Metal harmony",
-            "Enhance East for Wood growth"
+            `${t.activatedForEnergy || 'Activated for energy'}: ${t.south || 'South'} (${t.fire || 'Fire'})`,
+            `${t.balancedForHarmony || 'Balanced for harmony'}: ${t.west || 'West'} (${t.metal || 'Metal'})`,
+            `${t.enhancedForGrowth || 'Enhanced for growth'}: ${t.east || 'East'} (${t.wood || 'Wood'})`
         ];
-        
+
         const diagram = FENG_SHUI_DGL_SPEC.helpers.generateDiagram(instructions, {
             arrangement: "houtian",
             lang: App.lang
         });
-        
+
         const canvas = document.createElement('canvas');
         canvas.width = 1000;
         canvas.height = 1000;
         const ctx = canvas.getContext('2d');
-        
+
         // Draw background
         ctx.fillStyle = diagram.background || '#1a1a2e';
         ctx.fillRect(0, 0, 1000, 1000);
-        
+
         // Render the diagram
         SigilTools.renderFengShuiDiagram(diagram, ctx, 0, 0, 1000, '#d4af37');
-        
+
         // Create modal
         const modal = document.createElement('div');
         modal.className = 'fengshui-modal';
         modal.innerHTML = `
             <div class="fengshui-modal-content">
                 <div class="fengshui-modal-header">
-                    <h3>Bagua Diagram - Later Heaven Arrangement</h3>
+                    <h3>${t.baguaDiagram || 'Bagua Diagram'} - ${t.laterHeaven || 'Later Heaven Arrangement'}</h3>
                     <button onclick="this.closest('.fengshui-modal').remove()" class="fengshui-modal-close">&times;</button>
                 </div>
                 <div class="fengshui-modal-body">
                     <canvas id="fengshuiCanvas" width="1000" height="1000"></canvas>
                     <div class="fengshui-modal-instructions">
-                        <h4>Instructions Applied:</h4>
+                        <h4>${t.instructionsApplied || 'Instructions Applied'}:</h4>
                         <ul>
-                            <li>South (Fire) - Activated for energy</li>
-                            <li>West (Metal) - Balanced for harmony</li>
-                            <li>East (Wood) - Enhanced for growth</li>
+                            <li>${t.south || 'South'} (${t.fire || 'Fire'}) - ${t.activatedForEnergy || 'Activated for energy'}</li>
+                            <li>${t.west || 'West'} (${t.metal || 'Metal'}) - ${t.balancedForHarmony || 'Balanced for harmony'}</li>
+                            <li>${t.east || 'East'} (${t.wood || 'Wood'}) - ${t.enhancedForGrowth || 'Enhanced for growth'}</li>
                         </ul>
                     </div>
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         // Replace canvas with the rendered one
         const existingCanvas = modal.querySelector('#fengshuiCanvas');
         if (existingCanvas) {
             existingCanvas.parentNode.replaceChild(canvas, existingCanvas);
         }
-        
+
         // Add CSS for modal
         if (!document.querySelector('#fengshuiModalStyles')) {
             const style = document.createElement('style');
@@ -2393,61 +2805,62 @@ class UI {
         }
     }
 
-    static showBaguaDiagram() {
+    static showBaguaDiagram(lang = 'en') {
+        const t = I18N[lang] || I18N['en'];
         const instructions = [
-            "Activate South for Fire energy",
-            "Balance West for Metal harmony",
-            "Enhance East for Wood growth"
+            `${t.activatedForEnergy || 'Activated for energy'}: ${t.south || 'South'} (${t.fire || 'Fire'})`,
+            `${t.balancedForHarmony || 'Balanced for harmony'}: ${t.west || 'West'} (${t.metal || 'Metal'})`,
+            `${t.enhancedForGrowth || 'Enhanced for growth'}: ${t.east || 'East'} (${t.wood || 'Wood'})`
         ];
-        
+
         const diagram = FENG_SHUI_DGL_SPEC.helpers.generateDiagram(instructions, {
             arrangement: "houtian",
             lang: App.lang
         });
-        
+
         const canvas = document.createElement('canvas');
         canvas.width = 1000;
         canvas.height = 1000;
         const ctx = canvas.getContext('2d');
-        
+
         // Draw background
         ctx.fillStyle = diagram.background || '#1a1a2e';
         ctx.fillRect(0, 0, 1000, 1000);
-        
+
         // Render the diagram
         SigilTools.renderFengShuiDiagram(diagram, ctx, 0, 0, 1000, '#d4af37');
-        
+
         // Create modal
         const modal = document.createElement('div');
         modal.className = 'fengshui-modal';
         modal.innerHTML = `
             <div class="fengshui-modal-content">
                 <div class="fengshui-modal-header">
-                    <h3>Bagua Diagram - Later Heaven Arrangement</h3>
+                    <h3>${t.baguaDiagram || 'Bagua Diagram'} - ${t.laterHeaven || 'Later Heaven Arrangement'}</h3>
                     <button onclick="this.closest('.fengshui-modal').remove()" class="fengshui-modal-close">&times;</button>
                 </div>
                 <div class="fengshui-modal-body">
                     <canvas id="fengshuiCanvas" width="1000" height="1000"></canvas>
                     <div class="fengshui-modal-instructions">
-                        <h4>Instructions Applied:</h4>
+                        <h4>${t.instructionsApplied || 'Instructions Applied'}:</h4>
                         <ul>
-                            <li>South (Fire) - Activated for energy</li>
-                            <li>West (Metal) - Balanced for harmony</li>
-                            <li>East (Wood) - Enhanced for growth</li>
+                            <li>${t.south || 'South'} (${t.fire || 'Fire'}) - ${t.activatedForEnergy || 'Activated for energy'}</li>
+                            <li>${t.west || 'West'} (${t.metal || 'Metal'}) - ${t.balancedForHarmony || 'Balanced for harmony'}</li>
+                            <li>${t.east || 'East'} (${t.wood || 'Wood'}) - ${t.enhancedForGrowth || 'Enhanced for growth'}</li>
                         </ul>
                     </div>
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         // Replace canvas with the rendered one
         const existingCanvas = modal.querySelector('#fengshuiCanvas');
         if (existingCanvas) {
             existingCanvas.parentNode.replaceChild(canvas, existingCanvas);
         }
-        
+
         // Add CSS for modal
         if (!document.querySelector('#fengshuiModalStyles')) {
             const style = document.createElement('style');
@@ -2542,6 +2955,8 @@ class UI {
     static initReadingTabs() {
         // Main tabs
         document.querySelectorAll('.reading-tab-btn').forEach(btn => {
+            if (btn.dataset.tabListenerAttached) return;
+            btn.dataset.tabListenerAttached = 'true';
             btn.addEventListener('click', (e) => {
                 const tabId = e.currentTarget.dataset.tab;
                 this.switchReadingTab(tabId);
@@ -2550,6 +2965,8 @@ class UI {
 
         // Sub-tabs for interpretation
         document.querySelectorAll('#tab-interpretation .sub-tab-btn').forEach(btn => {
+            if (btn.dataset.subTabListenerAttached) return;
+            btn.dataset.subTabListenerAttached = 'true';
             btn.addEventListener('click', (e) => {
                 const subtabId = e.currentTarget.dataset.subtab;
                 this.switchSubTab('interpretation', subtabId);
@@ -2558,6 +2975,8 @@ class UI {
 
         // Sub-tabs for remedies
         document.querySelectorAll('#tab-remedies .sub-tab-btn').forEach(btn => {
+            if (btn.dataset.subTabListenerAttached) return;
+            btn.dataset.subTabListenerAttached = 'true';
             btn.addEventListener('click', (e) => {
                 const subtabId = e.currentTarget.dataset.subtab;
                 this.switchSubTab('remedies', subtabId);
@@ -2576,11 +2995,18 @@ class UI {
         document.querySelectorAll('.reading-tab-panel').forEach(panel => {
             panel.classList.toggle('active', panel.id === `tab-${tabId}`);
         });
-        
+
         // Trigger diagram rendering when specific tabs are activated
         if (tabId === 'remedies') {
             console.log(`[UI] Tab ${tabId} activated, triggering remedy diagram render`);
-            setTimeout(() => this._renderPendingRemedies(), 100);
+            // Increment render generation to cancel any stale retries
+            this._remedyRenderGen = (this._remedyRenderGen || 0) + 1;
+            const currentGen = this._remedyRenderGen;
+
+            // Multiple retries to ensure rendering happens after tab is fully visible
+            setTimeout(() => this._renderPendingRemedies(0, null, currentGen), 100);
+            setTimeout(() => this._renderPendingRemedies(0, null, currentGen), 500);
+            setTimeout(() => this._renderPendingRemedies(0, null, currentGen), 1000);
         }
         if (tabId === 'medicine') {
             console.log(`[UI] Tab ${tabId} activated, triggering Bagua Medicine diagram render`);
@@ -2673,7 +3099,7 @@ class UI {
     static ensureTextContrast(element, bgColor) {
         const contrastColor = this.getContrastColor(bgColor);
         element.style.color = contrastColor;
-        
+
         // Add text shadow for better readability
         if (contrastColor === '#FFFFFF') {
             element.style.textShadow = '0 1px 2px rgba(0,0,0,0.5)';
@@ -2705,21 +3131,39 @@ class UI {
             const astro = reading.chineseAstrology;
             const astroSummary = [];
             
+            // Helper to translate element names
+            const translateElement = (elementEn) => {
+                if (!elementEn) return elementEn;
+                const el = elementEn.toLowerCase();
+                if (el.includes('wood')) return t.wood || 'Wood';
+                if (el.includes('fire')) return t.fire || 'Fire';
+                if (el.includes('earth')) return t.earth || 'Earth';
+                if (el.includes('metal')) return t.metal || 'Metal';
+                if (el.includes('water')) return t.water || 'Water';
+                return elementEn;
+            };
+
             if (astro.bazi?.dayMaster) {
-                astroSummary.push(`Day Master: ${astro.bazi.dayMaster.zh} ${astro.bazi.dayMaster.name} (${astro.bazi.dayMaster.element})`);
+                const dayMasterLabel = t.dayMaster || AstrologyI18N.getTranslations(lang).dayMaster || 'Day Master';
+                const elementTranslated = translateElement(astro.bazi.dayMaster.element);
+                astroSummary.push(`${dayMasterLabel}: ${astro.bazi.dayMaster.zh} ${astro.bazi.dayMaster.name} (${elementTranslated})`);
             }
             if (astro.lunarMansion?.mansion) {
-                astroSummary.push(`Lunar Mansion: ${astro.lunarMansion.mansion.zh} ${astro.lunarMansion.mansion.name}`);
+                const lunarMansionLabel = t.lunarMansion || 'Lunar Mansion';
+                astroSummary.push(`${lunarMansionLabel}: ${astro.lunarMansion.mansion.zh} ${astro.lunarMansion.mansion.name}`);
             }
             if (astro.taiSui?.currentPosition) {
-                astroSummary.push(`Tai Sui: ${astro.taiSui.currentPosition.zh} (${astro.taiSui.currentPosition.direction})`);
+                const taiSuiLabel = t.taiSui || 'Tai Sui';
+                astroSummary.push(`${taiSuiLabel}: ${astro.taiSui.currentPosition.zh} (${astro.taiSui.currentPosition.direction})`);
             }
             if (astro.bagua?.hexiangua) {
-                astroSummary.push(`Life Gua: #${astro.bagua.hexiangua.hexagramNumber} ${astro.bagua.hexiangua.hexagramName}`);
+                const lifeGuaLabel = t.lifeGua || AstrologyI18N.getTranslations(lang).lifeGua || 'Life Gua';
+                astroSummary.push(`${lifeGuaLabel}: #${astro.bagua.hexiangua.hexagramNumber} ${astro.bagua.hexiangua.hexagramName}`);
             }
-            
+
             if (astroSummary.length > 0) {
-                celestialContent = `**Chinese Astrology Context:**\n${astroSummary.join(' • ')}\n\n${celestialContent}`;
+                const astroContextLabel = t.chineseAstrologyContext || 'Chinese Astrology Context';
+                celestialContent = `**${astroContextLabel}:**\n${astroSummary.join(' • ')}\n\n${celestialContent}`;
             }
         }
 
@@ -2727,13 +3171,19 @@ class UI {
         let elementsContent = r.elements;
         if (reading?.equilibrium?.elements) {
             const el = reading.equilibrium.elements;
+            // Translate element names
+            const woodLabel = t.wood || 'Wood';
+            const fireLabel = t.fire || 'Fire';
+            const earthLabel = t.earth || 'Earth';
+            const metalLabel = t.metal || 'Metal';
+            const waterLabel = t.water || 'Water';
             const elHtml = `
                 <div class="five-elements-balance">
-                    <div class="element-bar"><span class="el-label">Wood 木</span><div class="el-bar"><div class="el-fill wood" style="width:${el.wood || 0}%"></div></div><span class="el-value">${el.wood || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">Fire 火</span><div class="el-bar"><div class="el-fill fire" style="width:${el.fire || 0}%"></div></div><span class="el-value">${el.fire || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">Earth 土</span><div class="el-bar"><div class="el-fill earth" style="width:${el.earth || 0}%"></div></div><span class="el-value">${el.earth || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">Metal 金</span><div class="el-bar"><div class="el-fill metal" style="width:${el.metal || 0}%"></div></div><span class="el-value">${el.metal || 0}%</span></div>
-                    <div class="element-bar"><span class="el-label">Water 水</span><div class="el-bar"><div class="el-fill water" style="width:${el.water || 0}%"></div></div><span class="el-value">${el.water || 0}%</span></div>
+                    <div class="element-bar"><span class="el-label">${woodLabel} 木</span><div class="el-bar"><div class="el-fill wood" style="width:${el.wood || 0}%"></div></div><span class="el-value">${el.wood || 0}%</span></div>
+                    <div class="element-bar"><span class="el-label">${fireLabel} 火</span><div class="el-bar"><div class="el-fill fire" style="width:${el.fire || 0}%"></div></div><span class="el-value">${el.fire || 0}%</span></div>
+                    <div class="element-bar"><span class="el-label">${earthLabel} 土</span><div class="el-bar"><div class="el-fill earth" style="width:${el.earth || 0}%"></div></div><span class="el-value">${el.earth || 0}%</span></div>
+                    <div class="element-bar"><span class="el-label">${metalLabel} 金</span><div class="el-bar"><div class="el-fill metal" style="width:${el.metal || 0}%"></div></div><span class="el-value">${el.metal || 0}%</span></div>
+                    <div class="element-bar"><span class="el-label">${waterLabel} 水</span><div class="el-bar"><div class="el-fill water" style="width:${el.water || 0}%"></div></div><span class="el-value">${el.water || 0}%</span></div>
                 </div>
             `;
             elementsContent = elHtml + (elementsContent ? `<div class="elements-text">${elementsContent}</div>` : '');
@@ -2750,7 +3200,7 @@ class UI {
 
         sections.forEach(section => {
             let content = section.content;
-            
+
             // If no explicit content, try to get from result object
             if (!content) {
                 // Try different field names based on section
@@ -2767,11 +3217,11 @@ class UI {
 
             // Build 3-layer structure (Technical Data / Technical Analysis / Colloquial)
             const sectionPrefix = section.key === 'celestial' ? 'celestial' :
-                                  section.key === 'elements' ? 'elements' :
-                                  section.key === 'analysis' ? 'core' :
-                                  section.key === 'advice' ? 'core' :
-                                  section.key === 'houtou' ? 'houtou' : section.key;
-            
+                section.key === 'elements' ? 'elements' :
+                    section.key === 'analysis' ? 'core' :
+                        section.key === 'advice' ? 'core' :
+                            section.key === 'houtou' ? 'houtou' : section.key;
+
             // Check for preserved technical data (celestial has both astro and bazi)
             const technicalDataAstro = r.celestialAstroTechnicalData;
             const technicalDataBazi = r.celestialBaziTechnicalData;
@@ -2779,30 +3229,30 @@ class UI {
             const technicalData = r[`${sectionPrefix}TechnicalData`] || r[`${section.key}Data`] || technicalDataAstro;
             const technicalAnalysis = r[`${sectionPrefix}Technical`] || r[`${section.key}Technical`];
             // Advice section has colloquialInterpretation directly from core-application endpoint
-            const colloquialInterpretation = section.key === 'advice' 
+            const colloquialInterpretation = section.key === 'advice'
                 ? (r.colloquialInterpretation || r.coreColloquial || r.advice)
                 : (r[`${sectionPrefix}Colloquial`] || r[`${section.key}Colloquial`]);
-            
+
             // Debug: log advice section fields
             if (section.key === 'advice') {
                 console.log(`[UI.advice] Lang: ${lang}, has colloquialInterpretation: ${!!r.colloquialInterpretation}, has coreColloquial: ${!!r.coreColloquial}, has advice: ${!!r.advice}`);
                 if (r.colloquialInterpretation) console.log(`[UI.advice] colloquialInterpretation length: ${r.colloquialInterpretation.length}, preview: ${r.colloquialInterpretation.substring(0, 50)}...`);
                 if (r.coreColloquial) console.log(`[UI.advice] coreColloquial length: ${r.coreColloquial.length}, preview: ${r.coreColloquial.substring(0, 50)}...`);
             }
-            
+
             // Special handling for narrative content (from core-narrative endpoint)
             const narrativeAnalysis = section.key === 'analysis' ? (r.analysis || r.narrativeAnalysis) : null;
             const narrativeColloquial = section.key === 'analysis' ? r.colloquialInterpretation : null;
-            
+
             // If we have the 3-layer structure, build it properly (including narrative layers)
             // For advice section, also check for advice field directly
             const hasAdviceContent = section.key === 'advice' && (r.advice || r.colloquialInterpretation);
             const has3LayerStructure = technicalAnalysis || colloquialInterpretation || technicalDataAstro || technicalDataBazi || technicalDataElements || narrativeAnalysis || narrativeColloquial || hasAdviceContent;
             const hasSimpleContent = content && typeof content === 'string' && content.length > 10;
-            
+
             if (has3LayerStructure || hasSimpleContent) {
                 let layeredContent = '';
-                
+
                 // Layer 1: Technical Data (collapsible) - handle celestial specially
                 if (section.key === 'celestial' && (technicalDataAstro || technicalDataBazi)) {
                     let dataHtml = '';
@@ -2844,7 +3294,7 @@ class UI {
                         </div>
                     `;
                 }
-                
+
                 // Layer 2: Technical Analysis
                 if (technicalAnalysis) {
                     layeredContent += `
@@ -2854,7 +3304,7 @@ class UI {
                         </div>
                     `;
                 }
-                
+
                 // Layer 3: Colloquial Interpretation
                 if (colloquialInterpretation) {
                     const isAdvice = section.key === 'advice' || section.key === 'core-application';
@@ -2865,7 +3315,7 @@ class UI {
                         </div>
                     `;
                 }
-                
+
                 // Layer 3b: Advice text (for advice section)
                 if (section.key === 'advice' && r.advice && r.advice !== colloquialInterpretation) {
                     layeredContent += `
@@ -2875,7 +3325,7 @@ class UI {
                         </div>
                     `;
                 }
-                
+
                 // Layer 4: Narrative Technical (from core-narrative endpoint)
                 if (narrativeAnalysis) {
                     layeredContent += `
@@ -2885,7 +3335,7 @@ class UI {
                         </div>
                     `;
                 }
-                
+
                 // Layer 5: Narrative Colloquial (from core-narrative endpoint)
                 if (narrativeColloquial) {
                     layeredContent += `
@@ -2895,18 +3345,18 @@ class UI {
                         </div>
                     `;
                 }
-                
+
                 // Fallback to regular content if no layered content
                 if (!layeredContent && content) {
                     const isAdvice = section.key === 'advice';
                     layeredContent = this.formatParagraphs(content, { isAdvice });
                 }
-                
+
                 // Special handling for analysis section - ensure we always show analysis text
                 if (!layeredContent && section.key === 'analysis' && r.analysis) {
                     layeredContent = this.formatParagraphs(r.analysis);
                 }
-                
+
                 // Always render section if we have any content
                 if (layeredContent || content) {
                     const isAdvice = section.key === 'advice';
@@ -2927,7 +3377,7 @@ class UI {
         }); // Close forEach
 
         container.innerHTML = html || '<div style="color: var(--text-dim); padding: 20px;">No interpretation available</div>';
-        
+
         // Mark sections as translatable for the TranslationService
         if (typeof TranslationService !== 'undefined') {
             this.markTranslatableSections();
@@ -2946,7 +3396,7 @@ class UI {
                 card.setAttribute('data-translatable-section', sectionKey);
             }
         });
-        
+
         console.log(`[UI.markTranslatableSections] Marked ${sectionCards.length} sections as translatable`);
     }
 
@@ -2954,14 +3404,29 @@ class UI {
         const container = document.getElementById('remedies-content-area');
         if (!container) return;
 
+        // Normalize flat structure { remedies: [...], fuluContentList: [...] }
+        // into lang-keyed structure { en: { remedies: [...] }, fuluContentList: [...] }
+        if (remedies && remedies.remedies && !remedies.en && !remedies.es && !remedies.it && !remedies.zh) {
+            remedies = {
+                en: { remedies: remedies.remedies },
+                fuluContentList: remedies.fuluContentList || []
+            };
+        }
+
         console.log(`[UI.renderRemediesTabbed] Called with lang=${lang}, available langs:`, Object.keys(remedies || {}));
         console.log(`[UI.renderRemediesTabbed] remedies[${lang}]:`, remedies?.[lang] ? `has ${remedies[lang].remedies?.length || 0} remedies` : 'not found');
-        
+
         const displayLang = (remedies && remedies[lang] && remedies[lang].remedies?.length > 0) ? lang : 'en';
         console.log(`[UI.renderRemediesTabbed] Using displayLang: ${displayLang}`);
-        
+
         if (!remedies || !remedies[displayLang] || !remedies[displayLang].remedies?.length) {
-            container.innerHTML = '<div style="color: var(--text-dim); padding: 20px;">No remedies available</div>';
+            console.log(`[UI.renderRemediesTabbed] No remedies to display for ${displayLang}`, remedies);
+            const t = I18N[lang] || I18N['en'];
+            container.innerHTML = `
+                <div style="color: var(--text-dim); padding: 20px; text-align: center;">
+                    <p>${t.noRemediesAvailable || 'No remedies available for this reading.'}</p>
+                    <p style="font-size: 0.9em; opacity: 0.7; margin-top: 10px;">${t.tryAgainLater || 'Please try again or consult a practitioner for personalized guidance.'}</p>
+                </div>`;
             return;
         }
 
@@ -2970,18 +3435,108 @@ class UI {
         const remedyList = remedies[displayLang].remedies;
         const fuluContentList = remedies.fuluContentList || [];
 
+        // Helper to translate remedy content asynchronously
+        const translateRemedyContent = async (remedy, lang) => {
+            if (lang === 'en' || !window.translationService) return remedy;
+            
+            const fieldsToTranslate = ['relevance', 'description', 'instructions'];
+            for (const field of fieldsToTranslate) {
+                if (remedy[field] && typeof remedy[field] === 'string') {
+                    try {
+                        const translated = await window.translationService.translateText(remedy[field], lang, 'ui_content');
+                        if (translated && translated !== remedy[field]) {
+                            remedy[field] = translated;
+                        }
+                    } catch (err) {
+                        console.warn(`[UI] Failed to translate remedy ${field}:`, err);
+                    }
+                }
+            }
+            return remedy;
+        };
+
         remedyList.forEach((remedy, index) => {
             const isTalisman = remedy.type === 'fulu';
             const isFengShui = remedy.type === 'fengshui';
+            const isMedicine = remedy.type === 'medicine';
             const type = isTalisman ? 'fulu' : isFengShui ? 'fengshui' : 'medicine';
+
+            // Resolve name from object {zh, en} to string
+            const remedyName = this._resolveRemedyName(remedy, displayLang);
+            const remedyNameZh = typeof remedy.name === 'object' ? (remedy.name.zh || '') : (remedy.nameZh || '');
+
+            let fuluContent = fuluContentList.find(f => f.id === remedy.id) || fuluContentList[index] || {};
             
-            const fuluContent = fuluContentList.find(f => f.id === remedy.id) || fuluContentList[index] || {};
+            // Kick off async translation for remedy content if not English
+            if (displayLang !== 'en' && window.translationService) {
+                translateRemedyContent(remedy, displayLang).then(updatedRemedy => {
+                    // Update DOM with translated content
+                    const tabItems = document.querySelectorAll('.remedy-tab-item');
+                    tabItems.forEach(item => {
+                        const h3 = item.querySelector('h3');
+                        if (h3 && h3.textContent.includes(remedyName)) {
+                            // Update relevance
+                            const relevanceBox = item.querySelector('.remedy-relevance-box p');
+                            if (relevanceBox && updatedRemedy.relevance) {
+                                relevanceBox.innerHTML = this.formatMarkdownInline(updatedRemedy.relevance);
+                            }
+                            // Update description
+                            const descText = item.querySelector('.remedy-description-text');
+                            if (descText && updatedRemedy.description) {
+                                descText.innerHTML = this.formatParagraphs(updatedRemedy.description);
+                            }
+                            // Update instructions
+                            const instructionsBox = item.querySelector('.remedy-instructions-box p');
+                            if (instructionsBox && updatedRemedy.instructions) {
+                                instructionsBox.innerHTML = this.formatMarkdownInline(updatedRemedy.instructions);
+                            }
+                        }
+                    });
+                }).catch(err => console.error('[UI] Failed to translate remedy content:', err));
+            }
+
+            // Try to find instructions from other sources if missing in remedy
+            if (!remedy.instructions && !remedy.application) {
+                if (fuluContent.instructions) {
+                    remedy.instructions = fuluContent.instructions;
+                } else if (typeof DAOIST_REMEDIES_DB !== 'undefined') {
+                    let localRecord = null;
+                    if (isTalisman && DAOIST_REMEDIES_DB.fulu) {
+                        localRecord = DAOIST_REMEDIES_DB.fulu.find(f => f.id === remedy.id);
+                    } else if (isFengShui && DAOIST_REMEDIES_DB.fengshui) {
+                        localRecord = DAOIST_REMEDIES_DB.fengshui.find(f => f.id === remedy.id);
+                    }
+                    if (localRecord && localRecord.instructions) {
+                        remedy.instructions = localRecord.instructions;
+                        // Kick off async translation for DB-sourced text if not EN
+                        if (displayLang !== 'en' && window.translationService) {
+                            window.translationService.translateText(remedy.instructions, displayLang, 'ui_content')
+                                .then(translated => {
+                                    if (translated && translated !== remedy.instructions) {
+                                        remedy.instructions = translated;
+                                        // Update the DOM node directly to avoid full re-render
+                                        const tabItems = document.querySelectorAll('.remedy-tab-item');
+                                        tabItems.forEach(item => {
+                                            const h3 = item.querySelector('h3');
+                                            if (h3 && h3.textContent.includes(remedyName)) {
+                                                const p = item.querySelector('.remedy-instructions-box p');
+                                                if (p) p.innerHTML = this.formatMarkdownInline(translated);
+                                            }
+                                        });
+                                    }
+                                }).catch(err => console.error("Failed to translate DB instructions", err));
+                        }
+                    }
+                }
+            }
+
             const hasImage = fuluContent.image || (Array.isArray(fuluContent.image) && fuluContent.image.length > 0);
             const imageUrls = hasImage ? (Array.isArray(fuluContent.image) ? fuluContent.image : [fuluContent.image]) : [];
-            const hasFDL = fuluContent.fdl || isFengShui; // Feng Shui will generate FDL dynamically
-            
-            // Only show visual side if there's image or FDL potential
-            const showVisual = hasImage || hasFDL || isTalisman;
+            // hasFDL: true for all remedy types — FDL is generated for medicine via generateFuluFDL too
+            const hasFDL = fuluContent.fdl || isFengShui || isTalisman || remedy.type === 'medicine';
+
+            // Always show visual side since all types get FDL diagrams generated
+            const showVisual = true;
 
             const typeLabel = isTalisman ? t.talisman : isFengShui ? t.fengshui : t.medicine;
             const icon = isTalisman ? '符' : isFengShui ? '風' : '丹';
@@ -2991,17 +3546,17 @@ class UI {
                     <div class="remedy-tab-header">
                         <div class="remedy-tab-icon">${icon}</div>
                         <div class="remedy-tab-title">
-                            <h3>${remedy.name}</h3>
-                            <div class="subtitle">${typeLabel} | ${remedy.nameZh || ''}</div>
+                            <h3>${remedyName}</h3>
+                            <div class="subtitle">${typeLabel}${remedyNameZh ? ' | ' + remedyNameZh : ''}</div>
                         </div>
                     </div>
                     <div class="remedy-layout-grid">
                         ${showVisual ? `<div class="remedy-visual-side">
                             ${hasImage ? `<div class="fulu-image-container">
-                                ${imageUrls.map(url => `<img src="${url}" class="fulu-reference-image" onclick="UI.openImageModal('${url}', '${remedy.name}')" loading="lazy" crossorigin="anonymous" />`).join('')}
+                                ${imageUrls.map(url => `<img src="${url}" class="fulu-reference-image" onclick="UI.openImageModal('${url}', '${remedyName.replace(/'/g, '\\\'')}')" loading="lazy" crossorigin="anonymous" />`).join('')}
                             </div>` : ''}
-                            <div class="fulu-canvas-container" ${!hasFDL && !hasImage ? 'style="display:none"' : ''}>
-                                <canvas id="fuluCanvas_${index}" width="400" height="400"></canvas>
+                            <div class="fulu-canvas-container" style="min-height: 400px;">
+                                <canvas id="fuluCanvas_${index}" width="400" height="400" style="width: 100%; height: 400px;"></canvas>
                             </div>
                         </div>` : ''}
                         <div class="remedy-info-side">
@@ -3014,13 +3569,15 @@ class UI {
                                 <strong>${t.application}:</strong>
                                 <p>${this.formatMarkdownInline(remedy.application)}</p>
                             </div>` : ''}
-                            ${remedy.instructions ? `<div class="remedy-instructions-box">
+                            ${(remedy.instructions || remedy.application) ? `<div class="remedy-instructions-box">
                                 <strong>${t.instructions || 'Instructions'}:</strong>
-                                <p>${this.formatMarkdownInline(remedy.instructions)}</p>
-                            </div>` : ''}
+                                <p>${this.formatMarkdownInline(remedy.instructions || remedy.application || t.noInstructionsAvailable || 'Apply according to traditional practice.')}</p>
+                            </div>` : `<div class="remedy-instructions-box remedy-instructions-missing">
+                                <strong>${t.instructions || 'Instructions'}:</strong>
+                                <p class="instructions-placeholder">${t.noInstructionsAvailable || 'Instructions not available. Apply according to traditional practice or consult a qualified practitioner.'}</p>
+                            </div>`}
                             <div class="remedy-source-footer">
-                                <strong>${t.source}:</strong> ${this.formatMarkdownInline(remedy.source)}
-                                <span class="verif-tag">${remedy.verification}</span>
+                                <strong>${t.source}:</strong> ${this._formatSource(remedy.source)}${remedy.verification ? ` <span class="verif-tag">${remedy.verification}</span>` : ''}
                             </div>
                         </div>
                     </div>
@@ -3030,17 +3587,22 @@ class UI {
 
         container.innerHTML = html || '<div style="color: var(--text-dim); padding: 20px;">No remedies available</div>';
 
-        // Render Fulu diagrams - check if remedies tab is active first
+        // Render Fulu diagrams - check if remedies tab is active or in read mode
         const remediesTab = document.getElementById('tab-remedies');
-        const isVisible = remediesTab && remediesTab.classList.contains('active');
-        
-        console.log(`[UI.renderRemediesTabbed] Scheduling Fulu diagram rendering for ${remedyList.length} remedies, tab visible: ${isVisible}`);
-        
+        const isTabActive = remediesTab && remediesTab.classList.contains('active');
+        const isReadMode = document.body.classList.contains('single-read-mode');
+        const isVisible = isTabActive || isReadMode;
+
+        console.log(`[UI.renderRemediesTabbed] Scheduling Fulu diagram rendering for ${remedyList.length} remedies, tab visible: ${isVisible}, read mode: ${isReadMode}`);
+
         // Store rendering context for later use when tab becomes visible
+        this._remedyRenderGen = (this._remedyRenderGen || 0) + 1;
+        const currentGen = this._remedyRenderGen;
+
         this._pendingRemedyRenders = remedyList.map((remedy, index) => {
             const isFengShui = remedy.type === 'fengshui';
             let fuluContent = fuluContentList.find(f => f.id === remedy.id) || fuluContentList[index] || {};
-            
+
             // Lookup Fulu/Feng Shui data from DAOIST_REMEDIES_DB if available
             if (isFengShui && typeof DAOIST_REMEDIES_DB !== 'undefined' && DAOIST_REMEDIES_DB.fengshui) {
                 const localFS = DAOIST_REMEDIES_DB.fengshui.find(f => f.id === remedy.id);
@@ -3053,7 +3615,7 @@ class UI {
                     }
                 }
             }
-            
+
             // For Fulu, also check DAOIST_REMEDIES_DB.fulu
             const isTalisman = remedy.type === 'fulu';
             if (isTalisman && typeof DAOIST_REMEDIES_DB !== 'undefined' && DAOIST_REMEDIES_DB.fulu) {
@@ -3072,23 +3634,28 @@ class UI {
             if (!fuluContent.instructions && remedy.instructions) {
                 fuluContent = { ...fuluContent, instructions: remedy.instructions };
             }
-            
+
             let fdlData = null;
-            console.log(`[UI.renderRemediesTabbed] Processing ${remedy.name}, type: ${remedy.type}, has fdl: ${!!fuluContent.fdl}, has instructions: ${!!fuluContent.instructions}`);
-            
+            const resolvedName = this._resolveRemedyName(remedy, lang);
+            console.log(`[UI.renderRemediesTabbed] Processing ${resolvedName}, type: ${remedy.type}, has fdl: ${!!fuluContent.fdl}, has instructions: ${!!fuluContent.instructions}`);
+
             if (fuluContent.fdl) {
                 fdlData = fuluContent.fdl;
-                console.log(`[UI.renderRemediesTabbed] Using existing FDL for ${remedy.name}`);
+                console.log(`[UI.renderRemediesTabbed] Using existing FDL for ${resolvedName}`);
             } else if (isFengShui) {
                 // Pass remedy for fallback instructions lookup
-                fdlData = this.generateFengShuiFDL({...fuluContent, remedy}, lang);
-                console.log(`[UI.renderRemediesTabbed] Generated FengShui FDL for ${remedy.name}: ${fdlData ? 'success' : 'failed'}`);
+                fdlData = this.generateFengShuiFDL({ ...fuluContent, remedy }, lang);
+                console.log(`[UI.renderRemediesTabbed] Generated FengShui FDL for ${resolvedName}: ${fdlData ? 'success' : 'failed'} `);
+            } else if (remedy.type === 'medicine') {
+                // Medicine: generate a Five Elements / Yin-Yang diagram, NOT a fulu talisman
+                fdlData = this.generateMedicineFDL(fuluContent, lang);
+                console.log(`[UI.renderRemediesTabbed] Generated Medicine FDL for ${resolvedName}: ${fdlData ? 'success' : 'failed'} `);
             } else {
                 // For regular Fulu (talisman), generate FDL
                 fdlData = this.generateFuluFDL(fuluContent, lang);
-                console.log(`[UI.renderRemediesTabbed] Generated Fulu FDL for ${remedy.name}: ${fdlData ? 'success' : 'failed'}`);
+                console.log(`[UI.renderRemediesTabbed] Generated Fulu FDL for ${resolvedName}: ${fdlData ? 'success' : 'failed'} `);
             }
-            
+
             return {
                 canvasId: `fuluCanvas_${index}`,
                 remedy,
@@ -3098,23 +3665,32 @@ class UI {
                 lang
             };
         });
-        
+
         // Only render immediately if tab is visible
         if (isVisible) {
-            this._renderPendingRemedies();
+            this._renderPendingRemedies(0, null, currentGen);
         } else {
             console.log(`[UI.renderRemediesTabbed] Tab not visible, rendering deferred until tab activation`);
         }
     }
-    
-    static _renderPendingRemedies(retryCount = 0, itemsOverride = null) {
+
+    static _renderPendingRemedies(retryCount = 0, itemsOverride = null, generation = null) {
+        // If a new generation has started, abort this stale render loop
+        if (generation !== null && this._remedyRenderGen !== generation) {
+            console.log(`[UI._renderPendingRemedies] Aborting stale render loop(gen ${generation} != current ${this._remedyRenderGen})`);
+            return;
+        }
+
         const items = itemsOverride || this._pendingRemedyRenders;
         if (!items) return;
 
-        console.log(`[UI._renderPendingRemedies] Rendering ${items.length} remedies (attempt ${retryCount + 1})`);
+        console.log(`[UI._renderPendingRemedies] Rendering ${items.length} remedies(attempt ${retryCount + 1})`);
 
         const itemsSnapshot = items.slice(); // snapshot to avoid mutation issues
         setTimeout(() => {
+            // Check generation again after timeout
+            if (generation !== null && this._remedyRenderGen !== generation) return;
+
             const missing = [];
             itemsSnapshot.forEach(({ canvasId, fdlData, isFengShui, fuluContent }) => {
                 const canvas = document.getElementById(canvasId);
@@ -3123,7 +3699,18 @@ class UI {
                     missing.push({ canvasId, fdlData, isFengShui, fuluContent });
                     return;
                 }
-                
+
+                // Debug canvas state
+                const rect = canvas.getBoundingClientRect();
+                console.log(`[UI._renderPendingRemedies] Canvas ${canvasId}: ${rect.width}x${rect.height}, hasFDL: ${!!fdlData} `);
+
+                // If canvas has zero size but exists, retry later
+                if (rect.width === 0 || rect.height === 0) {
+                    console.log(`[UI._renderPendingRemedies] Canvas ${canvasId} has zero size, will retry`);
+                    missing.push({ canvasId, fdlData, isFengShui, fuluContent });
+                    return;
+                }
+
                 // Hide canvas container if no FDL and no meaningful content
                 if (!fdlData && !fuluContent?.image) {
                     console.log(`[UI._renderPendingRemedies] No FDL for ${canvasId}, hiding canvas`);
@@ -3131,14 +3718,22 @@ class UI {
                     if (container) container.style.display = 'none';
                     return;
                 }
-                
+
                 if (typeof SigilTools === 'undefined') {
                     console.warn(`[UI._renderPendingRemedies] SigilTools not loaded`);
                     return;
                 }
-                
+
+                // Check if already rendered to avoid over-drawing if multiple Timeouts hit at once
+                if (canvas.dataset.rendered === 'true') {
+                    console.log(`[UI._renderPendingRemedies] Canvas ${canvasId} already rendered, skipping`);
+                    // Skip redrawing but don't add to missing
+                    return;
+                }
+                canvas.dataset.rendered = 'true';
+
                 let bgColor, strokeCol;
-                
+
                 if (isFengShui) {
                     bgColor = '#f4f4f9';
                     strokeCol = '#0a0a1a'; // Darker ink for better contrast
@@ -3149,7 +3744,7 @@ class UI {
                     if (strokeCol === '#000000') strokeCol = '#4a0000'; // Deep cinnabar red
                     if (strokeCol === '#FFFFFF') strokeCol = '#ffd700'; // Bright gold
                 }
-                
+
                 SigilTools.draw(canvasId, {
                     fuluContent,
                     fdl: fdlData,
@@ -3161,8 +3756,8 @@ class UI {
             // If some canvases were missing (DOM not ready yet), retry up to 4 times
             if (missing.length > 0 && retryCount < 4) {
                 const delay = 300 * (retryCount + 1);
-                console.log(`[UI._renderPendingRemedies] ${missing.length} canvas(es) missing, retrying in ${delay}ms`);
-                setTimeout(() => this._renderPendingRemedies(retryCount + 1, missing), delay);
+                console.log(`[UI._renderPendingRemedies] ${missing.length} canvas(es) missing, retrying in ${delay} ms`);
+                setTimeout(() => this._renderPendingRemedies(retryCount + 1, missing, generation), delay);
             }
         }, 100);
     }
@@ -3181,17 +3776,17 @@ class UI {
 
         if (format === 'md') {
             let md = `# ${t.oracle || 'I Ching Oracle'} Reading\n\n`;
-            md += `**${t.dateLabel || 'Date'}:** ${new Date().toLocaleDateString()}\n\n`;
-            md += `**${t.question || 'Question'}:** ${question}\n\n`;
-            md += `---\n\n`;
+            md += `** ${t.dateLabel || 'Date'}:** ${new Date().toLocaleDateString()} \n\n`;
+            md += `** ${t.question || 'Question'}:** ${question} \n\n`;
+            md += `-- -\n\n`;
 
             // Pre-analysis
-            md += `## ${t.preAnalysis || 'Pre-Analysis'}\n\n`;
+            md += `## ${t.preAnalysis || 'Pre-Analysis'} \n\n`;
             const hexDetails = document.getElementById('hexagramDetailsContent');
             if (hexDetails) md += hexDetails.innerText + '\n\n';
 
             // Interpretation
-            md += `## ${t.aiInterpretation || 'Interpretation'}\n\n`;
+            md += `## ${t.aiInterpretation || 'Interpretation'} \n\n`;
             const interpContent = document.getElementById('interpretation-content-area');
             if (interpContent) {
                 const cards = interpContent.querySelectorAll('.tab-content-card');
@@ -3199,13 +3794,13 @@ class UI {
                     const title = card.querySelector('.card-title');
                     const content = card.querySelector('.card-content');
                     if (title && content) {
-                        md += `### ${title.innerText}\n\n${content.innerText}\n\n`;
+                        md += `### ${title.innerText} \n\n${content.innerText} \n\n`;
                     }
                 });
             }
 
             // Remedies
-            md += `## ${t.remedies || 'Remedies'}\n\n`;
+            md += `## ${t.remedies || 'Remedies'} \n\n`;
             const remediesContent = document.getElementById('remedies-content-area');
             if (remediesContent) {
                 const items = remediesContent.querySelectorAll('.remedy-tab-item');
@@ -3218,13 +3813,13 @@ class UI {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `iching-reading-${timestamp}.md`;
+            a.download = `iching - reading - ${timestamp}.md`;
             a.click();
             URL.revokeObjectURL(url);
 
         } else if (format === 'html') {
-            let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>I Ching Reading</title>`;
-            html += `<style>body{font-family:system-ui,sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.6;color:#333}</style></head><body>`;
+            let html = `< !DOCTYPE html > <html><head><meta charset="UTF-8"><title>I Ching Reading</title>`;
+            html += `<style>body{font - family:system-ui,sans-serif;max-width:800px;margin:40px auto;padding:20px;line-height:1.6;color:#333}</style></head><body>`;
             html += `<h1>${t.oracle || 'I Ching Oracle'} Reading</h1>`;
             html += `<p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>`;
             html += `<p><strong>Question:</strong> ${question}</p><hr>`;
@@ -3235,7 +3830,7 @@ class UI {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `iching-reading-${timestamp}.html`;
+            a.download = `iching - reading - ${timestamp}.html`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -3248,19 +3843,19 @@ class UI {
 
     static renderBaziEnhanced(birthBaziExtended, currentBaziExtended, lang) {
         console.log(`[UI.renderBaziEnhanced] Called with`, birthBaziExtended ? 'birth data' : 'no birth', currentBaziExtended ? 'current data' : 'no current');
-        
+
         const container = document.getElementById('lifePalaceContent');
         if (!container) {
             console.warn(`[UI.renderBaziEnhanced] Container not found`);
             return;
         }
-        
+
         // Skip if no extended data available
         if (!birthBaziExtended && !currentBaziExtended) {
             console.log(`[UI.renderBaziEnhanced] No extended data, skipping`);
             return;
         }
-        
+
         // Check if container is visible (has dimensions)
         const containerRect = container.getBoundingClientRect();
         if (containerRect.width === 0 || containerRect.height === 0) {
@@ -3271,13 +3866,13 @@ class UI {
         }
 
         const t = I18N[lang] || I18N['en'];
-        
+
         // Generate unique canvas ID
         const canvasId = 'baziEnhancedCanvas_' + Date.now();
-        
+
         // Append to existing content instead of replacing
         let html = `
-            <div class="bazi-enhanced-container">
+            < div class="bazi-enhanced-container" >
                 <div class="bazi-diagram-wrapper">
                     <canvas id="${canvasId}" width="500" height="500" class="bazi-enhanced-canvas"></canvas>
                     <div class="bazi-legend">
@@ -3300,7 +3895,7 @@ class UI {
             html += this.generateBaziDetailCards(currentBaziExtended, t.currentBaziTitle || 'Current BaZi', lang);
         }
 
-        html += `</div></div>`;
+        html += `</div></div > `;
         container.insertAdjacentHTML('beforeend', html);
 
         // Render the enhanced diagram
@@ -3316,10 +3911,10 @@ class UI {
                 return;
             }
             if (!birthBaziExtended) {
-                console.warn(`[UI.renderBaziEnhanced] No Bazi data - birthBaziExtended is null/undefined`);
+                console.warn(`[UI.renderBaziEnhanced] No Bazi data - birthBaziExtended is null / undefined`);
                 return;
             }
-            console.log(`[UI.renderBaziEnhanced] Bazi data keys:`, Object.keys(birthBaziExtended || {}));
+            console.log(`[UI.renderBaziEnhanced] Bazi data keys: `, Object.keys(birthBaziExtended || {}));
 
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1;
@@ -3330,7 +3925,7 @@ class UI {
                 return;
             }
 
-            console.log(`[UI.renderBaziEnhanced] Rendering diagram, canvas size: ${rect.width}x${rect.height}`);
+            console.log(`[UI.renderBaziEnhanced] Rendering diagram, canvas size: ${rect.width}x${rect.height} `);
 
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
@@ -3353,12 +3948,12 @@ class UI {
 
     static generateBaziDetailCards(baziData, title, lang) {
         const t = I18N[lang] || I18N['en'];
-        let html = `<div class="bazi-detail-section"><h4>${title}</h4>`;
-        
+        let html = `< div class="bazi-detail-section" > <h4>${title}</h4>`;
+
         // Hetu info
         if (baziData.hetu) {
             html += `
-                <div class="bazi-detail-card hetu-card">
+            < div class="bazi-detail-card hetu-card" >
                     <div class="card-header">河圖 Hetu</div>
                     <div class="card-content">
                         <div class="detail-row">
@@ -3370,14 +3965,14 @@ class UI {
                             <span class="value">${baziData.hetu.lifePath?.pathType || '-'}</span>
                         </div>
                     </div>
-                </div>
+                </div >
             `;
         }
-        
+
         // Luoshu info
         if (baziData.luoshu) {
             html += `
-                <div class="bazi-detail-card luoshu-card">
+            < div class="bazi-detail-card luoshu-card" >
                     <div class="card-header">洛書 Luoshu</div>
                     <div class="card-content">
                         <div class="detail-row">
@@ -3389,14 +3984,14 @@ class UI {
                             <span class="value">${baziData.luoshu.mingGua?.favorableDirections?.shengQi || '-'}</span>
                         </div>
                     </div>
-                </div>
+                </div >
             `;
         }
-        
+
         // Xiantian info
         if (baziData.xiantian) {
             html += `
-                <div class="bazi-detail-card xiantian-card">
+            < div class="bazi-detail-card xiantian-card" >
                     <div class="card-header">先天 Xiantian</div>
                     <div class="card-content">
                         <div class="detail-row">
@@ -3408,10 +4003,10 @@ class UI {
                             <span class="value">${baziData.xiantian.congenitalNature?.description || '-'}</span>
                         </div>
                     </div>
-                </div>
+                </div >
             `;
         }
-        
+
         html += '</div>';
         return html;
     }
@@ -3427,15 +4022,15 @@ class UI {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
-        
+
         if (rect.width === 0 || rect.height === 0) return;
 
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
 
-        const { 
-            houtianActive = [], 
+        const {
+            houtianActive = [],
             xiantianActive = [],
             title = null
         } = options;
@@ -3445,7 +4040,7 @@ class UI {
         ctx.fillRect(0, 0, rect.width, rect.height);
 
         // Draw dual Bagua
-        SigilTools.drawDualBagua(ctx, rect.width / 2, rect.height / 2 - (title ? 20 : 0), 
+        SigilTools.drawDualBagua(ctx, rect.width / 2, rect.height / 2 - (title ? 20 : 0),
             Math.min(rect.width, rect.height) * 0.85, {
             houtianActive,
             xiantianActive,
@@ -3458,7 +4053,7 @@ class UI {
         // Draw title if provided
         if (title) {
             ctx.fillStyle = '#d4af37';
-            ctx.font = `bold 16px "Noto Serif SC", sans-serif`;
+            ctx.font = `bold 16px "Noto Serif SC", sans - serif`;
             ctx.textAlign = 'center';
             ctx.fillText(title, rect.width / 2, rect.height - 10);
         }
@@ -3479,7 +4074,7 @@ class UI {
         const upper = reading.binaryKey?.substring(3, 6);
 
         let html = `
-            <div class="graphical-summary-container">
+            < div class="graphical-summary-container" >
                 <div class="summary-hexagram-section">
                     <h4>${hex?.name_en || ''} <span class="zh">${hex?.name_zh || ''}</span></h4>
                     <div class="summary-hexagram-display">
@@ -3525,7 +4120,7 @@ class UI {
         // Add elements summary if available
         if (reading.equilibrium) {
             html += `
-                <div class="summary-elements-section">
+            < div class="summary-elements-section" >
                     <h4>${t.elements || 'Elements'}</h4>
                     <div class="yin-yang-mini">
                         <div class="balance-bar-mini">
@@ -3535,11 +4130,11 @@ class UI {
                             <span>☯️ ${reading.equilibrium.yangCount}Y / ${reading.equilibrium.yinCount}Y</span>
                         </div>
                     </div>
-                </div>
+                </div >
             `;
         }
 
-        html += `</div>`;
+        html += `</div > `;
         container.innerHTML = html;
 
         // Render mini Bagua diagram
@@ -3555,7 +4150,7 @@ class UI {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
-        
+
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         ctx.scale(dpr, dpr);
@@ -3597,13 +4192,13 @@ class UI {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
-        
+
         if (rect.width === 0 || rect.height === 0) {
             console.warn(`[UI.renderBaguaMedicineDiagramDual] Canvas has zero size`);
             return;
         }
-        
-        console.log(`[UI.renderBaguaMedicineDiagramDual] Canvas size: ${rect.width}x${rect.height}`);
+
+        console.log(`[UI.renderBaguaMedicineDiagramDual] Canvas size: ${rect.width}x${rect.height} `);
 
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
@@ -3645,14 +4240,15 @@ class UI {
         }
 
         // Draw dual Bagua with highlights
-        SigilTools.drawDualBagua(ctx, rect.width / 2, rect.height / 2 - 15, 
+        SigilTools.drawDualBagua(ctx, rect.width / 2, rect.height / 2 - 15,
             Math.min(rect.width, rect.height) * 0.85, {
             houtianActive,
             xiantianActive,
             showLabels: true,
             stroke: '#d4af37',
             highlightColor: '#00FF00',
-            arrangement: 'both'
+            arrangement: 'both',
+            translateDirection: (dir) => UI._translateDirection(dir, lang)
         });
 
         // Draw legend
@@ -3660,10 +4256,10 @@ class UI {
         ctx.fillStyle = '#00FF00';
         ctx.font = '12px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`${t.favorable || 'Favorable'}: ${fengShuiData.favorable?.join(', ') || '-'}`, 
+        ctx.fillText(`${t.favorable || 'Favorable'}: ${fengShuiData.favorable?.join(', ') || '-'} `,
             rect.width / 2, rect.height - 25);
         ctx.fillStyle = '#FF4444';
-        ctx.fillText(`${t.unfavorable || 'Unfavorable'}: ${fengShuiData.unfavorable?.join(', ') || '-'}`, 
+        ctx.fillText(`${t.unfavorable || 'Unfavorable'}: ${fengShuiData.unfavorable?.join(', ') || '-'} `,
             rect.width / 2, rect.height - 10);
     }
 }

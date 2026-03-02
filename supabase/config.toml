@@ -1,14 +1,17 @@
 # Supabase Functions Configuration
 # Deploy with: supabase functions deploy
 
-[functions.hexagram]
-verify_jwt = false
-
-[functions.export]
-verify_jwt = false
-
 [functions.bazi-astrol]
 verify_jwt = false
 
 [functions.yijingtu]
+verify_jwt = false
+
+[functions.yijingtu-translate]
+verify_jwt = false
+
+[functions.yijingtu-remedies]
+verify_jwt = false
+
+[functions.yijingtu-advice]
 verify_jwt = false

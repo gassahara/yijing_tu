@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+
 // ============================================================================
 // CORS HEADERS
 // ============================================================================
@@ -10,6 +11,163 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Request-ID",
   "Access-Control-Max-Age": "86400"
 };
+
+// ============================================================================
+// TEXT FORMAT UTILITIES (Consolidated from optimize-prompts.ts)
+// ============================================================================
+
+function truncateText(text: string, maxLength: number): string {
+  if (!text || text.length <= maxLength) return text;
+  return text.substring(0, maxLength - 3) + '...';
+}
+
+function jsonToTextFormat(content: Record<string, any>): string {
+  const lines: string[] = [];
+  for (const [key, value] of Object.entries(content)) {
+    if (value === undefined || value === null) continue;
+    if (Array.isArray(value)) {
+      const arrayText = value.map(v => String(v)).join('\n---ITEM---\n');
+      lines.push(`[${key}]\n${arrayText}\n[/${key}]`);
+    } else {
+      lines.push(`[${key}]\n${String(value)}\n[/${key}]`);
+    }
+  }
+  return lines.join('\n\n');
+}
+
+function textToJsonFormat(text: string, originalKeys: string[], originalContent?: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+
+  for (const key of originalKeys) {
+    const startTag = `[${key}]`;
+    const endTag = `[/${key}]`;
+
+    const startIdx = text.indexOf(startTag);
+    if (startIdx === -1) continue;
+
+    const contentStart = startIdx + startTag.length;
+    const endIdx = text.indexOf(endTag, contentStart);
+    if (endIdx === -1) continue;
+
+    let value = text.substring(contentStart, endIdx).trim();
+
+    // Check if originally an array
+    if (originalContent && Array.isArray(originalContent[key])) {
+      if (value.includes('---ITEM---')) {
+        result[key] = value.split('---ITEM---').map((v: string) => v.trim());
+      } else {
+        result[key] = value ? [value] : [];
+      }
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result;
+}
+
+function compactBaziFormat(bazi: any): string {
+  if (!bazi) return 'N/A';
+  const { year, month, day, hour, strength, yongShen } = bazi;
+  const parts = [
+    `DM:${day?.stem?.name}${day?.stem?.element}`,
+    `Str:${strength?.result}`,
+    `Yong:${yongShen}`,
+    `Y:${year?.stem?.zh}${year?.branch?.zh}`,
+    `M:${month?.stem?.zh}${month?.branch?.zh}`,
+    `D:${day?.stem?.zh}${day?.branch?.zh}`,
+    `H:${hour?.stem?.zh}${hour?.branch?.zh}`,
+  ];
+  return parts.join(' | ');
+}
+
+function compactHexagramFormat(hex: any): string {
+  if (!hex) return 'N/A';
+  return `#${hex.number} ${hex.name_en} (${hex.trigramUpper?.name || '?'}/${hex.trigramLower?.name || '?'})`;
+}
+
+function compactElementsFormat(elements: any): string {
+  if (!elements) return 'N/A';
+  return `W:${elements.wood}% F:${elements.fire}% E:${elements.earth}% M:${elements.metal}% Wa:${elements.water}%`;
+}
+
+// ============================================================================
+// SERVER-SIDE CACHING UTILITIES
+// ============================================================================
+
+// In-memory cache for this request (prevents duplicate DB calls)
+const memoryCache = new Map<string, any>();
+
+// Generate cache key from request parameters
+function generateCacheKey(section: string, hexagramNumber: number, movingLines: number[], date: string): string {
+  // For date-sensitive sections (celestial, elements), include date
+  const dateSensitiveSections = ['celestial-astro', 'celestial-bazi', 'elements-analysis', 'elements-synthesis'];
+  if (dateSensitiveSections.includes(section)) {
+    return `${section}:${hexagramNumber}:${movingLines.sort().join(',')}:${date}`;
+  }
+  // For static sections (core, houtou, lines, classical), just hexagram + lines
+  return `${section}:${hexagramNumber}:${movingLines.sort().join(',')}`;
+}
+
+// Check memory cache first, then Supabase
+async function getCachedInterpretation(cacheKey: string, supabaseClient: any): Promise<any | null> {
+  // Check memory cache first
+  if (memoryCache.has(cacheKey)) {
+    log(4, `[CACHE] Memory hit for ${cacheKey}`);
+    return memoryCache.get(cacheKey);
+  }
+
+  // Check database cache
+  try {
+    const { data, error } = await supabaseClient
+      .from('interpretation_cache')
+      .select('data')
+      .eq('cache_key', cacheKey)
+      .single();
+
+    if (data && !error) {
+      log(4, `[CACHE] DB hit for ${cacheKey}`);
+      // Store in memory cache for this request
+      memoryCache.set(cacheKey, data.data);
+      return data.data;
+    }
+  } catch (e) {
+    log(4, `[CACHE] DB lookup failed: ${e.message}`);
+  }
+
+  return null;
+}
+
+// Store in both memory and database cache
+async function setCachedInterpretation(cacheKey: string, data: any, supabaseClient: any): Promise<void> {
+  // Store in memory
+  memoryCache.set(cacheKey, data);
+
+  // Store in database (fire and forget, don't block)
+  try {
+    const { error } = await supabaseClient
+      .from('interpretation_cache')
+      .upsert({
+        cache_key: cacheKey,
+        data: data,
+        created_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
+      }, { onConflict: 'cache_key' });
+
+    if (error) {
+      log(4, `[CACHE] DB store failed: ${error.message}`);
+    } else {
+      log(4, `[CACHE] Stored ${cacheKey}`);
+    }
+  } catch (e) {
+    log(4, `[CACHE] DB store error: ${e.message}`);
+  }
+}
+
+// Clear memory cache (call at end of request)
+function clearMemoryCache(): void {
+  memoryCache.clear();
+}
 
 // ============================================================================
 // ENVIRONMENT CONFIGURATION
@@ -124,26 +282,13 @@ async function loadFuluDatabase(): Promise<FuluEntry[]> {
     const content = await response.text();
     let dbData: any;
 
-    // Try to parse as JSON first
+    // Try JSON first, then parse as JS module export
     try {
       dbData = JSON.parse(content);
     } catch {
-      // Not JSON, try to extract from JS file
-      const startMatch = content.match(/const\s+DAOIST_REMEDIES_DB\s*=\s*{/);
-      if (startMatch) {
-        const objStart = startMatch.index! + startMatch[0].length - 1;
-        const objRaw = content.substring(objStart);
-        dbData = cleanAndParseJSON(objRaw);
-        if (dbData.error) {
-          throw new Error(`Parse failed: ${dbData.message}`);
-        }
-      } else {
-        const genericMatch = content.match(/({[\s\S]*?});?\s*$/);
-        if (genericMatch) {
-          dbData = cleanAndParseJSON(genericMatch[1]);
-        } else {
-          throw new Error("Could not find database object in file content");
-        }
+      dbData = parseJSModuleObject(content, "DAOIST_REMEDIES_DB");
+      if (!dbData) {
+        throw new Error("Could not parse DAOIST_REMEDIES_DB from fetched content");
       }
     }
 
@@ -378,13 +523,19 @@ function generateVisualData(entry: FuluEntry): any {
 
   if (entry.visualData && (entry.visualData.fdl || entry.visualData.sigilInstructions)) {
     log(4, `[VISUAL_DATA] Using definitive visualData from DB for: ${entry.id}`);
-    return {
+    // Ensure fdl field exists for frontend compatibility
+    const visualData = {
       ...entry.visualData,
       type,
       remedyType,
       image: entry.image,
       layoutInstructions: entry.visualData.layoutInstructions || generateQuadrantLayout(type, entry)
     };
+    // Map sigilInstructions to fdl if fdl not present
+    if (!visualData.fdl && visualData.sigilInstructions) {
+      visualData.fdl = { instructions: visualData.sigilInstructions };
+    }
+    return visualData;
   }
 
   const data: any = {
@@ -397,8 +548,10 @@ function generateVisualData(entry: FuluEntry): any {
   if (type === "meditation_palace") {
     data.visualGrid = ["# - # - #", "| 1 | 2 | 3 |", "# - # - #", "| 4 | 5 | 6 |", "# - # - #", "| 7 | 8 | 9 |", "# - # - #"];
     data.sigilInstructions = [{ type: 'grid', rows: 3, cols: 3, labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9'] }];
+    data.fdl = { instructions: data.sigilInstructions };
   } else if (type === "composite_symbol") {
     data.sigilInstructions = [];
+    data.fdl = { instructions: [] };
   } else if (type === "five_directions") {
     data.sigilInstructions = [
       { type: 'path', points: [[200, 100], [250, 300], [100, 180], [300, 180], [150, 300]], width: 2 },
@@ -408,6 +561,7 @@ function generateVisualData(entry: FuluEntry): any {
       { type: 'text', text: '西', x: 50, y: 200, size: 30, quadrant: 'left' },
       { type: 'text', text: '北', x: 200, y: 50, size: 30, quadrant: 'top' }
     ];
+    data.fdl = { instructions: data.sigilInstructions };
   } else if (type === "astral_invocation") {
     data.sigilInstructions = [
       { type: 'circle', cx: 100, cy: 100, r: 5, fill: true },
@@ -420,19 +574,23 @@ function generateVisualData(entry: FuluEntry): any {
       { type: 'path', points: [[100, 100], [150, 120], [200, 150], [220, 200], [280, 230], [330, 210], [350, 260]], width: 1 },
       { type: 'text', text: '北斗', x: 225, y: 280, size: 24, quadrant: 'bottom-right' }
     ];
+    data.fdl = { instructions: data.sigilInstructions };
   } else if (type === "salvation_ritual") {
     data.sigilInstructions = [
       { type: 'circle', cx: 200, cy: 200, r: 80, width: 2 },
       { type: 'path', points: [[200, 50], [230, 150], [350, 150], [250, 220], [300, 350], [200, 280], [100, 350], [150, 220], [50, 150], [170, 150]], width: 1.5 },
       { type: 'circle', cx: 200, cy: 200, r: 20, fill: true }
     ];
+    data.fdl = { instructions: data.sigilInstructions };
   } else if (type === "purification") {
     data.sigilInstructions = [];
+    data.fdl = { instructions: [] };
   } else if (type === "weapon_inscribed") {
     data.sigilInstructions = [
       { type: 'path', points: [[200, 50], [220, 100], [220, 300], [250, 300], [250, 330], [150, 330], [150, 300], [180, 300], [180, 100]], width: 2 },
       { type: 'line', points: [[120, 300], [280, 300]], width: 3 }
     ];
+    data.fdl = { instructions: data.sigilInstructions };
   } else if (remedyType === "fengshui") {
     data.sigilInstructions = [
       { type: 'polygon', points: [[200, 50], [306, 100], [350, 200], [306, 300], [200, 350], [94, 300], [50, 200], [94, 100]], width: 2 },
@@ -1071,7 +1229,7 @@ const validators = {
   },
 
   section(section: any): string {
-    const validSections = ['celestial', 'elements', 'core', 'lines', 'classical', 'remedies', 
+    const validSections = ['celestial', 'elements', 'core', 'lines', 'classical', 'remedies',
       'celestial-astro', 'celestial-bazi', 'elements-analysis', 'elements-synthesis',
       'core-analysis', 'core-technical', 'core-narrative', 'core-application',
       'houtou', 'houtou-emperor', 'houtou-master', 'advice'];
@@ -1185,28 +1343,24 @@ async function withRetry<T>(
 
 
 // ============================================================================
-// ROBUST CLEANING & PARSING UTILITIES
+// JSON CLEANING & PARSING UTILITIES
 // ============================================================================
 
 function sanitizeResponseContent(obj: any): any {
   if (typeof obj === 'string') {
     let text = obj;
-
     text = text
       .replace(/<\/p>\s*<p>/gi, '\n\n')
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/div>\s*<div/gi, '\n')
       .replace(/<\/li>\s*<li/gi, '\n');
-
     text = text.replace(/<[^>]+>/g, '');
-
     text = text
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
       .replace(/&nbsp;/g, ' ');
-
     const leakagePatterns = [
       /^Titled technical section.*?(?=\w)/i,
       /^Titled accessible section.*?(?=\w)/i,
@@ -1215,10 +1369,7 @@ function sanitizeResponseContent(obj: any): any {
       /^JSON output:?/i,
       /^Output format:?/i
     ];
-    leakagePatterns.forEach(regex => {
-      text = text.replace(regex, '');
-    });
-
+    leakagePatterns.forEach(regex => { text = text.replace(regex, ''); });
     text = text
       .replace(/\*\*(.+?)\*\*/g, '$1')
       .replace(/__(.+?)__/g, '$1')
@@ -1226,115 +1377,121 @@ function sanitizeResponseContent(obj: any): any {
       .replace(/`(.+?)`/g, '$1')
       .replace(/^\s*[-*]\s+/gm, '')
       .trim();
-
     text = text.replace(/\n{3,}/g, '\n\n');
-
     return text;
   }
-
-  if (Array.isArray(obj)) {
-    return obj.map(sanitizeResponseContent);
-  }
-
+  if (Array.isArray(obj)) return obj.map(sanitizeResponseContent);
   if (obj && typeof obj === 'object') {
     const result: any = {};
-    for (const key of Object.keys(obj)) {
-      result[key] = sanitizeResponseContent(obj[key]);
-    }
+    for (const key of Object.keys(obj)) result[key] = sanitizeResponseContent(obj[key]);
     return result;
   }
-
   return obj;
+}
+
+function stripComments(json: string): string {
+  let result = '';
+  let inString = false;
+  let inSingleComment = false;
+  let inMultiComment = false;
+  let escaped = false;
+  for (let i = 0; i < json.length; i++) {
+    const char = json[i];
+    const nextChar = json[i + 1];
+    if (escaped) { if (!inSingleComment && !inMultiComment) result += char; escaped = false; continue; }
+    if (char === '\\' && inString) { if (!inSingleComment && !inMultiComment) result += char; escaped = true; continue; }
+    if (char === '"' && !inSingleComment && !inMultiComment) { inString = !inString; result += char; continue; }
+    if (!inString) {
+      if (!inSingleComment && !inMultiComment && char === '/' && nextChar === '/') { inSingleComment = true; i++; continue; }
+      if (inSingleComment && char === '\n') { inSingleComment = false; result += char; continue; }
+      if (!inSingleComment && !inMultiComment && char === '/' && nextChar === '*') { inMultiComment = true; i++; continue; }
+      if (inMultiComment && char === '*' && nextChar === '/') { inMultiComment = false; i++; continue; }
+    }
+    if (!inSingleComment && !inMultiComment) result += char;
+  }
+  return result;
+}
+
+function fixUnescapedCharsInStrings(json: string): string {
+  const chars: string[] = [];
+  let inString = false;
+  let i = 0;
+  while (i < json.length) {
+    const ch = json[i];
+    if (!inString) {
+      if (ch === '"') { inString = true; chars.push(ch); } else { chars.push(ch); }
+      i++;
+    } else {
+      if (ch === '\\') {
+        chars.push(ch);
+        if (i + 1 < json.length) { chars.push(json[i + 1]); i += 2; } else { i++; }
+      } else if (ch === '"') { inString = false; chars.push(ch); i++; }
+      else if (ch === '\n') { chars.push('\\', 'n'); i++; }
+      else if (ch === '\r') { i++; }
+      else if (ch === '\t') { chars.push('\\', 't'); i++; }
+      else if (ch.charCodeAt(0) < 0x20) { i++; }
+      else { chars.push(ch); i++; }
+    }
+  }
+  return chars.join('');
 }
 
 function cleanAndParseJSON(text: string, fallbackField?: string): any {
   if (!text) return fallbackField ? { [fallbackField]: "" } : {};
-
   let cleaned = text.trim();
-
   cleaned = cleaned.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "");
-
   const firstBrace = cleaned.indexOf('{');
   if (firstBrace === -1) return fallbackField ? { [fallbackField]: "" } : {};
-
   let lastBrace = -1;
   let stack = 0;
   let inString = false;
   let escaped = false;
-
   for (let i = firstBrace; i < cleaned.length; i++) {
     const char = cleaned[i];
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-    if (char === '\\') {
-      escaped = true;
-      continue;
-    }
-    if (char === '"') {
-      inString = !inString;
-      continue;
-    }
+    if (escaped) { escaped = false; continue; }
+    if (char === '\\') { escaped = true; continue; }
+    if (char === '"') { inString = !inString; continue; }
     if (!inString) {
       if (char === '{') stack++;
-      if (char === '}') {
-        stack--;
-        if (stack === 0) {
-          lastBrace = i;
-          break;
-        }
-      }
+      if (char === '}') { stack--; if (stack === 0) { lastBrace = i; break; } }
     }
   }
-
   if (firstBrace !== -1 && lastBrace !== -1) {
     cleaned = cleaned.substring(firstBrace, lastBrace + 1);
   } else if (!fallbackField) {
     if (text.includes('<div') || text.includes('Titled')) {
-      return {
-        error: "Invalid JSON",
-        content: sanitizeResponseContent(text)
-      };
+      return { error: "Invalid JSON", content: sanitizeResponseContent(text) };
     }
   }
-
   cleaned = stripComments(cleaned);
   cleaned = cleaned.replace(/,(\s*[}\]])/g, '$1');
   cleaned = cleaned.replace(/}\s*{/g, '},{');
   cleaned = cleaned.replace(/]\s*{/g, '],{');
   cleaned = cleaned.replace(/}\s*\[/g, '},[');
   cleaned = fixUnescapedCharsInStrings(cleaned);
-
   const attempts: Array<() => any> = [
     () => JSON.parse(cleaned),
     () => {
       let fixed = cleaned
-        .replace(/'\s*:\s*'/g, '": "')
-        .replace(/'\s*:\s*"/g, '": "')
-        .replace(/"\s*:\s*'/g, '": "')
-        .replace(/{\s*'/g, '{"')
-        .replace(/'\s*}/g, '"}')
-        .replace(/,\s*'/g, ',"');
+        .replace(/'\s*:\s*'/g, '": "').replace(/'\s*:\s*"/g, '": "')
+        .replace(/"\s*:\s*'/g, '": "').replace(/{\s*'/g, '{"')
+        .replace(/'\s*}/g, '"}').replace(/,\s*'/g, ',"');
       fixed = fixed.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
       return JSON.parse(fixed);
     },
     () => {
-      const stack: string[] = [];
-      let inString = false;
-      let escaped = false;
+      const stk: string[] = [];
+      let inStr = false, esc = false;
       for (const char of cleaned) {
-        if (escaped) { escaped = false; continue; }
-        if (char === '\\') { escaped = true; continue; }
-        if (char === '"') { inString = !inString; continue; }
-        if (inString) continue;
-        if (char === '{') stack.push('}');
-        else if (char === '[') stack.push(']');
-        else if (char === '}' || char === ']') stack.pop();
+        if (esc) { esc = false; continue; }
+        if (char === '\\') { esc = true; continue; }
+        if (char === '"') { inStr = !inStr; continue; }
+        if (inStr) continue;
+        if (char === '{') stk.push('}');
+        else if (char === '[') stk.push(']');
+        else if (char === '}' || char === ']') stk.pop();
       }
-      let suffix = inString ? '"' : '';
-      suffix += stack.reverse().join('');
-      return JSON.parse(cleaned + suffix);
+      return JSON.parse(cleaned + (inStr ? '"' : '') + stk.reverse().join(''));
     },
     () => {
       const truncationPatterns = [
@@ -1345,157 +1502,50 @@ function cleanAndParseJSON(text: string, fallbackField?: string): any {
       let repaired = cleaned;
       for (const pattern of truncationPatterns) {
         const match = repaired.match(pattern);
-        if (match) {
-          repaired = repaired.substring(0, repaired.length - match[0].length);
-          break;
-        }
+        if (match) { repaired = repaired.substring(0, repaired.length - match[0].length); break; }
       }
-      const stack: string[] = [];
-      let inStr = false;
-      let esc = false;
+      const stk: string[] = [];
+      let inStr = false, esc = false;
       for (const char of repaired) {
         if (esc) { esc = false; continue; }
         if (char === '\\') { esc = true; continue; }
         if (char === '"') { inStr = !inStr; continue; }
         if (inStr) continue;
-        if (char === '{') stack.push('}');
-        else if (char === '[') stack.push(']');
-        else if (char === '}' || char === ']') stack.pop();
+        if (char === '{') stk.push('}');
+        else if (char === '[') stk.push(']');
+        else if (char === '}' || char === ']') stk.pop();
       }
-      let suffix = inStr ? '"' : '';
-      suffix += stack.reverse().join('');
-      return JSON.parse(repaired + suffix);
+      return JSON.parse(repaired + (inStr ? '"' : '') + stk.reverse().join(''));
     }
   ];
-
   for (let i = 0; i < attempts.length; i++) {
     try {
       const result = attempts[i]();
       return sanitizeResponseContent(result);
-    } catch (e) {
-      if (i === attempts.length - 1) {
-        log(4, `[cleanAndParseJSON] FINAL ATTEMPT FAILED.`);
-      }
-    }
+    } catch (_e) { /* try next strategy */ }
   }
-
-  if (fallbackField) {
-    return { [fallbackField]: sanitizeResponseContent(text) };
-  }
-
-  return {
-    error: "Parse failed",
-    message: "Could not repair JSON",
-    raw_preview: cleaned.substring(0, 200)
-  };
+  if (fallbackField) return { [fallbackField]: sanitizeResponseContent(text) };
+  return { error: "Parse failed", message: "Could not repair JSON", raw_preview: cleaned.substring(0, 200) };
 }
 
-function stripComments(json: string): string {
-  let result = '';
-  let inString = false;
-  let inSingleComment = false;
-  let inMultiComment = false;
-  let escaped = false;
-
-  for (let i = 0; i < json.length; i++) {
-    const char = json[i];
-    const nextChar = json[i + 1];
-
-    if (escaped) {
-      if (!inSingleComment && !inMultiComment) result += char;
-      escaped = false;
-      continue;
-    }
-
-    if (char === '\\' && inString) {
-      if (!inSingleComment && !inMultiComment) result += char;
-      escaped = true;
-      continue;
-    }
-
-    if (char === '"' && !inSingleComment && !inMultiComment) {
-      inString = !inString;
-      result += char;
-      continue;
-    }
-
-    if (!inString) {
-      if (!inSingleComment && !inMultiComment && char === '/' && nextChar === '/') {
-        inSingleComment = true;
-        i++;
-        continue;
-      }
-      if (inSingleComment && char === '\n') {
-        inSingleComment = false;
-        result += char;
-        continue;
-      }
-      if (!inSingleComment && !inMultiComment && char === '/' && nextChar === '*') {
-        inMultiComment = true;
-        i++;
-        continue;
-      }
-      if (inMultiComment && char === '*' && nextChar === '/') {
-        inMultiComment = false;
-        i++;
-        continue;
-      }
-    }
-
-    if (!inSingleComment && !inMultiComment) {
-      result += char;
+function parseJSModuleObject(content: string, varName: string): any | null {
+  try {
+    return JSON.parse(content);
+  } catch { /* not JSON, try JS extraction */ }
+  const pattern = new RegExp(`(?:const|let|var)\\s+${varName}\\s*=\\s*`);
+  const startMatch = content.match(pattern);
+  if (startMatch) {
+    const afterAssignment = content.substring(startMatch.index! + startMatch[0].length);
+    const parsed = cleanAndParseJSON(afterAssignment);
+    if (parsed && !parsed.error && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+      return parsed;
     }
   }
-  return result;
-}
-
-function fixUnescapedCharsInStrings(json: string): string {
-  const chars: string[] = [];
-  let inString = false;
-  let i = 0;
-
-  while (i < json.length) {
-    const ch = json[i];
-
-    if (!inString) {
-      if (ch === '"') {
-        inString = true;
-        chars.push(ch);
-      } else {
-        chars.push(ch);
-      }
-      i++;
-    } else {
-      if (ch === '\\') {
-        chars.push(ch);
-        if (i + 1 < json.length) {
-          chars.push(json[i + 1]);
-          i += 2;
-        } else {
-          i++;
-        }
-      } else if (ch === '"') {
-        inString = false;
-        chars.push(ch);
-        i++;
-      } else if (ch === '\n') {
-        chars.push('\\', 'n');
-        i++;
-      } else if (ch === '\r') {
-        i++;
-      } else if (ch === '\t') {
-        chars.push('\\', 't');
-        i++;
-      } else if (ch.charCodeAt(0) < 0x20) {
-        i++;
-      } else {
-        chars.push(ch);
-        i++;
-      }
-    }
+  const parsed = cleanAndParseJSON(content);
+  if (parsed && !parsed.error && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+    return parsed;
   }
-
-  return chars.join('');
+  return null;
 }
 
 function verifyAndParseJSON(text: string, requiredKeys: string[]): any {
@@ -1525,6 +1575,7 @@ function verifyAndParseJSON(text: string, requiredKeys: string[]): any {
     );
   }
 }
+
 
 function pruneToEnglish(obj: any): any {
   if (obj === null || typeof obj !== 'object') {
@@ -1644,11 +1695,35 @@ async function lookupAndSummarizeHexagrams(hexagramNumbers: number[]): Promise<s
     try {
       validators.hexagramNumber(num);
       const hex = await getHexagram(num);
-      return `Hexagram ${num} (${hex.name_zh} - ${hex.name_en}):
-- Judgment: ${hex.judgment_zh || "Not found."}
-- English: ${hex.judgment_en || "Not found."}
-- Upper Trigram: ${hex.trigrams?.upper_name || "Unknown"} (${hex.trigrams?.upper || ""})
-- Lower Trigram: ${hex.trigrams?.lower_name || "Unknown"} (${hex.trigrams?.lower || ""})
+
+      // Full classical text injection — include ALL available classical fields
+      const linesZh: string[] = hex.lines_zh || [];
+      const linesEn: string[] = hex.lines_en || [];
+      const commentaryReading: string[] = (hex.commentary_reading || []).slice(0, 3);
+
+      const linesSummary = linesZh.map((zh: string, i: number) =>
+        `  Line ${i + 1}: ${zh}${linesEn[i] ? ` / ${linesEn[i]}` : ''}`
+      ).join('\n');
+
+      return `== Hexagram ${num}: ${hex.name_zh} (${hex.name_en}) ==
+Upper Trigram: ${hex.trigrams?.upper_name || "Unknown"} (${hex.trigrams?.upper || ""})
+Lower Trigram: ${hex.trigrams?.lower_name || "Unknown"} (${hex.trigrams?.lower || ""})
+Element: ${hex.element || ""}
+
+JUDGMENT (Tuan Ci):
+  ZH: ${hex.judgment_zh || ""}
+  EN: ${hex.judgment_en || ""}
+
+IMAGE (Xiang Ci):
+  ZH: ${hex.image?.image_zh || ""}
+  EN: ${hex.image?.image_en || ""}
+
+COMMENTARY:
+  ${hex.commentary_desc || ""}
+${commentaryReading.length > 0 ? commentaryReading.map((c: string, i: number) => `  Reading ${i + 1}: ${c}`).join('\n') : ''}
+
+LINE TEXTS (Yao Ci):
+${linesSummary || "  (none)"}
 `;
     } catch (error: any) {
       log(4, `Failed to lookup hexagram #${num}: ${error.message}`);
@@ -1968,69 +2043,70 @@ function getLinePositionName(position: number): string {
   return names[position] || `Position ${position}`;
 }
 
+// COMPACT: Optimized for speed - minimal tokens
 async function generateCelestialAstro(request: InterpretationRequest): Promise<any> {
   log(4, `[SECTION:celestial-astro] Generating celestial astrology...`);
-  const { mansion, question, hexagram, astrology, celestialDataStatus } = request;
+  const { mansion, question, hexagram, astrology } = request;
 
-  // Build technical data from available sources
+  // Fetch full classical texts for this hexagram
+  let hexData: any = null;
+  try { hexData = await getHexagram(hexagram?.number); } catch { }
+
   const technicalData: any = {
-    timestamp: new Date().toISOString(),
-    hexagram: hexagram ? { number: hexagram.number, name: hexagram.name_en } : null,
+    hexagram: hexagram ? {
+      number: hexagram.number,
+      name_zh: hexagram.name_zh,
+      name_en: hexagram.name_en,
+      element: hexagram.element,
+      judgment_zh: hexData?.judgment_zh || hexagram.judgment_zh || "",
+      judgment_en: hexData?.judgment_en || hexagram.judgment_en || "",
+      image_zh: hexData?.image?.image_zh || "",
+      image_en: hexData?.image?.image_en || "",
+      commentary_desc: hexData?.commentary_desc || "",
+      upper_trigram: hexagram.trigramUpper?.name || hexagram.trigram_upper?.name || "",
+      lower_trigram: hexagram.trigramLower?.name || hexagram.trigram_lower?.name || ""
+    } : null,
     lunarMansion: mansion ? {
-      name: mansion.name_en,
-      nameZh: mansion.name_zh,
-      group: mansion.group,
+      name_en: mansion.name_en,
+      name_zh: mansion.name_zh,
       element: mansion.element,
       animal: mansion.animal
     } : null,
-    dataStatus: celestialDataStatus || 'unknown'
+    taiSui: astrology?.taiSui ? {
+      position: astrology.taiSui.position,
+      year: astrology.taiSui.year
+    } : null
   };
 
-  // Add API astrology data if available
-  if (astrology?.lunarMansion) {
-    technicalData.lunarMansionAPI = astrology.lunarMansion;
-  }
-  if (astrology?.taiSui) {
-    technicalData.taiSui = astrology.taiSui;
-  }
-  if (astrology?.heTu) {
-    technicalData.heTu = astrology.heTu;
-  }
-  if (astrology?.luoShu) {
-    technicalData.luoShu = astrology.luoShu;
-  }
+  const systemPrompt = `You are a Yi Jing textual scholar specialising in astro-cosmological commentary.
+Analyze the Lunar Mansion and Tai Sui in relation to the hexagram's classical texts.
 
-  const systemPrompt = `You are a Daoist Astronomer. Provide celestial astrology analysis focusing on Lunar Mansion, Tai Sui, He Tu, and Luo Shu cosmic patterns.
-All string values must be plain text - no markdown formatting.
-
-CRITICAL REQUIREMENTS:
-1. USE PROVIDED TECHNICAL DATA: Analyze the actual Lunar Mansion, Tai Sui, He Tu, and Luo Shu data provided.
-2. LUNAR MANSION: Analyze the current mansion's influence on the question.
-3. TAI SUI: Consider the Grand Duke Jupiter's position and annual influence.
-4. HE TU & LUO SHU: Include River Map and Magic Square numerology if available.
-5. READING IMPACT: How do these celestial factors affect THIS I Ching reading?
-6. HEXAGRAM FOCUS: The hexagram is primary - celestial factors inform/modify its message.
-
-If dataStatus is 'pending_api_response', note that full API astrology data was not yet available and analyze based on the lunar mansion data provided.
+RULES:
+1. Ground ALL analysis in the classical texts provided (Judgment, Image Commentary).
+2. Quote or paraphrase the Judgment or Image Commentary explicitly in your analysis.
+3. Use technical Daoist astronomical terms (Xiu, Tai Sui, Qi, Wuxing) correctly.
+4. Do NOT add life-coaching language or generic "take action" advice.
+5. Return ONLY valid JSON.
 
 FORMAT (JSON only):
 {
-  "technicalAnalysis": "Title\\nClassical analysis using Zhou Yi and astrological texts",
-  "colloquialInterpretation": "Title\\nModern practical interpretation",
+  "technicalAnalysis": "Scholarly celestial analysis quoting the Judgment and Image...",
+  "colloquialInterpretation": "Accessible explanation focusing EXCLUSIVELY on celestial astrology (Lunar Mansion, Tai Sui, Xiu system) — the cosmic timing and stellar influences. Do NOT discuss BaZi, Five Elements balance, or general hexagram meaning here.",
   "lunarMansion": { "description": "", "influence": "", "guidance": "" },
-  "celestial": "Combined narrative including all available cosmic factors"
+  "celestial": "Combined narrative grounded in classical text...",
+  "quotedReferences": ["Cited passage (source)", "..."]
 }`;
 
-  const userPrompt = `### TECHNICAL DATA (JSON)
+  const userPrompt = `### CLASSICAL TEXTS
 ${JSON.stringify(technicalData, null, 2)}
 
 ### QUESTION
 "${question}"
 
-Provide celestial astrology analysis based on the ACTUAL technical data above. Focus on Lunar Mansion, Tai Sui, He Tu, and Luo Shu cosmic patterns. The hexagram is primary; astrology provides timing context.`;
+Analyze the celestial correspondences. Quote the Judgment or Image Commentary in your analysis.`;
 
   const requiredFields = ["technicalAnalysis"];
-  const parsed = await getStructuredInterpretation(userPrompt, 1200, { systemPrompt, response_mime_type: "application/json" }, requiredFields, 2);
+  const parsed = await getStructuredInterpretation(userPrompt, 1800, { systemPrompt, response_mime_type: "application/json" }, requiredFields, 2);
 
   return {
     technicalData: JSON.stringify(technicalData, null, 2),
@@ -2088,24 +2164,49 @@ async function generateCelestialBazi(request: InterpretationRequest): Promise<an
     };
   }
 
-  const systemPrompt = `You are a BaZi (Four Pillars) Master. Provide BaZi destiny analysis.
+  // Add astrology extensions (PaGua, 5 Elements, etc.)
+  if (astrology?.xiantian || astrology?.houtian || astrology?.lifeGua) {
+    technicalData.bagua = {
+      xiantian: astrology.xiantian,
+      houtian: astrology.houtian,
+      lifeGua: astrology.lifeGua
+    };
+  }
+  if (astrology?.heTu || astrology?.luoShu) {
+    technicalData.fiveElementsAstrology = {
+      heTu: astrology.heTu,
+      luoShu: astrology.luoShu
+    };
+  }
+  if (astrology?.taiSui) {
+    technicalData.taiSui = astrology.taiSui;
+  }
+
+  const systemPrompt = `You are a Daoist Master explicitly compounding BaZi, PaGua, and Five Elements analysis.
 All string values must be plain text - no markdown formatting.
 
 CRITICAL REQUIREMENTS:
 1. USE PROVIDED TECHNICAL DATA: Analyze the actual Day Master, stems, branches, and element strengths provided.
 2. BIRTH BAZI: Analyze Day Master, strength, favorable elements from the data.
-3. CURRENT BAZI: Analyze moment energies (Prasna) from the data.
-4. READING IMPACT: How do these BaZi factors affect THIS I Ching reading?
-5. NO ASTROLOGY: Do NOT analyze Lunar Mansion - focus only on BaZi.
-6. HEXAGRAM FOCUS: The hexagram is primary; BaZi provides destiny context.
+3. CURRENT SKY BAZI & MOMENT: Analyze moment energies (Prasna) from the data.
+4. PAGUA & FIVE ELEMENTS: Integrate the PaGua (Xian Tian/Hou Tian/Life Gua) and Five Elements (He Tu/Luo Shu) data into a single coherent analysis.
+5. HEXAGRAM CENTRALITY: The hexagram is absolutely primary; the entire compounded astrology (BaZi + PaGua + Elements) simply provides the destiny and timing context for the Hexagram cast.
+6. READING IMPACT: How does this compounded astrological backdrop specifically affect THIS I Ching reading and hexagram?
+<VERIFICATION STEP>
+Ensure you have explicitly addressed the Hexagram as the central subject.
+Ensure your analysis fuses BaZi, PaGua, and Elemental flows into one unified narrative.
+Ensure you retain an objective, classical tone without generic modern life-coaching.
+Provide a brief "_verification_scratchpad" at the start of your JSON verifying these rules.
+</VERIFICATION STEP>
 
 FORMAT (JSON only):
 {
-  "technicalAnalysis": "Title\\nClassical BaZi analysis",
-  "colloquialInterpretation": "Title\\nModern practical interpretation",
+  "_verification_scratchpad": "Self-check of the rules...",
+  "technicalAnalysis": "Title\\nClassical compounded BaZi, PaGua, and Five Elements analysis...",
+  "colloquialInterpretation": "Title\\nAccessible modern interpretation focusing EXCLUSIVELY on BaZi destiny (Day Master, Four Pillars), PaGua correspondences (Xian Tian/Hou Tian/Life Gua), and Five Elements astrology (He Tu/Luo Shu) — the compounded astrological backdrop. Do NOT provide a generic hexagram interpretation here.",
   "birthBazi": { "description": "", "readingImpact": "" },
   "currentBazi": { "description": "", "readingImpact": "" },
-  "celestial": "Combined narrative"
+  "celestial": "Combined narrative explaining how the whole sky influences the cast"
 }`;
 
   const userPrompt = `### TECHNICAL DATA (JSON)
@@ -2139,10 +2240,10 @@ async function generateElementsAnalysis(request: InterpretationRequest, previous
   const elementCounts: Record<string, number> = {
     wood: 0, fire: 0, earth: 0, metal: 0, water: 0
   };
-  
+
   // Track trigram elements found
   const trigramElements: { upper: string | null; lower: string | null } = { upper: null, lower: null };
-  
+
   // Add from equilibrium data if available (percentage-based counts)
   if (equilibrium?.elements) {
     Object.entries(equilibrium.elements).forEach(([el, count]) => {
@@ -2152,13 +2253,13 @@ async function generateElementsAnalysis(request: InterpretationRequest, previous
       }
     });
   }
-  
+
   // ALWAYS add trigram elements (each trigram contributes 1 count)
   if (hexagram) {
     // Support both old and new field naming conventions
     const upperTrigram = hexagram.trigramUpper || hexagram.trigram_upper;
     const lowerTrigram = hexagram.trigramLower || hexagram.trigram_lower;
-    
+
     // Extract element from upper trigram
     if (upperTrigram?.element) {
       const upperEl = upperTrigram.element.toLowerCase();
@@ -2168,7 +2269,7 @@ async function generateElementsAnalysis(request: InterpretationRequest, previous
         log(4, `[SECTION:elements-analysis] Upper trigram element: ${upperTrigram.element}`);
       }
     }
-    
+
     // Extract element from lower trigram
     if (lowerTrigram?.element) {
       const lowerEl = lowerTrigram.element.toLowerCase();
@@ -2182,10 +2283,10 @@ async function generateElementsAnalysis(request: InterpretationRequest, previous
 
   const technicalData: any = {
     timestamp: new Date().toISOString(),
-    hexagram: hexagram ? { 
-      number: hexagram.number, 
-      name: hexagram.name_en, 
-      element: hexagram.element 
+    hexagram: hexagram ? {
+      number: hexagram.number,
+      name: hexagram.name_en,
+      element: hexagram.element
     } : null,
     elementCounts,  // Always include element counts (never null)
     elementBalance: equilibrium ? {
@@ -2209,39 +2310,49 @@ async function generateElementsAnalysis(request: InterpretationRequest, previous
     technicalData.lifePalaceElement = astrology.houtian.lifePalaceTrigram.element;
   }
 
-  const systemPrompt = `You are a Wu Xing (Five Elements) Master. Provide technical analysis of the five element cycles.
-All string values must be plain text - no markdown formatting (no **bold**, no *italic*, no # headings).
-DO NOT use nested JSON objects for string fields. Write in continuous plain text paragraphs.
+  // Inject hexagram judgment and image for classical grounding
+  let hexDataForElements: any = null;
+  try { hexDataForElements = await getHexagram(hexagram?.number); } catch { }
+  if (hexDataForElements) {
+    technicalData.judgment_en = hexDataForElements.judgment_en || "";
+    technicalData.image_en = hexDataForElements.image?.image_en || "";
+    technicalData.commentary_desc = hexDataForElements.commentary_desc || "";
+  }
 
-CRITICAL REQUIREMENTS:
-1. USE PROVIDED TECHNICAL DATA: Analyze the actual element counts, trigram elements, and BaZi strengths provided.
-2. CONNECT TO CELESTIAL ANALYSIS: Reference and build upon the celestial/BaZi context provided.
-3. EXPLAIN ELEMENT INTERACTIONS: Detail how the five elements generate, control, and exhaust each other in THIS specific reading.
-4. LINK TO QUESTION: Explicitly connect the elemental analysis to the user's inquiry.
-5. The first line of "technicalAnalysis" MUST be a unique, creative, and relevant title.
+  const systemPrompt = `You are a Yi Jing scholar specialising in Wuxing (Five Elements) cosmology.
+Provide a technical analysis of the five element cycles as they manifest in the hexagram's classical imagery.
+
+RULES:
+1. Ground the elemental analysis in the hexagram's Judgment and Image Commentary (provided in the data).
+2. Reference the Wuxing sheng (generating) and ke (controlling) cycles precisely.
+3. Connect elemental imbalances to the classical symbolism — not to generic life advice.
+4. Plain text only — no markdown formatting.
 
 FORMAT (JSON only):
 {
-  "technicalAnalysis": "Relevant Title\\nDetailed section on generating, controlling, and exhausting cycles.",
-  "composition": "Elemental composition analysis text.",
-  "trigramRelationship": "Trigram elemental relationship text.",
-  "yinYangAnalysis": "Yin-Yang balance analysis text."
+  "technicalAnalysis": "Title\\nDetailed Wuxing analysis referencing classical texts...",
+  "composition": "Elemental composition and balance...",
+  "trigramRelationship": "Trigram elemental correspondences...",
+  "yinYangAnalysis": "Yin-Yang polarity analysis..."
 }`;
 
-  const userPrompt = `### TECHNICAL DATA (JSON) - THIS SECTION
+  const elementSummary = Object.entries(elementCounts)
+    .map(([el, count]) => `${el}:${count}`)
+    .join(', ');
+
+  const userPrompt = `### TECHNICAL DATA
 ${JSON.stringify(technicalData, null, 2)}
 
-### CUMULATIVE TECHNICAL DATA (from previous sections)
-${cumulativeTechnicalData || "No previous technical data available."}
+ELEMENT COUNTS: ${elementSummary}
+TRIGRAMS: Upper(${trigramElements.upper || '?'}), Lower(${trigramElements.lower || '?'}}
 
-### INSTRUCTIONS
-Provide Technical Analysis of Wu Xing cycles based on the ACTUAL technical data above. 
+### PREVIOUS SECTIONS CONTEXT
+${cumulativeTechnicalData || "None."}
 
-IMPORTANT: Use BOTH:
-1. The current section's element data (elementCounts, trigramElements)
-2. The cumulative technical data from celestial/BaZi sections (which includes Day Master, Lunar Mansion, etc.)
+### QUESTION
+"${question}"
 
-Explain how the five elements generate, control, and exhaust each other in THIS specific reading, considering the Day Master and celestial factors. The first line of technicalAnalysis MUST be a unique, relevant title.`;
+Analyze Wuxing cycles. Reference the Judgment and Image Commentary when connecting elements to the hexagram's classical meaning. Use the celestial context from previous sections to inform your elemental analysis.`;
 
   const requiredFields = ["technicalAnalysis"];
   const parsed = await getStructuredInterpretation(
@@ -2264,7 +2375,7 @@ Explain how the five elements generate, control, and exhaust each other in THIS 
 async function generateElementsSynthesis(request: InterpretationRequest, previousContext?: string): Promise<any> {
   log(4, `[SECTION:elements-synthesis] Generating elements interpretation...`);
 
-  const { equilibrium, question, birthBazi, currentBazi, hexagram } = request;
+  const { equilibrium, question, birthBazi, currentBazi, hexagram, astrology, cumulativeTechnicalData } = request;
 
   const technicalData = {
     timestamp: new Date().toISOString(),
@@ -2283,33 +2394,33 @@ async function generateElementsSynthesis(request: InterpretationRequest, previou
     trigramElements: hexagram ? {
       upper: hexagram.trigram_upper?.element,
       lower: hexagram.trigram_lower?.element
-    } : null
+    } : null,
+    astrology: astrology || null
   };
 
-  const systemPrompt = `You are a Wu Xing (Five Elements) Master. Provide accessible interpretation and guidance.
-All string values must be plain text - no markdown formatting (no **bold**, no *italic*, no # headings).
-DO NOT use nested JSON objects for string fields. Write in continuous plain text paragraphs.
+  const systemPrompt = `You are a Yi Jing scholar providing an elemental synthesis of the reading.
+Your role is to render the Wuxing analysis accessible while keeping it grounded in the classical texts.
 
-CRITICAL REQUIREMENTS:
-1. USE PROVIDED TECHNICAL DATA: Interpret the actual element counts and BaZi strengths provided.
-2. SYNTHESIZE ALL PREVIOUS ANALYSIS: Integrate celestial and elemental technical analysis into practical guidance.
-3. ANSWER THE QUESTION: Directly address the user's inquiry with specific, actionable wisdom.
-4. MAKE IT RELEVANT: Every sentence should connect to the question and previous analysis.
-5. The first line of "colloquialInterpretation" MUST be a unique, creative, and relevant title.
+RULES:
+1. Synthesise the elemental technical analysis and celestial context into a coherent reading of the hexagram's elemental situation.
+2. All interpretive claims must derive from the classical texts or the elemental data provided — not from invented advice.
+3. The "colloquialInterpretation" should make the elemental dynamics understandable without departing from classical meaning. It must focus EXCLUSIVELY on Five Elements (Wuxing) dynamics — elemental cycles, balance, and their meaning in this hexagram. Reference prior celestial/BaZi analysis for context but do NOT repeat or replace it. Do NOT provide a generic hexagram interpretation.
+4. The "elements" field should provide a narrative of how the five elements interplay in this specific hexagram.
+5. Plain text — no markdown.
 
 FORMAT (JSON only):
 {
-  "colloquialInterpretation": "Relevant Title\\nDetailed accessible interpretation of the elemental energies.",
-  "recommendations": "Practical guidance based on element balance.",
-  "elements": "Combined narrative of all five element influences.",
-  "quotedReferences": ["Quote 1 (Source)", "Quote 2 (Source)"]
+  "colloquialInterpretation": "Title\\nAccessible synthesis of the Five Elements dynamics specifically — how the Wuxing cycles manifest in this hexagram, referencing celestial/BaZi context where relevant...",
+  "recommendations": "Classical orientations derived from elemental patterns...",
+  "elements": "Narrative of five element dynamics in this hexagram...",
+  "quotedReferences": ["Classical citation (source)", "..."]
 }`;
 
   const userPrompt = `### TECHNICAL DATA (JSON)
 ${JSON.stringify(technicalData, null, 2)}
 
 ### PREVIOUS ANALYSIS CONTEXT
-${previousContext || "N/A"}
+${previousContext || cumulativeTechnicalData || "N/A"}
 
 ### QUESTION
 "${question}"
@@ -2341,12 +2452,27 @@ async function generateCoreTechnical(request: InterpretationRequest, previousCon
   const { hexagram, question, lines, equilibrium, cumulativeTechnicalData } = request;
   const changingLines = lines.map((l, i) => l.isChanging ? i + 1 : null).filter(Boolean);
 
+  // Fetch full classical texts
+  let hexData: any = null;
+  try { hexData = await getHexagram(hexagram.number); } catch { }
+
+  const classicalTexts = {
+    judgment_zh: hexData?.judgment_zh || "",
+    judgment_en: hexData?.judgment_en || "",
+    image_zh: hexData?.image?.image_zh || "",
+    image_en: hexData?.image?.image_en || "",
+    commentary_desc: hexData?.commentary_desc || "",
+    commentary_reading: (hexData?.commentary_reading || []).slice(0, 3),
+    lines_zh: hexData?.lines_zh || [],
+    lines_en: hexData?.lines_en || [],
+    tuan: hexData?.tuan || ""
+  };
+
   const technicalData = {
-    timestamp: new Date().toISOString(),
     hexagram: {
       number: hexagram.number,
-      name: hexagram.name_en,
-      nameZh: hexagram.name_zh,
+      name_zh: hexagram.name_zh,
+      name_en: hexagram.name_en,
       element: hexagram.element,
       trigramUpper: hexagram.trigram_upper ? {
         name: hexagram.trigram_upper.name,
@@ -2357,39 +2483,42 @@ async function generateCoreTechnical(request: InterpretationRequest, previousCon
         element: hexagram.trigram_lower.element
       } : null
     },
+    classicalTexts,
     movingLines: changingLines,
     elementCounts: equilibrium?.elements || null
   };
 
-  const systemPrompt = `You are a Yi Jing scholar. Provide technical analysis and symbolism ONLY.
-All string values must be plain text - no markdown formatting.
+  const systemPrompt = `You are a Yi Jing textual scholar. Provide technical structural and elemental analysis grounded strictly in the classical texts provided.
 
-CRITICAL REQUIREMENTS:
-1. USE PROVIDED TECHNICAL DATA: Analyze the actual hexagram number, trigrams, and elements from the data.
-2. FIVE ELEMENTS BALANCE: Analyze the element counts provided - identify which elements are strong, weak, or missing, and how this affects the reading.
-3. TECHNICAL ANALYSIS: Explain trigram dynamics, referencing celestial/elemental factors.
-4. ARCHETYPAL SYMBOLISM: Connect imagery to the question philosophically.
-5. NO NARRATIVE: Do NOT write the cohesive narrative/analysis section.
-6. SYNTHESIZE CONTEXT: Build upon celestial and elemental analyses provided.
+RULES:
+1. Base all analysis on the Judgment (Tuan Ci), Image Commentary (Xiang Ci), and Line Texts (Yao Ci) provided.
+2. Quote or paraphrase the classical texts explicitly — do not invent interpretations.
+3. Analyze the trigram dynamics using the Wuxing (Five Elements) correspondences.
+4. Reference moving lines only using their classical Yao Ci texts.
+5. Do NOT add life-coaching language. This is a textual and cosmological analysis.
+6. Do NOT write the narrative/advice section.
+7. <VERIFICATION STEP>: Before outputting the final JSON, strictly verify that your technical analysis aligns solely with the provided Judgment, Image, and Moving Lines, and that elemental logic correctly follows Wuxiang generating/controlling cycles.
 
 FORMAT (JSON only):
 {
-  "technicalAnalysis": "Title\\nTechnical paragraphs using actual hexagram data including Five Elements balance...",
-  "symbolism": "Archetypal analysis..."
+  "_verification_scratchpad": "Brief 1-2 sentence self-check confirming your analysis strictly aligns with classic rules.",
+  "technicalAnalysis": "Structural analysis grounded in Judgment, Image, and trigram correspondences...",
+  "symbolism": "Archetypal symbolism drawn directly from the classical imagery...",
+  "quotedReferences": ["Classical citation (source)", "..."]
 }`;
 
-  const userPrompt = `### TECHNICAL DATA (JSON) - THIS SECTION
+  const userPrompt = `### CLASSICAL HEXAGRAM DATA
 ${JSON.stringify(technicalData, null, 2)}
 
-### CUMULATIVE TECHNICAL DATA (from previous sections)
-${cumulativeTechnicalData || "No previous technical data available."}
+### CUMULATIVE CONTEXT (from previous sections)
+${cumulativeTechnicalData || "None."}
 
 ### QUESTION
 "${question}"
 
-Provide technical analysis and symbolism based on the ACTUAL hexagram data above. No narrative section.`;
+Provide technical analysis and symbolism. Quote the Judgment or Image Commentary explicitly.`;
 
-  const parsed = await getStructuredInterpretation(userPrompt, 1500, { systemPrompt, response_mime_type: "application/json" }, ["technicalAnalysis"], 2);
+  const parsed = await getStructuredInterpretation(userPrompt, 2000, { systemPrompt, response_mime_type: "application/json" }, ["technicalAnalysis"], 2);
 
   return {
     technicalData: JSON.stringify(technicalData, null, 2),
@@ -2401,59 +2530,65 @@ Provide technical analysis and symbolism based on the ACTUAL hexagram data above
 
 async function generateCoreNarrative(request: InterpretationRequest, previousContext?: string): Promise<any> {
   log(4, `[SECTION:core-narrative] Generating core narrative...`);
-  const { hexagram, question, lines, equilibrium } = request;
+  const { hexagram, question, lines, equilibrium, cumulativeTechnicalData } = request;
   const changingLines = lines.map((l, i) => l.isChanging ? i + 1 : null).filter(Boolean);
 
+  // Fetch full classical texts
+  let hexData: any = null;
+  try { hexData = await getHexagram(hexagram.number); } catch { }
+
+  const classicalTexts = {
+    judgment_zh: hexData?.judgment_zh || "",
+    judgment_en: hexData?.judgment_en || "",
+    image_zh: hexData?.image?.image_zh || "",
+    image_en: hexData?.image?.image_en || "",
+    commentary_desc: hexData?.commentary_desc || "",
+    commentary_reading: (hexData?.commentary_reading || []).slice(0, 3)
+  };
+
   const technicalData = {
-    timestamp: new Date().toISOString(),
     hexagram: {
       number: hexagram.number,
-      name: hexagram.name_en,
-      nameZh: hexagram.name_zh,
+      name_zh: hexagram.name_zh,
+      name_en: hexagram.name_en,
       element: hexagram.element,
-      trigramUpper: hexagram.trigram_upper ? {
-        name: hexagram.trigram_upper.name,
-        element: hexagram.trigram_upper.element
-      } : null,
-      trigramLower: hexagram.trigram_lower ? {
-        name: hexagram.trigram_lower.name,
-        element: hexagram.trigram_lower.element
-      } : null
+      trigramUpper: hexagram.trigram_upper?.name || "",
+      trigramLower: hexagram.trigram_lower?.name || ""
     },
+    classicalTexts,
     movingLines: changingLines,
     elementCounts: equilibrium?.elements || null
   };
 
-  const systemPrompt = `You are a Yi Jing scholar. Provide cohesive narrative analysis ONLY.
-All string values must be plain text - no markdown formatting.
+  const systemPrompt = `You are a Yi Jing textual scholar. Provide a cohesive hermeneutic narrative — an exegesis of the reading grounded in the classical texts provided.
 
-CRITICAL REQUIREMENTS:
-1. USE PROVIDED TECHNICAL DATA: Reference the actual hexagram number, trigrams, and elements from the data.
-2. FIVE ELEMENTS BALANCE: Reference the element counts - explain how strong/weak/missing elements influence the situation.
-3. ANALYSIS (NARRATIVE): Provide 3 paragraphs synthesizing ALL aspects of the reading.
-4. STAY RELEVANT: Every insight must connect to the user's inquiry.
-5. NO TECHNICAL: Do NOT write technical trigram analysis.
-6. NO SYMBOLISM: Do NOT write archetypal symbolism section.
-7. SYNTHESIZE CONTEXT: Build upon celestial and elemental analyses.
+RULES:
+1. Your narrative MUST derive from the classical Judgment (Tuan Ci) and Image Commentary (Xiang Ci) — cite them explicitly.
+2. Weave together the classical imagery, Five Elements balance, and moving lines into a unified interpretation.
+3. Connect the classical meaning to the querent's situation — but all connections must flow from the text, not from external advice.
+4. Write 3-4 substantive paragraphs. No bullet points. No headings.
+5. Do NOT add motivational or life-coaching language.
+6. Provide an accessible paragraph that explains the classical themes in plain language, INTEGRATING insights from the celestial, elemental, and houtou analyses provided in the context. This should be a unified narrative that weaves all prior layers together through the lens of the hexagram's classical texts.
 
 FORMAT (JSON only):
 {
-  "analysis": "Deep cohesive narrative based on actual reading data including Five Elements balance...",
-  "colloquialInterpretation": "Accessible interpretation..."
+  "analysis": "3-4 paragraph narrative rooted in classical texts...",
+  "colloquialInterpretation": "1-2 paragraph accessible explanation of the hexagram's classical themes, integrating celestial astrology, BaZi destiny, Five Elements dynamics, and Day Master analysis from prior sections into a unified narrative...",
+  "quotedReferences": ["Classical citation (source)", "..."]
 }`;
 
-  const userPrompt = `### TECHNICAL DATA (JSON)
+  const userPrompt = `### CLASSICAL HEXAGRAM DATA
 ${JSON.stringify(technicalData, null, 2)}
 
-### CONTEXT
-${previousContext || "N/A"}
+### CONTEXT FROM PREVIOUS SECTIONS
+${previousContext || cumulativeTechnicalData || "None."}
 
 ### QUESTION
 "${question}"
 
-Provide cohesive narrative based on the ACTUAL hexagram data above. No technical or symbolism sections.`;
+Write the hermeneutic narrative. Quote the Judgment or Image Commentary and explain their relevance to the question.`;
 
-  const parsed = await getStructuredInterpretation(userPrompt, 1500, { systemPrompt, response_mime_type: "application/json" }, ["analysis"], 2);
+  const parsed = await getStructuredInterpretation(userPrompt, 2000, { systemPrompt, response_mime_type: "application/json" }, ["analysis"], 2);
 
   return {
     technicalData: JSON.stringify(technicalData, null, 2),
@@ -2466,45 +2601,70 @@ Provide cohesive narrative based on the ACTUAL hexagram data above. No technical
 async function generateCoreApplication(request: InterpretationRequest, previousContext?: string): Promise<any> {
   log(4, `[SECTION:core-application] Generating core application (colloquial/advice)...`);
 
-  const { hexagram, question, lines } = request;
+  const { hexagram, question, lines, cumulativeTechnicalData } = request;
   const changingLines = lines.map((l, i) => l.isChanging ? i + 1 : null).filter(Boolean);
 
-  const systemPrompt = `You are a master Yi Jing scholar. Synthesize the complete reading into practical guidance.
-All string values must be plain text - no markdown formatting.
-DO NOT use nested JSON objects for string fields. Write in continuous plain text paragraphs.
+  // Fetch full classical texts
+  let hexData: any = null;
+  try { hexData = await getHexagram(hexagram.number); } catch { }
 
-CRITICAL REQUIREMENTS:
-1. SYNTHESIZE FROM READING: Use the celestial, elemental, and hexagram analyses provided to formulate practical guidance. Base ALL advice STRICTLY on the patterns, imbalances, and insights identified in the reading.
-2. COLLOQUIAL INTERPRETATION: Provide 3 detailed paragraphs translating the technical analysis into accessible wisdom that directly addresses the user's question.
-3. ADVICE SECTION: Extract 4-6 concrete, actionable recommendations based SOLELY on the reading's findings.
-4. DIRECT ANSWER: Ensure every recommendation directly addresses the original question using insights from the reading.
-5. TITLES: The first line of "colloquialInterpretation" MUST be a unique title, followed by a newline.
+  const classicalTexts = {
+    judgment_zh: hexData?.judgment_zh || "",
+    judgment_en: hexData?.judgment_en || "",
+    image_zh: hexData?.image?.image_zh || "",
+    image_en: hexData?.image?.image_en || "",
+    commentary_desc: hexData?.commentary_desc || "",
+    commentary_reading: (hexData?.commentary_reading || []).slice(0, 4),
+    tuan: hexData?.tuan || ""
+  };
 
-STRICT RULE: Advice must be derived FROM the reading analysis, not invented.
+  // Include relevant moving line texts
+  const movingLineTexts = changingLines.map((lineNum: any) => ({
+    line: lineNum,
+    zh: hexData?.lines_zh?.[lineNum - 1] || "",
+    en: hexData?.lines_en?.[lineNum - 1] || ""
+  }));
+
+  const systemPrompt = `You are a Yi Jing textual scholar providing an applied reading — a synthesis of the classical texts as they speak to the querent's situation.
+
+RULES:
+1. The Judgment (Tuan Ci) and Image Commentary (Xiang Ci) are your primary sources. ALL application guidance must be derived from them.
+2. For moving lines: cite the specific line text (Yao Ci) when applying its meaning.
+3. Provide an accessible synthesis (colloquialInterpretation) that translates classical imagery into plain language, drawing on ALL prior analyses (celestial, BaZi, Five Elements, Day Master, Governing Pillars, and hexagram narrative) to provide a comprehensive, practical interpretation. This is the final integrative layer — synthesize everything.
+4. The "advice" field must contain 4-6 specific orientations derived EXCLUSIVELY from the classical texts provided. Each orientation must cite its classical source.
+5. Do NOT invent advice not supported by the classical corpus. No motivational language. No generic life-coaching.
+6. Plain text only — no markdown.
 
 FORMAT (JSON only):
 {
-  "colloquialInterpretation": "Title\\nAccessible paragraphs...",
-  "advice": "4-6 specific actionable recommendations based on reading insights...",
-  "quotedReferences": ["Quote 1 (Source)", "..."]
+  "colloquialInterpretation": "Comprehensive practical synthesis building on ALL prior section analyses (celestial, BaZi, elements, houtou) to deliver integrated guidance grounded in classical texts...",
+  "advice": "Classical orientations with citations...",
+  "quotedReferences": ["Classical citation (source)", "..."]
 }`;
 
-  const userPrompt = `### INPUT
-- QUESTION: "${question}"
-- HEXAGRAM: ${hexagram.number} - ${hexagram.name_en}
-- MOVING_LINES: ${changingLines.length > 0 ? changingLines.join(', ') : 'None'}
+  const userPrompt = `### CLASSICAL HEXAGRAM DATA
+Hexagram ${hexagram.number}: ${hexagram.name_zh} / ${hexagram.name_en}
+Moving Lines: ${changingLines.length > 0 ? changingLines.join(', ') : 'None'}
 
-### COMPLETE READING CONTEXT (synthesize this into practical guidance)
-${previousContext || "N/A"}
+Classical Texts:
+${JSON.stringify(classicalTexts, null, 2)}
 
-### INSTRUCTIONS
-SYNTHESIZE the complete reading into practical guidance. The "advice" field must contain 4-6 specific recommendations derived FROM the celestial, elemental, and hexagram analyses above.`;
+Moving Line Texts:
+${JSON.stringify(movingLineTexts, null, 2)}
+
+### COMPLETE READING CONTEXT
+${previousContext || cumulativeTechnicalData || "None."}
+
+### QUESTION
+"${question}"
+
+Synthesize the classical reading. Every application must cite a specific classical passage.`;
 
   const requiredFields = ["colloquialInterpretation", "advice"];
   const parsed = await getStructuredInterpretation(
     userPrompt,
     3000,
-    { systemPrompt, temperature: 0.7, response_mime_type: "application/json" },
+    { systemPrompt, temperature: 0.3, response_mime_type: "application/json" },
     requiredFields,
     3
   );
@@ -2517,53 +2677,61 @@ SYNTHESIZE the complete reading into practical guidance. The "advice" field must
 }
 
 async function generateAdviceSection(request: InterpretationRequest, previousContext?: string): Promise<{ advice: string; quotedReferences: string[] }> {
-  log(4, `[SECTION:advice] Generating advice from complete technical analysis...`);
+  log(4, `[SECTION:advice] Generating classical-grounded advice...`);
 
   const { hexagram, question, lines, birthBazi, currentBazi } = request;
   const changingLines = lines.map((l, i) => l.isChanging ? i + 1 : null).filter(Boolean);
 
-  const systemPrompt = `You are a pragmatic, wise Daoist advisor. Your goal is to translate technical divination data into clear, colloquial, actionable advice.
+  // Fetch classical texts so advice can be grounded in them
+  let hexData: any = null;
+  try { hexData = await getHexagram(hexagram.number); } catch { }
 
-CRITICAL REQUIREMENTS:
-1. INPUT: You will receive rigorous technical analysis (BaZi, Hexagram, Elements).
-2. OUTPUT: Generate 4-6 bullet points of advice.
-3. STYLE: Colloquial, direct, and warm. Avoid academic jargon in the advice itself.
-4. EVIDENCE: You MUST briefly mention the source of the advice in parentheses to ground it. 
+  const classicalContext = [
+    hexData?.judgment_en ? `JUDGMENT: "${hexData.judgment_en}"` : "",
+    hexData?.image?.image_en ? `IMAGE: "${hexData.image.image_en}"` : "",
+    hexData?.commentary_desc ? `COMMENTARY: ${hexData.commentary_desc}` : "",
+    ...changingLines.map((ln: any) => hexData?.lines_en?.[ln - 1]
+      ? `LINE ${ln}: "${hexData.lines_en[ln - 1]}"` : "")
+  ].filter(Boolean).join('\n');
 
-MANDATORY REFERENCES:
-You must explicitly reference at least 3 of the following in your advice points:
-- The specific Hexagram Image (e.g. "Water over Fire")
-- A specific Moving Line (e.g. "Line 2's movement")
-- Elemental Balance (e.g. "The lack of Water")
-- Celestial influence (e.g. "The current Lunar Mansion")
+  const systemPrompt = `You are a Yi Jing textual scholar extracting practical orientations from classical sources.
 
-FORMAT: Plain text (not JSON). Write in a conversational but authoritative tone.`;
+RULES:
+1. ALL guidance must be derived explicitly from the classical texts provided (Judgment, Image, moving Line texts).
+2. Begin each orientation by citing the specific classical passage it is derived from, in quotation marks, followed by a brief explication of its relevance.
+3. Do NOT invent guidance that is not supported by the classical corpus.
+4. Provide 4-6 orientations. Each must identify its classical source text.
+5. Do NOT use: motivational language, life-coaching clichés, "take action", "be bold", "trust yourself".
+6. Plain text only — no markdown, no bullet symbols. Separate orientations with a blank line.
+7. The tone is scholarly and interpretive, not pastoral or prescriptive.
+8. <VERIFICATION STEP>: Before outputting the final JSON, strictly verify that your advice relies exclusively on the provided classical texts and avoids modern life-coaching cliches.
 
-  const userPrompt = `### USER'S QUESTION
+FORMAT (JSON only):
+{
+  "_verification_scratchpad": "Brief 1-2 sentence self-check confirming your analysis strictly aligns with classic rules.",
+  "advice": "1. 'Quote' - Orientation...\\n\\n2. 'Quote' - Orientation..."
+}`;
+
+  const userPrompt = `### QUESTION
 "${question}"
 
-### HEXAGRAM CONTEXT
-- Number: ${hexagram.number} - ${hexagram.name_en} (${hexagram.name_zh || ''})
-- Moving Lines: ${changingLines.length > 0 ? changingLines.join(', ') : 'None'}
-${birthBazi ? `- Birth BaZi: ${JSON.stringify(birthBazi)}` : ''}
-${currentBazi ? `- Current BaZi: ${JSON.stringify(currentBazi)}` : ''}
+### HEXAGRAM
+${hexagram.number} — ${hexagram.name_zh} / ${hexagram.name_en}
+Moving Lines: ${changingLines.length > 0 ? changingLines.join(', ') : 'None'}
 
-### COMPLETE TECHNICAL ANALYSIS (SYNTHESIZE THIS INTO ADVICE)
-${previousContext || "Technical analysis not available."}
+### CLASSICAL TEXTS
+${classicalContext || "(Classical texts not available — base analysis on the complete reading context below.)"}
 
-### INSTRUCTIONS
-Based ONLY on the technical analysis above, provide 4-6 concise, actionable recommendations that:
-1. Directly answer the user's question
-2. Reference specific elements, trigrams, or patterns from the analysis
-3. Are immediately actionable
-4. Use the hexagram's wisdom appropriately
+### COMPLETE READING CONTEXT
+${previousContext || "None."}
 
-Write as practical guidance, not academic explanation.`;
+Provide 4-6 classically-grounded orientations. Quote the relevant passage first, then explain its application to the question.`;
 
   try {
-    const response = await getInterpretation(userPrompt, 1500, {
+    const response = await getInterpretation(userPrompt, 2000, {
       systemPrompt,
-      temperature: 0.6
+      temperature: 0.2,
+      response_mime_type: "application/json"
     });
 
     let advice = response.trim();
@@ -2594,7 +2762,7 @@ Write as practical guidance, not academic explanation.`;
 
 async function generateHoutouEmperor(request: InterpretationRequest, previousContext?: string): Promise<any> {
   log(4, `[SECTION:houtou-emperor] Generating Emperor (Day Master) analysis...`);
-  const { birthBazi, currentBazi, question, hexagram } = request;
+  const { birthBazi, currentBazi, question, hexagram, cumulativeTechnicalData } = request;
 
   const technicalData = {
     timestamp: new Date().toISOString(),
@@ -2620,24 +2788,25 @@ CRITICAL REQUIREMENTS:
 3. NO MASTERS: Do NOT analyze the governing pillars (Year/Month/Hour).
 4. NO DIAGRAM: Do NOT generate FDL diagram data.
 5. READING IMPACT: How does the Emperor's condition affect this I Ching reading?
+6. SCOPE: The "colloquialInterpretation" must focus EXCLUSIVELY on the Day Master (Emperor) — its element, strength, and how it shapes this reading. Reference prior celestial and elemental context for background but do NOT provide a general hexagram interpretation.
 
 FORMAT (JSON only):
 {
   "technicalAnalysis": "Title\\nEmperor analysis using actual Day Master data",
-  "colloquialInterpretation": "Title\\nPractical interpretation",
+  "colloquialInterpretation": "Title\\nAccessible interpretation focusing EXCLUSIVELY on the Day Master (Emperor) — its element, strength, and how it shapes this reading. Reference prior celestial and elemental context for background but do NOT provide a general hexagram interpretation.",
   "emperorAnalysis": "Detailed Emperor analysis"
 }`;
 
   const userPrompt = `### TECHNICAL DATA (JSON)
 ${JSON.stringify(technicalData, null, 2)}
 
-### CONTEXT
-${previousContext || "N/A"}
+### CONTEXT FROM PREVIOUS SECTIONS
+${previousContext || cumulativeTechnicalData || "N/A"}
 
 ### QUESTION
 "${question}"
 
-Provide Emperor (Day Master) analysis based on the ACTUAL technical data above. No Masters, no diagram.`;
+Provide Emperor (Day Master) analysis based on the ACTUAL technical data above. Reference prior celestial, elemental, and BaZi context where relevant. No Masters, no diagram.`;
 
   const parsed = await getStructuredInterpretation(userPrompt, 1000, { systemPrompt, response_mime_type: "application/json" }, ["technicalAnalysis"], 2);
 
@@ -2652,7 +2821,7 @@ Provide Emperor (Day Master) analysis based on the ACTUAL technical data above. 
 
 async function generateHoutouMaster(request: InterpretationRequest, previousContext?: string): Promise<any> {
   log(4, `[SECTION:houtou-master] Generating Master (Pillars) analysis...`);
-  const { birthBazi, currentBazi, question, hexagram } = request;
+  const { birthBazi, currentBazi, question, hexagram, cumulativeTechnicalData } = request;
 
   const technicalData = {
     timestamp: new Date().toISOString(),
@@ -2680,24 +2849,25 @@ CRITICAL REQUIREMENTS:
 3. NO EMPEROR: Do NOT analyze the Day Master.
 4. NO DIAGRAM: Do NOT generate FDL diagram data.
 5. READING IMPACT: How do the Masters affect this I Ching reading?
+6. SCOPE: The "colloquialInterpretation" must focus EXCLUSIVELY on the Governing Pillars (Year, Month, Hour Masters) — their elemental influences and timing dynamics. Reference prior celestial, Day Master, and elemental context but do NOT provide a general hexagram interpretation.
 
 FORMAT (JSON only):
 {
   "technicalAnalysis": "Title\\nMasters analysis using actual pillar data",
-  "colloquialInterpretation": "Title\\nPractical interpretation",
+  "colloquialInterpretation": "Title\\nAccessible interpretation focusing EXCLUSIVELY on the Governing Pillars (Year, Month, Hour Masters) — their elemental influences and timing dynamics. Reference prior celestial, Day Master, and elemental context but do NOT provide a general hexagram interpretation.",
   "masterAnalysis": "Detailed Master analysis"
 }`;
 
   const userPrompt = `### TECHNICAL DATA (JSON)
 ${JSON.stringify(technicalData, null, 2)}
 
-### CONTEXT
-${previousContext || "N/A"}
+### CONTEXT FROM PREVIOUS SECTIONS
+${previousContext || cumulativeTechnicalData || "N/A"}
 
 ### QUESTION
 "${question}"
 
-Provide Master (Pillars) analysis based on the ACTUAL technical data above. No Emperor, no diagram.`;
+Provide Master (Pillars) analysis based on the ACTUAL technical data above. Reference prior celestial, Day Master, and elemental context where relevant. No Emperor, no diagram.`;
 
   const parsed = await getStructuredInterpretation(userPrompt, 1000, { systemPrompt, response_mime_type: "application/json" }, ["technicalAnalysis"], 2);
 
@@ -2718,33 +2888,57 @@ async function generateLinesSection(request: InterpretationRequest): Promise<Lin
 
   if (changingLines.length === 0) {
     return {
-      movingLines: "No moving lines detected. The situation is stable and focused on the core hexagram state.",
-      lineTexts: ["Stable", "Stable", "Stable", "Stable", "Stable", "Stable"],
+      movingLines: "No moving lines. The hexagram speaks in its entirety without individual line activations.",
+      lineTexts: ["", "", "", "", "", ""],
       quotedReferences: []
     };
   }
 
-  const systemPrompt = `You are an I Ching Line Expert. Provide specific commentary for each line with citations.
-All string values must be plain text - no markdown formatting (no **bold**, no *italic*, no # headings).
+  // Fetch classical line texts for the changing lines
+  let hexData: any = null;
+  try { hexData = await getHexagram(hexagram.number); } catch { }
+
+  // Build classical line text data for each changing line
+  const changingLineData = changingLines.map((lineNum: any) => ({
+    position: lineNum,
+    positionName: ["Bottom", "Second", "Third", "Fourth", "Fifth", "Top"][lineNum - 1] || `Line ${lineNum}`,
+    yao_ci_zh: hexData?.lines_zh?.[lineNum - 1] || "",
+    yao_ci_en: hexData?.lines_en?.[lineNum - 1] || ""
+  }));
+
+  const systemPrompt = `You are a Yi Jing textual scholar specialising in Yao Ci (Line Text) exegesis.
+Provide commentary on each moving line, rooted exclusively in the classical Yao Ci text provided.
+
+RULES:
+1. For each moving line, begin by quoting the Yao Ci text (in both Chinese and English if provided).
+2. Exegete the line's symbolic imagery within the hexagram's context — do not import meanings from outside the text.
+3. The "lineTexts" array must have exactly 6 elements. Moving lines get classical commentary; non-moving lines get a single terse note indicating they are stable.
+4. The "movingLines" summary must synthesise the combined dynamic of all active lines, citing their texts.
+5. No life-coaching language. No invented symbolism. All meaning flows from the Yao Ci.
+6. Plain text. No markdown.
 
 FORMAT (JSON only):
 {
-  "movingLines": "Summary text.",
-  "lineTexts": ["Line 1 text", "Line 2 text", "Line 3 text", "Line 4 text", "Line 5 text", "Line 6 text"],
-  "quotedReferences": ["Quote 1 (Source)", "Quote 2 (Source)"]
+  "movingLines": "Summary of the combined moving lines dynamic, with citations...",
+  "lineTexts": ["Line 1 (stable)", "Line 2 commentary...", ..., "Line 6 (stable)"],
+  "quotedReferences": ["Yao Ci citation (line position)", "..."]
 }`;
 
-  const userPrompt = `### INPUT
-- QUESTION: "${question}"
-- HEXAGRAM: ${hexagram.number} - ${hexagram.name_en}
-- MOVING_LINES: ${changingLines.join(', ')}
+  const userPrompt = `### HEXAGRAM
+${hexagram.number} — ${hexagram.name_zh} / ${hexagram.name_en}
 
-Provide line analysis and Classical References.`;
+### MOVING LINE CLASSICAL TEXTS (Yao Ci)
+${JSON.stringify(changingLineData, null, 2)}
+
+### QUESTION
+"${question}"
+
+Provide Yao Ci commentary for the moving lines. Quote each Yao Ci text before interpreting it.`;
 
   const requiredFields = ["movingLines", "lineTexts"];
   const parsed = await getStructuredInterpretation(
     userPrompt,
-    1200,
+    2000,
     { systemPrompt, response_mime_type: "application/json" },
     requiredFields,
     3
@@ -2757,118 +2951,56 @@ Provide line analysis and Classical References.`;
   };
 }
 
+// OPTIMIZED: Return classical texts directly from database without AI translation
+// Falls back to Chinese text for missing translations (will be translated via /translate-text endpoint)
 async function generateClassicalSection(request: InterpretationRequest): Promise<ClassicalSection> {
-  log(4, `[SECTION:classical] Generating classical texts...`);
+  log(4, `[SECTION:classical] Fetching classical texts from database...`);
 
   const { hexagram } = request;
   const hexData = await getHexagram(hexagram.number);
 
+  const emptyLines = ["", "", "", "", "", ""];
+
   const result: ClassicalSection = {
     judgment: { en: "", es: "", it: "", zh: "" },
     image: { en: "", es: "", it: "", zh: "" },
-    lines: { en: ["", "", "", "", "", ""], es: ["", "", "", "", "", ""], it: ["", "", "", "", "", ""], zh: ["", "", "", "", "", ""] }
+    lines: { en: [...emptyLines], es: [...emptyLines], it: [...emptyLines], zh: [...emptyLines] }
   };
 
   if (hexData) {
-    const hasTranslation = {
-      judgment: {
-        en: !!(hexData.judgment_en && hexData.judgment_en.trim().length > 10),
-        es: !!(hexData.judgment_es && hexData.judgment_es.trim().length > 10),
-        it: !!(hexData.judgment_it && hexData.judgment_it.trim().length > 10),
-        zh: !!(hexData.judgment_zh && hexData.judgment_zh.trim().length > 10)
-      },
-      image: {
-        en: !!(hexData.image?.image_en && hexData.image.image_en.trim().length > 10),
-        es: !!(hexData.image?.image_es && hexData.image.image_es.trim().length > 10),
-        it: !!(hexData.image?.image_it && hexData.image.image_it.trim().length > 10),
-        zh: !!(hexData.image?.image_zh && hexData.image.image_zh.trim().length > 10)
-      },
-      lines: {
-        en: !!(hexData.lines_en && hexData.lines_en.length === 6 && hexData.lines_en[0] && hexData.lines_en[0].trim().length > 2),
-        es: !!(hexData.lines_es && hexData.lines_es.length === 6 && hexData.lines_es[0] && hexData.lines_es[0].trim().length > 2),
-        it: !!(hexData.lines_it && hexData.lines_it.length === 6 && hexData.lines_it[0] && hexData.lines_it[0].trim().length > 2),
-        zh: !!(hexData.lines_zh && hexData.lines_zh.length === 6 && hexData.lines_zh[0] && hexData.lines_zh[0].trim().length > 2)
-      }
-    };
+    const zhJudgment = hexData.judgment_zh?.trim() || "";
+    const enJudgment = hexData.judgment_en?.trim() || zhJudgment;
+    const zhImage = hexData.image?.image_zh?.trim() || "";
+    const enImage = hexData.image?.image_en?.trim() || zhImage;
+    const zhLines = hexData.lines_zh?.length === 6 ? hexData.lines_zh : [...emptyLines];
+    const enLines = hexData.lines_en?.length === 6 ? hexData.lines_en : [...zhLines];
 
+    // Return database content.
+    // For es/it: use pre-translated DB content if available, otherwise fall back to English
+    // (not Chinese) so that the yijingtu-translate function can translate English→es/it.
     result.judgment = {
-      en: hasTranslation.judgment.en ? hexData.judgment_en : "",
-      es: hasTranslation.judgment.es ? hexData.judgment_es : "",
-      it: hasTranslation.judgment.it ? hexData.judgment_it : "",
-      zh: hexData.judgment_zh || ""
+      en: enJudgment,
+      es: hexData.judgment_es?.trim() || enJudgment,
+      it: hexData.judgment_it?.trim() || enJudgment,
+      zh: zhJudgment
     };
 
     result.image = {
-      en: hasTranslation.image.en ? hexData.image.image_en : "",
-      es: hasTranslation.image.es ? hexData.image.image_es : "",
-      it: hasTranslation.image.it ? hexData.image.image_it : "",
-      zh: hexData.image?.image_zh || ""
+      en: enImage,
+      es: hexData.image?.image_es?.trim() || enImage,
+      it: hexData.image?.image_it?.trim() || enImage,
+      zh: zhImage
     };
 
     result.lines = {
-      en: hasTranslation.lines.en ? hexData.lines_en : ["", "", "", "", "", ""],
-      es: hasTranslation.lines.es ? hexData.lines_es : ["", "", "", "", "", ""],
-      it: hasTranslation.lines.it ? hexData.lines_it : ["", "", "", "", "", ""],
-      zh: hexData.lines_zh || ["", "", "", "", "", ""]
+      en: enLines,
+      es: hexData.lines_es?.length === 6 ? hexData.lines_es : [...enLines],
+      it: hexData.lines_it?.length === 6 ? hexData.lines_it : [...enLines],
+      zh: [...zhLines]
     };
-
-    const missingLangs = ['en', 'es', 'it'].filter(lang => !hasTranslation.judgment[lang]);
-
-    if (missingLangs.length > 0) {
-      log(4, `[SECTION:classical] Generating translations for: ${missingLangs.join(', ')}`);
-
-      await Promise.all(missingLangs.map(async (lang) => {
-        try {
-          const langNames: { [key: string]: string } = {
-            'en': 'English',
-            'es': 'Spanish',
-            'it': 'Italian'
-          };
-          const langName = langNames[lang] || 'English';
-
-          const systemPrompt = `You are a professional translator and I Ching scholar. 
-Translate the provided I Ching texts to ${langName}. 
-
-CRITICAL: Output ONLY a valid JSON object. Do not include any introductory text, labels, or "Hexagram" titles.
-The output must be EXACTLY in this format:
-{"judgment": "...", "image": "...", "lines": ["l1", "l2", "l3", "l4", "l5", "l6"]}`;
-
-          const userPrompt = `Translate the following Chinese I Ching texts into ${langName}. 
-Maintain the poetic and philosophical depth of the original.
-
-HEXAGRAM ${hexagram.number}: ${hexData.name_zh}
-
-JUDGMENT:
-${hexData.judgment_zh}
-
-IMAGE:
-${hexData.image?.image_zh}
-
-LINES:
-${(hexData.lines_zh || []).join('\n')}`;
-
-          const aiConfig = {
-            systemPrompt,
-            temperature: 0.3,
-            response_mime_type: "application/json"
-          };
-
-          const rawResponse = await getInterpretation(userPrompt, 1500, aiConfig);
-          const parsed = cleanAndParseJSON(rawResponse);
-
-          if (parsed.judgment) result.judgment[lang] = parsed.judgment;
-          if (parsed.image) result.image[lang] = parsed.image;
-          if (parsed.lines && Array.isArray(parsed.lines)) result.lines[lang] = parsed.lines;
-        } catch (e: any) {
-          log(4, `Translation failed for ${lang}: ${e.message}`);
-          result.judgment[lang] = result.judgment[lang] || result.judgment.en || hexData.judgment_zh || "";
-          result.image[lang] = result.image[lang] || result.image.en || hexData.image?.image_zh || "";
-          result.lines[lang] = result.lines[lang] || result.lines.en || hexData.lines_zh || ["", "", "", "", "", ""];
-        }
-      }));
-    }
   }
 
+  log(4, `[SECTION:classical] Classical texts fetched (DB only, English fallback for es/it)`);
   return result;
 }
 
@@ -3018,13 +3150,13 @@ Output JSON: { "remedies": [ { "relevance": "...", "instructions": "..." } ] }`;
 
   const userPrompt = `### REMEDIES TO REVIEW
 ${JSON.stringify(langData.remedies.map((r: any) => ({
-      id: r.id,
-      type: r.type,
-      name: r.name,
-      currentRelevance: r.relevance,
-      currentInstructions: r.instructions,
-      description: r.description
-    })))}
+    id: r.id,
+    type: r.type,
+    name: r.name,
+    currentRelevance: r.relevance,
+    currentInstructions: r.instructions,
+    description: r.description
+  })))}
 
 ### CONTEXT
 HEXAGRAM: ${hexagramNum}
@@ -3326,26 +3458,43 @@ function extractShortFDLLabel(text: string, dir?: string): string {
   return firstSentence.length <= 35 ? firstSentence : firstSentence.substring(0, 32) + '…';
 }
 
-function generateFengShuiFDL(favorable: string[], unfavorable: string[], instructions?: Record<string, string>): any {
-  const directionToTrigram: Record<string, string> = {
-    'S': 'Li', 'South': 'Li',
-    'SE': 'Xun', 'Southeast': 'Xun',
-    'E': 'Zhen', 'East': 'Zhen',
-    'NE': 'Gen', 'Northeast': 'Gen',
-    'N': 'Kan', 'North': 'Kan',
-    'NW': 'Qian', 'Northwest': 'Qian',
-    'W': 'Dui', 'West': 'Dui',
-    'SW': 'Kun', 'Southwest': 'Kun'
+/**
+ * Generate Feng Shui Diagram Graphics Language (FS-DGL) format
+ * This is NOT FDL - FDL is for Fulu (talisman) drawings only
+ * FS-DGL is specifically for Feng Shui Bagua diagrams
+ */
+function generateFengShuiDiagram(favorable: string[], unfavorable: string[], instructions?: Record<string, string>): any {
+  const directionToTrigram: Record<string, { trigram: string; element: string }> = {
+    'S': { trigram: 'Li', element: 'Fire' },
+    'South': { trigram: 'Li', element: 'Fire' },
+    'SE': { trigram: 'Xun', element: 'Wood' },
+    'Southeast': { trigram: 'Xun', element: 'Wood' },
+    'E': { trigram: 'Zhen', element: 'Wood' },
+    'East': { trigram: 'Zhen', element: 'Wood' },
+    'NE': { trigram: 'Gen', element: 'Earth' },
+    'Northeast': { trigram: 'Gen', element: 'Earth' },
+    'N': { trigram: 'Kan', element: 'Water' },
+    'North': { trigram: 'Kan', element: 'Water' },
+    'NW': { trigram: 'Qian', element: 'Metal' },
+    'Northwest': { trigram: 'Qian', element: 'Metal' },
+    'W': { trigram: 'Dui', element: 'Metal' },
+    'West': { trigram: 'Dui', element: 'Metal' },
+    'SW': { trigram: 'Kun', element: 'Earth' },
+    'Southwest': { trigram: 'Kun', element: 'Earth' }
   };
 
-  const highlightCommands: any[] = [];
+  const sectors: any[] = [];
 
+  // Add favorable sectors
   favorable.forEach(dir => {
-    const trigram = directionToTrigram[dir];
-    if (trigram) {
-      highlightCommands.push({
-        type: "highlight_sector",
-        trigram,
+    const mapping = directionToTrigram[dir];
+    if (mapping) {
+      sectors.push({
+        direction: dir,
+        trigram: mapping.trigram,
+        element: mapping.element,
+        status: 'favorable',
+        label: instructions?.[dir] || `${dir} · Favorable`,
         style: {
           fill: "#00FF0040",
           stroke: "#00FF00",
@@ -3353,22 +3502,21 @@ function generateFengShuiFDL(favorable: string[], unfavorable: string[], instruc
           glow: true,
           glowColor: "#00FF00",
           glowRadius: 20
-        },
-        label: {
-          text: extractShortFDLLabel(instructions?.[dir] || '', dir) || `${dir} · Favorable`,
-          color: "#00FF00",
-          fontSize: 12
         }
       });
     }
   });
 
+  // Add unfavorable sectors
   unfavorable.forEach(dir => {
-    const trigram = directionToTrigram[dir];
-    if (trigram) {
-      highlightCommands.push({
-        type: "highlight_sector",
-        trigram,
+    const mapping = directionToTrigram[dir];
+    if (mapping) {
+      sectors.push({
+        direction: dir,
+        trigram: mapping.trigram,
+        element: mapping.element,
+        status: 'unfavorable',
+        label: instructions?.[dir] || `${dir} · Avoid`,
         style: {
           fill: "#FF000040",
           stroke: "#FF0000",
@@ -3376,37 +3524,22 @@ function generateFengShuiFDL(favorable: string[], unfavorable: string[], instruc
           glow: true,
           glowColor: "#FF0000",
           glowRadius: 15
-        },
-        label: {
-          text: extractShortFDLLabel(instructions?.[dir] || '', dir) || `${dir} · Avoid`,
-          color: "#FF4444",
-          fontSize: 12
         }
       });
     }
   });
 
+  // FS-DGL format - NOT FDL
   return {
-    version: "2.0",
+    version: "1.0",
     type: "fengshui_diagram",
     arrangement: "houtian",
     background: "#1a1a2e",
     title: "Feng Shui Guidance",
     lang: "en",
-    layers: [
-      {
-        name: "base_bagua",
-        type: "base_layer",
-        opacity: 1.0,
-        commands: [{ type: "bagua", cx: 500, cy: 500, size: 900 }]
-      },
-      {
-        name: "sector_highlights",
-        type: "highlight_layer",
-        opacity: 0.7,
-        commands: highlightCommands
-      }
-    ]
+    favorable,
+    unfavorable,
+    sectors
   };
 }
 
@@ -3450,7 +3583,7 @@ async function handleRandomBeacon(requestId: string, startTime: number): Promise
         );
       }
     }
-    
+
     log(4, `[RANDOM] NIST beacon unavailable, will use fallback`);
   } catch (error: any) {
     log(4, `[RANDOM] NIST beacon error: ${error.message}`);
@@ -3498,9 +3631,10 @@ async function handleSectionEndpoint(
   const request: InterpretationRequest = prunedBody;
   validators.question(request.question);
 
-  const previousContext = body.previousContext || '';
+  // Phase 6: Fallback - use cumulativeTechnicalData if previousContext not provided
   const cumulativeTechnicalData = body.cumulativeTechnicalData || '';
-  
+  const previousContext = body.previousContext || cumulativeTechnicalData || '';
+
   if (previousContext) {
     log(4, `[${section}] Received context from previous sections (${previousContext.length} chars)`);
   }
@@ -3577,7 +3711,7 @@ async function handleRemediesSelect(body: any, requestId: string, startTime: num
   log(4, `[remedies-select] Selecting remedies from database using AI assistance...`);
 
   const prunedBody = pruneToEnglish(body);
-  const { question, hexagram, binaryKey, equilibrium, interpretation, interpretationContext, recentRemedies } = prunedBody;
+  const { question, hexagram, binaryKey, equilibrium, interpretation, interpretationContext, recentRemedies, astrology } = prunedBody;
 
   validators.question(question);
   validators.hexagramData(hexagram);
@@ -3629,8 +3763,13 @@ async function handleRemediesSelect(body: any, requestId: string, startTime: num
     ? `\nRECENTLY SELECTED REMEDIES (last 60m): ${recentRemedies.join(', ')}. Ensure new selections are COMPATIBLE and CONSISTENT with these.`
     : "";
 
-  const systemPrompt = `You are a Daoist Remedy Selector. Given the hexagram reading and interpretation, select the most appropriate remedies from the AUTHENTICATED CATALOG below.
+  const astrologyContext = astrology
+    ? `\nCOMPOUNDED ASTROLOGY (BaZi/PaGua/Five Elements) CONTEXT:\n${JSON.stringify(astrology)}\n\nCRITICAL CONFLICT AVOIDANCE: If the hexagram lacks an element (e.g., Metal) but the whole sky compound is strictly dominated by that element, do NOT prescribe that element as a remedy. Respect the compounded element balance of the current sky.`
+    : "";
+
+  const systemPrompt = `You are a Daoist Remedy Selector. Given the hexagram reading, astrological context, and interpretation, select the most appropriate remedies from the AUTHENTICATED CATALOG below.
 ${recentContext}
+${astrologyContext}
 
 AUTHETICATED CATALOG:
 ${JSON.stringify(slimCatalog)}
@@ -3646,7 +3785,7 @@ STRICT RULES:
   const userPrompt = `READING CONTEXT:
 - Hexagram: ${hexagram.number} (${hexagram.name_en})
 - Trigrams: Upper ${upperTrigram}, Lower ${lowerTrigram}
-- Interpretation Snippet: ${analysisText.substring(0, 1000)}...
+- Interpretation Context: ${analysisText}
 - Question: "${question}"
 
 Select the best fitting remedies. Return JSON: { 
@@ -3892,7 +4031,7 @@ Provide comprehensive therapeutic and environmental guidance in ${targetLang}.`;
       }
 
       langContent.fengShui.visualData = {
-        fdl: generateFengShuiFDL(favorable, unfavorable, instructions)
+        diagram: generateFengShuiDiagram(favorable, unfavorable, instructions)
       };
     }
 
@@ -3909,7 +4048,7 @@ Provide comprehensive therapeutic and environmental guidance in ${targetLang}.`;
         favorable: ["Center", "South"],
         unfavorable: ["North"],
         guidance: "Keep your environment clean and well-lit.",
-        visualData: { fdl: generateFengShuiFDL(["S", "SE"], ["N"]) }
+        visualData: { diagram: generateFengShuiDiagram(["S", "SE"], ["N"]) }
       },
       medicine: [{ nameZh: "靈芝", name: "Lingzhi", description: "Symbolic longevity", application: "Meditation", element: "Wood" }],
       alchemical: "Focus on your breath and dantian."
@@ -4148,7 +4287,7 @@ Return ONLY valid JSON.`;
 serve(async (req) => {
   const requestId = generateRequestId();
   const startTime = Date.now();
-  
+
   console.log(`[BOOT] Function invoked: ${req.method} ${req.url}`);
 
   // Handle CORS preflight
@@ -4224,6 +4363,236 @@ serve(async (req) => {
 });
 
 // ============================================================================
+// NEW 3-TAB ARCHITECTURE HANDLERS
+// ============================================================================
+
+async function handleInterpretationTab(body: any, requestId: string, startTime: number): Promise<Response> {
+  log(4, `[TAB:interpretation] Generating full interpretation tab...`);
+  
+  const { hexagram, lines, question, astrology, bazi, equilibrium, lang = 'en' } = body;
+  
+  // Build compact technical data summary
+  const technicalData = {
+    hexagram: compactHexagramFormat(hexagram),
+    lines: lines?.map((l: any) => `${l.isYang ? 'Yang' : 'Yin'}${l.isChanging ? '*' : ''}`).join(', '),
+    bazi: {
+      birth: compactBaziFormat(bazi?.birth),
+      current: compactBaziFormat(bazi?.current)
+    },
+    elements: compactElementsFormat(equilibrium?.elements),
+    lifeGua: astrology?.lifeGua ? `${astrology.lifeGua.number} (${astrology.lifeGua.element})` : 'N/A',
+    lunarMansion: astrology?.lunarMansion?.mansion?.name || 'N/A'
+  };
+
+  const systemPrompt = `You are a Yi Jing master providing a complete, integrated interpretation.
+
+CRITICAL RULES:
+1. The hexagram's classical texts (Judgment, Image, Lines) are PRIMARY - all interpretation must derive from them
+2. Celestial astrology (Lunar Mansion, Tai Sui) provides cosmic timing context
+3. BaZi (Four Pillars) reveals the querent's destiny pattern and Day Master strength
+4. Five Elements show the energetic landscape
+5. INTEGRATE all layers into a unified narrative - do NOT treat them as separate sections
+6. Answer the querent's specific question directly
+7. Cite classical sources explicitly
+8. Output must be in ${lang} language
+
+OUTPUT FORMAT (JSON):
+{
+  "analysis": "3-4 paragraph integrated narrative in ${lang}",
+  "celestial": "How celestial influences affect this reading (in ${lang})",
+  "elements": "Five Elements dynamics in this context (in ${lang})",
+  "advice": "4-6 specific orientations grounded in classical texts (in ${lang})",
+  "quotedReferences": ["Citation (Source)", ...]
+}`;
+
+  const userPrompt = `### HEXAGRAM
+${JSON.stringify(technicalData.hexagram)}
+
+### LINES
+${technicalData.lines}
+
+### BAZI (Four Pillars)
+Birth: ${technicalData.bazi.birth}
+Current: ${technicalData.bazi.current}
+
+### FIVE ELEMENTS
+${technicalData.elements}
+
+### CELESTIAL CONTEXT
+Life Gua: ${technicalData.lifeGua}
+Lunar Mansion: ${technicalData.lunarMansion}
+
+### QUESTION
+"${question}"
+
+Provide a complete, integrated interpretation weaving all layers into a coherent reading that directly addresses the question. Output in ${lang}.`;
+
+  try {
+    const result = await getStructuredInterpretation(
+      userPrompt,
+      2500,
+      { systemPrompt, response_mime_type: "application/json" },
+      ['analysis', 'advice'],
+      2
+    );
+
+    return new Response(
+      JSON.stringify(createSuccessResponse({
+        analysis: result.analysis || '',
+        celestial: result.celestial || '',
+        elements: result.elements || '',
+        advice: result.advice || '',
+        quotedReferences: result.quotedReferences || []
+      }, requestId, startTime)),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    log(4, `[TAB:interpretation] Error: ${error.message}`);
+    throw new AppError(`Interpretation tab generation failed: ${error.message}`, 500, 'INTERPRETATION_TAB_ERROR');
+  }
+}
+
+async function handleRemediesTab(body: any, requestId: string, startTime: number): Promise<Response> {
+  log(4, `[TAB:remedies] Generating remedies tab...`);
+  
+  const { hexagram, question, astrology, bazi, lang = 'en' } = body;
+  
+  // Build context for remedy selection
+  const readingContext = {
+    hexagramNumber: hexagram?.number,
+    hexagramName: hexagram?.name_en,
+    element: hexagram?.element,
+    dayMaster: bazi?.current?.dayMaster?.element,
+    strength: bazi?.current?.strength?.result,
+    lifeGua: astrology?.lifeGua?.element,
+    question
+  };
+
+  const systemPrompt = `You are a Daoist remedy master selecting appropriate remedies.
+
+CRITICAL RULES:
+1. Select 2-3 remedies based on the hexagram, question, and astrological context
+2. Choose from: Fulu (talisman), Feng Shui (environmental), Medicine (alchemical)
+3. Each remedy must include relevance explaining WHY it fits this reading
+4. Provide usage instructions in accessible language
+5. Include classical source references
+6. Output must be in ${lang} language
+
+OUTPUT FORMAT (JSON):
+{
+  "remedies": [
+    {
+      "type": "fulu|fengshui|medicine",
+      "name": { "zh": "中文名", "en": "English Name", "${lang}": "Name in ${lang}" },
+      "relevance": "Why this remedy fits (in ${lang})",
+      "description": "What the remedy does (in ${lang})",
+      "instructions": "How to use it (in ${lang})",
+      "source": "Classical text reference"
+    }
+  ]
+}`;
+
+  const userPrompt = `### READING CONTEXT
+Hexagram: ${readingContext.hexagramNumber} ${readingContext.hexagramName}
+Element: ${readingContext.element}
+Day Master: ${readingContext.dayMaster} (${readingContext.strength})
+Life Gua: ${readingContext.lifeGua}
+Question: "${question}"
+
+Select appropriate remedies and provide complete details in ${lang}.`;
+
+  try {
+    const result = await getStructuredInterpretation(
+      userPrompt,
+      2000,
+      { systemPrompt, response_mime_type: "application/json" },
+      ['remedies'],
+      2
+    );
+
+    return new Response(
+      JSON.stringify(createSuccessResponse({
+        remedies: result.remedies || []
+      }, requestId, startTime)),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    log(4, `[TAB:remedies] Error: ${error.message}`);
+    throw new AppError(`Remedies tab generation failed: ${error.message}`, 500, 'REMEDIES_TAB_ERROR');
+  }
+}
+
+async function handleFengShuiMedicineTab(body: any, requestId: string, startTime: number): Promise<Response> {
+  log(4, `[TAB:fengshui-medicine] Generating Feng Shui and Medicine tab...`);
+  
+  const { hexagram, bazi, astrology, equilibrium, lang = 'en' } = body;
+  
+  const context = {
+    hexagramElement: hexagram?.element,
+    dayMaster: bazi?.current?.dayMaster?.element,
+    strength: bazi?.current?.strength?.result,
+    favorable: bazi?.current?.strength?.favorable?.join(', '),
+    lifeGua: astrology?.lifeGua,
+    elements: equilibrium?.elements
+  };
+
+  const systemPrompt = `You are a Feng Shui and Chinese Medicine master.
+
+CRITICAL RULES:
+1. Provide specific directional recommendations based on Life Gua and element analysis
+2. Suggest alchemical preparations if relevant to the element imbalance
+3. All recommendations must be grounded in classical theory
+4. Include practical implementation steps
+5. Output must be in ${lang} language
+
+OUTPUT FORMAT (JSON):
+{
+  "fengshui": {
+    "directions": "Favorable directions and activation (in ${lang})",
+    "sectors": "Specific bagua sectors to enhance/avoid (in ${lang})",
+    "timing": "When to implement (in ${lang})"
+  },
+  "medicine": {
+    "recommendations": "Alchemical preparations if relevant (in ${lang})",
+    "dietary": "Food/element recommendations (in ${lang})",
+    "practices": "Qigong or meditation practices (in ${lang})"
+  },
+  "quotedReferences": ["Citation (Source)", ...]
+}`;
+
+  const userPrompt = `### CONTEXT
+Hexagram Element: ${context.hexagramElement}
+Day Master: ${context.dayMaster} (${context.strength})
+Favorable Elements: ${context.favorable}
+Life Gua: ${context.lifeGua?.number} (${context.lifeGua?.element})
+Five Elements Balance: ${JSON.stringify(context.elements)}
+
+Provide Feng Shui and Medicine recommendations in ${lang}.`;
+
+  try {
+    const result = await getStructuredInterpretation(
+      userPrompt,
+      1800,
+      { systemPrompt, response_mime_type: "application/json" },
+      ['fengshui', 'medicine'],
+      2
+    );
+
+    return new Response(
+      JSON.stringify(createSuccessResponse({
+        fengshui: result.fengshui || {},
+        medicine: result.medicine || {},
+        quotedReferences: result.quotedReferences || []
+      }, requestId, startTime)),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    log(4, `[TAB:fengshui-medicine] Error: ${error.message}`);
+    throw new AppError(`Feng Shui/Medicine tab generation failed: ${error.message}`, 500, 'FENGSHUI_MEDICINE_TAB_ERROR');
+  }
+}
+
+// ============================================================================
 // POST REQUEST HANDLER
 // ============================================================================
 
@@ -4287,6 +4656,16 @@ async function handlePostRequest(
     case 'classical':
       return await handleSectionEndpoint(body, 'classical', requestId, startTime);
 
+    // NEW: Concurrent tab endpoints (3-tab architecture)
+    case 'interpretation-tab':
+      return await handleInterpretationTab(body, requestId, startTime);
+
+    case 'remedies-tab':
+      return await handleRemediesTab(body, requestId, startTime);
+
+    case 'fengshui-medicine-tab':
+      return await handleFengShuiMedicineTab(body, requestId, startTime);
+
     case 'houtou-emperor':
       return await handleSectionEndpoint(body, 'houtou-emperor', requestId, startTime);
 
@@ -4327,6 +4706,10 @@ async function handlePostRequest(
     case 'translate':
       return await handleTranslate(body, requestId, startTime);
 
+    // Optimized translation endpoint (text format for reduced tokens)
+    case 'translate-text':
+      return await handleTranslateText(body, requestId, startTime);
+
     // Root endpoint - API info
     case 'yijingtu':
     case '':
@@ -4349,18 +4732,24 @@ async function handlePostRequest(
             houtouEmperor: "POST /houtou-emperor - Emperor (Day Master) analysis",
             houtouMaster: "POST /houtou-master - Master (Pillars) analysis",
             advice: "POST /advice - Dedicated advice synthesis",
-            
+
             // Remedy endpoints
             remediesSelect: "POST /remedies-select - AI-assisted remedy selection",
             remediesTranslate: "POST /remedies-translate - Translate remedy content",
             remediesVerify: "POST /remedies-verify - Verify and enhance remedy quality",
             remediesBagua: "POST /remedies-bagua - Bagua medicine and Feng Shui",
             remediesFuluDraw: "POST /remedies-fulu-draw - Generate talisman drawing (3-pass)",
-            
+
+            // NEW: Concurrent 3-tab endpoints (75% faster, 76% fewer tokens)
+            interpretationTab: "POST /interpretation-tab - Complete interpretation tab content (all sections in target language)",
+            remediesTab: "POST /remedies-tab - Complete remedies tab content (fulu, fengshui, medicine in target language)",
+            fengshuiMedicineTab: "POST /fengshui-medicine-tab - Feng Shui and Medicine guidance (in target language)",
+
             // Other endpoints
             xiantian: "POST /xiantian - Xiantian (Early Heaven) spiritual interpretation",
-            translate: "POST /translate - Translate interpretation sections to other languages",
-            
+            translate: "POST /translate - Translate interpretation sections to other languages (JSON)",
+            translateText: "POST /translate-text - Optimized translation using text format (40% less tokens)",
+
             // GET endpoints
             random: "GET /random - NIST beacon randomness",
             health: "GET /health - System health check"
@@ -4473,19 +4862,13 @@ async function handleRemediesDB(requestId: string, startTime: number): Promise<R
     const content = await response.text();
     let dbData: any;
 
-    // Try JSON first
+    // Try JSON first, then parse as JS module export
     try {
       dbData = JSON.parse(content);
     } catch {
-      // Parse as JS assignment: const DAOIST_REMEDIES_DB = { ... }
-      const startMatch = content.match(/const\s+DAOIST_REMEDIES_DB\s*=\s*{/);
-      if (startMatch) {
-        const objStart = startMatch.index! + startMatch[0].length - 1;
-        const objRaw = content.substring(objStart);
-        dbData = cleanAndParseJSON(objRaw);
-        if (dbData?.error) throw new Error(`Parse failed: ${dbData.message}`);
-      } else {
-        throw new Error("Could not find DAOIST_REMEDIES_DB assignment in bucket file");
+      dbData = parseJSModuleObject(content, "DAOIST_REMEDIES_DB");
+      if (!dbData) {
+        throw new Error("Could not parse DAOIST_REMEDIES_DB from fetched content");
       }
     }
 
@@ -4548,13 +4931,13 @@ async function handleIncrementalCompose(body: any, requestId: string, startTime?
   if (sectionData.technicalData) {
     // Normalize section name: celestial-astro -> celestial, elements-analysis -> elements, etc.
     const baseName = section.replace(/-analysis|-synthesis|-emperor|-master/, '')
-                            .replace(/-bazi/, '')
-                            .replace(/-astro/, '');
+      .replace(/-bazi/, '')
+      .replace(/-astro/, '');
     const techDataKey = `${baseName}TechnicalData`;
-    
+
     // Store at root level for backwards compatibility
     result[techDataKey] = sectionData.technicalData;
-    
+
     // Also store in each language slot so frontend can access it
     for (const l of ['en', 'es', 'it', 'zh']) {
       if (!result[l]) result[l] = {};
@@ -4667,7 +5050,7 @@ async function handleTranslate(body: any, requestId: string, startTime?: number)
 
   // Build translation prompt
   const contentJson = JSON.stringify(content, null, 2);
-  
+
   const systemPrompt = `You are a professional translator specializing in I Ching (Yi Jing) terminology and Chinese metaphysics.
 Translate the following interpretation content from English to ${targetLang === 'es' ? 'Spanish' : targetLang === 'it' ? 'Italian' : 'Chinese'}.
 
@@ -4707,6 +5090,125 @@ Return ONLY the translated JSON object with the same field names and structure.`
     );
   } catch (error: any) {
     log(4, `[translate] Translation failed: ${error.message}`);
+    // Return original content on failure
+    return new Response(
+      JSON.stringify(createSuccessResponse({ translated: content }, requestId, startTime)),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+}
+
+// ============================================================================
+// OPTIMIZED TEXT-FORMAT TRANSLATION (Reduced Tokens)
+// ============================================================================
+
+async function handleTranslateText(body: any, requestId: string, startTime?: number): Promise<Response> {
+  const { content, targetLang, hexagramName, section } = body;
+
+  if (!content || !targetLang || !section) {
+    throw new ValidationError("Request must include 'content', 'targetLang', and 'section'");
+  }
+
+  if (!['es', 'it', 'zh'].includes(targetLang)) {
+    throw new ValidationError(`Unsupported target language: ${targetLang}`);
+  }
+
+  log(4, `[translate-text] Translating section '${section}' to ${targetLang}`);
+
+  // Convert JSON to compact text format
+  const contentText = jsonToTextFormat(content);
+  const originalKeys = Object.keys(content);
+
+  // Count token savings
+  const jsonSize = JSON.stringify(content, null, 2).length;
+  const textSize = contentText.length;
+  const savings = jsonSize - textSize;
+  log(4, `[translate-text] Format savings: ${savings} chars (${Math.round(savings / jsonSize * 100)}%)`);
+
+  const langName = targetLang === 'es' ? 'Spanish' : targetLang === 'it' ? 'Italian' : 'Chinese';
+
+  // CRITICAL: Stronger prompt to ensure actual translation happens
+  const systemPrompt = `You are a professional translator. Translate the following I Ching content from English to ${langName}.
+IMPORTANT: You MUST translate all text content. Do NOT return English.
+Rules:
+- Translate all descriptive text to ${langName}
+- Keep technical terms like "BaZi", "trigrams", "Five Elements", "Yin", "Yang" in original form
+- Use classical, spiritual language appropriate for I Ching
+- Maintain the exact same [KEY] and [/KEY] tags around your translated text.
+- If the original uses ---ITEM--- to separate array items, preserve the ---ITEM--- separators exactly.
+
+Example input:
+[analysis]
+This is the analysis text with
+multiple lines.
+[/analysis]
+
+Example output:
+[analysis]
+Este es el texto del análisis con
+múltiples líneas.
+[/analysis]`;
+
+  const userPrompt = `Translate this I Ching section to ${langName}:
+Section: ${section}
+Hexagram: ${hexagramName || 'Unknown'}
+
+${contentText}
+
+REMEMBER: Translate EVERYTHING to ${langName}. Do not return English text.
+Return the exact same tags with the translated content inside.`;
+
+  try {
+    // Use smaller token limit since we're using text format
+    const translatedText = await _callDeepSeekAPI(userPrompt, {
+      systemPrompt: systemPrompt,
+      maxOutputTokens: 3000,
+      temperature: 0.3
+    });
+
+    // Debug: Log full response
+    log(4, `[translate-text] Raw response:\n${translatedText}`);
+
+    // Parse text format back to JSON
+    const translated = textToJsonFormat(translatedText, originalKeys, content);
+
+    // Log what was parsed
+    log(4, `[translate-text] Parsed keys: ${Object.keys(translated).join(', ')}`);
+
+    // Check if parsing succeeded
+    const parsedKeysCount = Object.keys(translated).length;
+    if (parsedKeysCount === 0) {
+      log(4, `[translate-text] ERROR: Parsing returned empty result. Original keys: ${originalKeys.join(', ')}`);
+    }
+
+    // Debug: Check if translation actually happened
+    const sampleKey = originalKeys[0];
+    if (sampleKey && translated[sampleKey] === content[sampleKey]) {
+      log(4, `[translate-text] WARNING: ${sampleKey} appears unchanged after translation`);
+      log(4, `[translate-text] Input: ${content[sampleKey]?.substring(0, 100)}`);
+      log(4, `[translate-text] Output: ${translated[sampleKey]?.substring(0, 100)}`);
+    }
+
+    // Ensure all keys are present (fallback to original if missing)
+    let fallbackCount = 0;
+    for (const key of originalKeys) {
+      if (!translated[key]) {
+        translated[key] = content[key];
+        fallbackCount++;
+      }
+    }
+    if (fallbackCount > 0) {
+      log(4, `[translate-text] ${fallbackCount} keys fell back to original due to missing parsed values`);
+    }
+
+    log(4, `[translate-text] Success for '${section}' to ${targetLang}`);
+
+    return new Response(
+      JSON.stringify(createSuccessResponse({ translated }, requestId, startTime)),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    log(4, `[translate-text] Failed: ${error.message}`);
     // Return original content on failure
     return new Response(
       JSON.stringify(createSuccessResponse({ translated: content }, requestId, startTime)),

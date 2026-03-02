@@ -170,6 +170,24 @@
     display: block;
 }
 
+.fulu-reference-image {
+    max-width: 100%;
+    max-height: 280px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.fulu-image-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
 .fulu-label-overlay {
     position: absolute;
     bottom: 8px;
@@ -2566,4 +2584,207 @@ body.loading-active {
 .technical-analysis-layer p:last-child,
 .colloquial-layer p:last-child {
     margin-bottom: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SINGLE READ MODE (Continuous / Accessibility)
+   When body has class .single-read-mode:
+     - Hide ALL tab navs (main-tabs, reading-tabs-nav, sub-tabs-nav, analysis-sub-tabs)
+     - Force ALL tab panels to display:block (visible simultaneously)
+     - Show ALL wizard steps for continuous reading
+     - Add visual dividers between sections for readability
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* --- Hide all tab navigation bars --- */
+body.single-read-mode .main-tabs,
+body.single-read-mode .reading-tabs-nav,
+body.single-read-mode .sub-tabs-nav,
+body.single-read-mode .analysis-sub-tabs,
+body.single-read-mode .results-bookmarks {
+    display: none !important;
+}
+
+/* --- Force all tab panels to be visible simultaneously --- */
+body.single-read-mode .tab-content-panel,
+body.single-read-mode .reading-tab-panel,
+body.single-read-mode .analysis-sub-panel {
+    display: block !important;
+}
+
+/* --- Show ALL wizard steps in read mode (continuous flow) --- */
+body.single-read-mode .wizard-step {
+    display: block !important;
+}
+
+/* Hide step 1 (question input) and step 2 (meditation) in read mode when showing results */
+body.single-read-mode.has-results .wizard-step#step-1,
+body.single-read-mode.has-results .wizard-step#step-2 {
+    display: none !important;
+}
+
+/* Alternative: Show all steps including input/meditation for full history view */
+body.single-read-mode.show-all-steps .wizard-step#step-1,
+body.single-read-mode.show-all-steps .wizard-step#step-2 {
+    display: block !important;
+}
+
+/* --- Visual styling for wizard steps in read mode --- */
+body.single-read-mode .wizard-step {
+    border-left: 3px solid rgba(212, 175, 55, 0.3);
+    padding-left: 20px;
+    margin-bottom: 32px;
+}
+
+body.single-read-mode .wizard-step:last-child {
+    border-left: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+/* --- Section dividers between consecutive panels --- */
+body.single-read-mode .tab-content-panel + .tab-content-panel {
+    border-top: 2px solid rgba(212, 175, 55, 0.3);
+    margin-top: 32px;
+    padding-top: 32px;
+}
+
+body.single-read-mode .reading-tab-panel + .reading-tab-panel {
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    margin-top: 24px;
+    padding-top: 24px;
+}
+
+body.single-read-mode .analysis-sub-panel + .analysis-sub-panel {
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    margin-top: 24px;
+    padding-top: 24px;
+}
+
+/* --- Disable animations in read mode for smoother scroll --- */
+body.single-read-mode .reading-tab-panel,
+body.single-read-mode .wizard-step {
+    animation: none !important;
+}
+
+/* --- Typography improvements for continuous reading --- */
+body.single-read-mode .reading-tab-panel {
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+body.single-read-mode .card-content {
+    max-width: 75ch;
+}
+
+/* --- Improved spacing for readability --- */
+body.single-read-mode .tab-content-card {
+    margin-bottom: 24px;
+    padding: 24px;
+}
+
+body.single-read-mode .preanalysis-card {
+    margin-bottom: 20px;
+}
+
+/* --- Section headers in read mode --- */
+body.single-read-mode .reading-tabs-container::before {
+    content: '';
+    display: none;
+}
+
+/* --- Analysis section improvements --- */
+body.single-read-mode .analysis-tab-container {
+    padding: 0;
+}
+
+body.single-read-mode .analysis-section {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+/* --- Indicator banner when Read Mode is active --- */
+body.single-read-mode .container::before {
+    content: '📖 Continuous Read Mode — All Sections';
+    display: block;
+    text-align: center;
+    padding: 10px 20px;
+    margin-bottom: 24px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: var(--gold, #d4af37);
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+/* --- Floating Exit Read Mode button --- */
+.read-mode-exit-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 24px;
+    background: rgba(212, 175, 55, 0.95);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 10000;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+    font-family: var(--font-main, 'Crimson Pro', serif);
+}
+
+.read-mode-exit-btn:hover {
+    background: var(--gold, #d4af37);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.read-mode-exit-btn:active {
+    transform: translateY(0);
+}
+
+/* --- Mobile adjustments for read mode --- */
+@media (max-width: 768px) {
+    .read-mode-exit-btn {
+        bottom: 16px;
+        right: 16px;
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+    
+    body.single-read-mode .wizard-step {
+        padding-left: 12px;
+        margin-bottom: 24px;
+    }
+    
+    body.single-read-mode .tab-content-card,
+    body.single-read-mode .analysis-section {
+        padding: 16px;
+    }
+}
+
+/* --- Read Mode: Show all remedy items regardless of sub-tab filter --- */
+body.single-read-mode #remedies-content-area .remedy-tab-item {
+    display: block !important;
+}
+
+/* --- Read Mode: Show all interpretation cards regardless of sub-tab filter --- */
+body.single-read-mode #interpretation-content-area .tab-content-card {
+    display: block !important;
+}
+
+/* --- Remedy Instructions Missing Placeholder --- */
+.remedy-instructions-missing {
+    background: rgba(255, 193, 7, 0.1);
+    border-left: 3px solid rgba(255, 193, 7, 0.5);
+}
+
+.remedy-instructions-missing .instructions-placeholder {
+    color: var(--text-dim, #94a3b8);
+    font-style: italic;
 }

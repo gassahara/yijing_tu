@@ -143,21 +143,23 @@
       "bagua_area": "SW",
       "feng_shui_area": "Love & Relationships",
       "lines_es": [
-        "Primera línea seis: Caminar sobre escarcha. El hielo sólido llegará pronto.",
-        "Seis en el segundo lugar: Recto, cuadrado, grande. Sin practicar, todo será favorable.",
-        "Seis en el tercer lugar: Líneas ocultas pero firmemente mantenidas. Si debe servir al rey, no reclame el mérito. Llevar las cosas a buen fin.",
-        "Seis en el cuarto lugar: Saco atado. Sin culpa ni alabanza.",
-        "Seis en el quinto lugar: Manto amarillo. Gran fortuna.",
-        "Seis en lo alto: Dragones luchando en el campo. Su sangre es violeta y amarilla."
+        "Seis al principio: Cuando hay escarcha bajo los pies, el hielo sólido no está lejos.",
+        "Seis en el segundo lugar: Recto, cuadrado, grande. Sin propósito, pero nada queda sin favorecer.",
+        "Seis en el tercer lugar: Líneas ocultas. Uno es capaz de permanecer perseverante. Si por casualidad sirves a un rey, no busques obras, sino lleva a término.",
+        "Seis en el cuarto lugar: Un saco atado. Sin culpa, sin alabanza.",
+        "Seis en el quinto lugar: Una prenda inferior amarilla trae suprema buena fortuna.",
+        "Seis en lo alto: Los dragones luchan en el prado. Su sangre es negra y amarilla."
       ],
       "lines_it": [
-        "Prima linea sei: Calpestare la brina. Il ghiaccio duro arriverà presto.",
-        "Sei al secondo posto: Retto, quadrato, grande. Senza ripetere, ogni cosa è favorevole.",
-        "Sei al terzo posto: Linee nascoste ma saldamente mantenute. Al servizio del re, senza reclamare il successo. Portare le cose a buon fine.",
-        "Sei al quarto posto: Sacco legato. Nessuna colpa né lode.",
-        "Sei al quinto posto: Veste gialla. Grande fortuna.",
-        "Sei in cima: Dragoni combattono nella pianura. Il loro sangue è violetto e giallo."
-      ]
+        "Sei all'inizio: Quando c'è brina sotto i piedi, il ghiaccio solido non è lontano.",
+        "Sei al secondo posto: Retto, quadrato, grande. Senza scopo, ma nulla rimane senza essere favorito.",
+        "Sei al terzo posto: Linee nascoste. Si è capaci di rimanere perseveranti. Se per caso servite un re, non cercate opere, ma portate a termine.",
+        "Sei al quarto posto: Un sacco legato. Nessuna colpa, nessuna lode.",
+        "Sei al quinto posto: Una veste inferiore gialla porta suprema buona fortuna.",
+        "Sei in cima: I dragoni combattono nel prato. Il loro sangue è nero e giallo."
+      ],
+      "judgment_es": "Éxito sublime. La perseverancia de la yegua es favorable. El hombre superior tiene un empeño: primero se extravía, luego encuentra guía. Es favorable en el suroeste encontrar amigos, en el noreste perder amigos. La perseverancia tranquila trae buena fortuna.",
+      "judgment_it": "Successo sublime. La perseveranza della cavalla è favorevole. L'uomo nobile ha un'impresa: prima si smarrisce, poi trova guida. È favorevole nel sud-ovest trovare amici, nel nord-est perderli. La perseveranza tranquilla porta buona fortuna."
     },
     "3": {
       "number": 3,
@@ -212,7 +214,25 @@
       ],
       "element": "Water",
       "bagua_area": "N",
-      "feng_shui_area": "Career & Life Path"
+      "feng_shui_area": "Career & Life Path",
+      "judgment_es": "Éxito sublime. La perseverancia favorece. No se debe emprender nada. Favorece al hombre nombrar ayudantes.",
+      "judgment_it": "Successo sublime. La perseveranza favorisce. Non si deve intraprendere nulla. È favorevole all'uomo nominare aiutanti.",
+      "lines_es": [
+        "Nueve al principio: Vacilación e impedimento. Favorece al hombre permanecer perseverante. Favorece al hombre nombrar ayudantes.",
+        "Seis en el segundo lugar: Las dificultades se acumulan. El caballo y el carro se separan. No es un ladrón; quiere cortejar cuando llegue el momento. La doncella es casta, no se compromete. Diez años —entonces se compromete.",
+        "Seis en el tercer lugar: Quien caza ciervos sin el guardabosque solo pierde el camino en el bosque. El hombre superior entiende las señales del tiempo y prefiere desistir. Seguir adelante trae humillación.",
+        "Seis en el cuarto lugar: El caballo y el carro se separan. Se busca la unión. Ir trae buena fortuna. Todo actúa para favorecer.",
+        "Nueve en el quinto lugar: Dificultades en bendecir. Un poco de perseverancia trae buena fortuna. Gran perseverancia trae desgracia.",
+        "Seis en lo alto: El caballo y el carro se separan. Lágrimas de sangre fluyen."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Esitazione e impedimento. È favorevole all'uomo rimanere perseverante. È favorevole all'uomo nominare aiutanti.",
+        "Sei al secondo posto: Le difficoltà si accumulano. Il cavallo e il carro si separano. Non è un ladro; vuole corteggiare quando arriva il momento. La fanciulla è casta, non si impegna. Dieci anni —poi si impegna.",
+        "Sei al terzo posto: Chi caccia cervi senza il guardaboschi perde solo la strada nella foresta. L'uomo nobile comprende i segni del tempo e preferisce desistere. Andare avanti porta umiliazione.",
+        "Sei al quarto posto: Il cavallo e il carro si separano. Si cerca l'unione. Andare porta buona fortuna. Tutto agisce per favorire.",
+        "Nove al quinto posto: Difficoltà nel benedire. Un po' di perseveranza porta buona fortuna. Grande perseveranza porta sventura.",
+        "Sei in cima: Il cavallo e il carro si separano. Lacrime di sangue scorrono."
+      ]
     },
     "4": {
       "number": 4,
@@ -267,7 +287,25 @@
       ],
       "element": "Water",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "Éxito. No soy yo quien busca al joven necio; el joven necio me busca a mí. En el primer oráculo le informo. Si pregunta dos o tres veces, es importunidad. Si importuna, no le doy información. La perseverancia favorece.",
+      "judgment_it": "Successo. Non sono io che cerco il giovane sciocco; il giovane sciocco cerca me. Al primo oracolo lo informo. Se chiede due o tre volte, è importunità. Se importuna, non gli do informazioni. La perseveranza favorisce.",
+      "lines_es": [
+        "Seis al principio: Para hacer desarrollar a un necio favorece aplicar disciplina. Los grilletes deben ser removidos. Seguir así trae humillación.",
+        "Nueve en el segundo lugar: Soportar a los necios con amabilidad trae buena fortuna. Saber cómo tomar esposas trae buena fortuna. El hijo es capaz de hacerse cargo del hogar.",
+        "Seis en el tercer lugar: No debes casarte con una doncella que ve a un hombre de bronce y pierde el dominio de sí misma. Nada favorece.",
+        "Seis en el cuarto lugar: La necedad enredada trae humillación.",
+        "Seis en el quinto lugar: La necedad infantil trae buena fortuna.",
+        "Nueve en lo alto: Al castigar la necedad no favorece al hombre cometer transgresiones. Lo único que favorece es prevenir las transgresiones."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Per far sviluppare uno sciocco è favorevole applicare disciplina. I ceppi devono essere rimossi. Continuare così porta umiliazione.",
+        "Nove al secondo posto: Sopportare gli sciocchi con gentilezza porta buona fortuna. Sapere come prendere moglie porta buona fortuna. Il figlio è capace di prendersi cura della casa.",
+        "Sei al terzo posto: Non devi sposare una fanciulla che vede un uomo di bronzo e perde il controllo di sé. Nulla favorisce.",
+        "Sei al quarto posto: La sciocchezza aggrovigliata porta umiliazione.",
+        "Sei al quinto posto: La sciocchezza infantile porta buona fortuna.",
+        "Nove in cima: Nel punire la sciocchezza non è favorevole all'uomo commettere trasgressioni. L'unica cosa che favorisce è prevenire le trasgressioni."
+      ]
     },
     "5": {
       "number": 5,
@@ -322,7 +360,25 @@
       ],
       "element": "Water",
       "bagua_area": "N",
-      "feng_shui_area": "Career & Life Path"
+      "feng_shui_area": "Career & Life Path",
+      "judgment_es": "Si eres sincero, tienes luz y éxito. La perseverancia trae buena fortuna. Favorece al hombre cruzar la gran agua.",
+      "judgment_it": "Se sei sincero, hai luce e successo. La perseveranza porta buona fortuna. È favorevole all'uomo attraversare la grande acqua.",
+      "lines_es": [
+        "Nueve al principio: Esperar en el prado. Favorece al hombre permanecer en lo que perdura. Sin culpa.",
+        "Nueve en el segundo lugar: Esperar en la arena. Hay algo de chisme. El fin trae buena fortuna.",
+        "Nueve en el tercer lugar: Esperar en el barro trae la llegada del enemigo.",
+        "Seis en el cuarto lugar: Esperar en la sangre. Sal del pozo.",
+        "Nueve en el quinto lugar: Esperar ante carne y bebida. La perseverancia trae buena fortuna.",
+        "Seis en lo alto: Uno cae en el pozo. Llegan tres huéspedes no invitados. Honrarlos, y al final habrá buena fortuna."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Aspettare nel prato. È favorevole all'uomo rimanere in ciò che perdura. Nessuna colpa.",
+        "Nove al secondo posto: Aspettare sulla sabbia. C'è un po' di pettegolezzo. La fine porta buona fortuna.",
+        "Nove al terzo posto: Aspettare nel fango porta l'arrivo del nemico.",
+        "Sei al quarto posto: Aspettare nel sangue. Esci dal pozzo.",
+        "Nove al quinto posto: Aspettare davanti a carne e bevande. La perseveranza porta buona fortuna.",
+        "Sei in cima: Uno cade nel pozzo. Arrivano tre ospiti non invitati. Onorarli, e alla fine ci sarà buona fortuna."
+      ]
     },
     "6": {
       "number": 6,
@@ -377,7 +433,25 @@
       ],
       "element": "Water",
       "bagua_area": "NW",
-      "feng_shui_area": "Helpful People & Travel"
+      "feng_shui_area": "Helpful People & Travel",
+      "judgment_es": "Eres sincero pero estás siendo obstruido. Una detención cautelosa a mitad de camino trae buena fortuna. Llegar hasta el final trae desgracia. Favorece al hombre ver al gran hombre. No favorece al hombre cruzar la gran agua.",
+      "judgment_it": "Sei sincero ma stai venendo ostruito. Una sosta cauta a metà strada porta buona fortuna. Andare fino in fondo porta sventura. È favorevole all'uomo vedere il grande uomo. Non è favorevole all'uomo attraversare la grande acqua.",
+      "lines_es": [
+        "Seis al principio: Si uno no perpetúa el asunto, hay un poco de chisme. Al final, viene la buena fortuna.",
+        "Nueve en el segundo lugar: No se puede participar en conflicto; uno vuelve a casa, cede. La gente de su pueblo, trescientos hogares, permanece libre de culpa.",
+        "Seis en el tercer lugar: Nutrirse de la virtud antigua induce perseverancia. Peligro. Al final, viene la buena fortuna. Si por casualidad estás al servicio de un rey, no busques obras.",
+        "Nueve en el cuarto lugar: No se puede participar en conflicto. Uno se vuelve y se somete al destino, cambia su actitud, y encuentra paz en la perseverancia. Buena fortuna.",
+        "Nueve en el quinto lugar: Contender ante él trae suprema buena fortuna.",
+        "Nueve en lo alto: Incluso si por casualidad se otorga a uno un cinturón de cuero, al final de la mañana habrá sido arrebatado tres veces."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Se non si perpetua l'affare, c'è un po' di pettegolezzo. Alla fine, viene la buona fortuna.",
+        "Nove al secondo posto: Non si può partecipare al conflitto; uno torna a casa, cede. La gente del suo villaggio, trecento famiglie, rimane libera da colpa.",
+        "Sei al terzo posto: Nutrirsi della virtù antica induce perseveranza. Pericolo. Alla fine, viene la buona fortuna. Se per caso sei al servizio di un re, non cercare opere.",
+        "Nove al quarto posto: Non si può partecipare al conflitto. Uno si volge e si sottomette al destino, cambia il suo atteggiamento, e trova pace nella perseveranza. Buona fortuna.",
+        "Nove al quinto posto: Contendere davanti a lui porta suprema buona fortuna.",
+        "Nove in cima: Anche se per caso viene conferito a uno un cinturone di cuoio, alla fine della mattina sarà stato strappato via tre volte."
+      ]
     },
     "7": {
       "number": 7,
@@ -432,7 +506,25 @@
       ],
       "element": "Water",
       "bagua_area": "SW",
-      "feng_shui_area": "Love & Relationships"
+      "feng_shui_area": "Love & Relationships",
+      "judgment_es": "El ejército necesita perseverancia y un hombre fuerte. Buena fortuna sin culpa.",
+      "judgment_it": "L'esercito ha bisogno di perseveranza e di un uomo forte. Buona fortuna senza colpa.",
+      "lines_es": [
+        "Seis al principio: Un ejército debe partir en orden apropiado. Si el orden no es bueno, amenaza la desgracia.",
+        "Nueve en el segundo lugar: En medio del ejército. Buena fortuna. Sin culpa. El rey otorga una triple decoración.",
+        "Seis en el tercer lugar: Tal vez el ejército lleva cadáveres en el carro. Desgracia.",
+        "Seis en el cuarto lugar: El ejército se retira. Sin culpa.",
+        "Seis en el quinto lugar: Hay caza en el campo. Favorece al hombre atraparla. Sin culpa. Que el mayor lidere el ejército. El menor transporta cadáveres; entonces la perseverancia trae desgracia.",
+        "Seis en lo alto: El gran príncipe emite órdenes, funda estados, invierte familias con feudos. No deben emplearse personas inferiores."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Un esercito deve partire in ordine appropriato. Se l'ordine non è buono, minaccia la sventura.",
+        "Nove al secondo posto: In mezzo all'esercito. Buona fortuna. Nessuna colpa. Il re conferisce una tripla decorazione.",
+        "Sei al terzo posto: Forse l'esercito trasporta cadaveri nel carro. Sventura.",
+        "Sei al quarto posto: L'esercito si ritira. Nessuna colpa.",
+        "Sei al quinto posto: C'è selvaggina nel campo. È favorevole all'uomo catturarla. Nessuna colpa. Che il maggiore guidi l'esercito. Il minore trasporta cadaveri; allora la perseveranza porta sventura.",
+        "Sei in cima: Il gran principe emette ordini, fonda stati, investe famiglie con feudi. Non devono essere impiegate persone inferiori."
+      ]
     },
     "8": {
       "number": 8,
@@ -487,7 +579,25 @@
       ],
       "element": "Water",
       "bagua_area": "N",
-      "feng_shui_area": "Career & Life Path"
+      "feng_shui_area": "Career & Life Path",
+      "judgment_es": "Buena fortuna. Pregunta al oráculo una vez más si posees sublimidad, constancia y perseverancia; entonces no hay culpa.",
+      "judgment_it": "Buona fortuna. Chiedi all'oracolo una volta ancora se possiedi sublimità, costanza e perseveranza; allora non c'è colpa.",
+      "lines_es": [
+        "Seis al principio: Aferrarse a él en verdad y lealtad; esto es sin culpa. Verdad, como un cuenco de tierra lleno: así al final la buena fortuna viene de fuera.",
+        "Seis en el segundo lugar: Aferrarse a él interiormente. La perseverancia trae buena fortuna.",
+        "Seis en el tercer lugar: Te aferras a las personas equivocadas.",
+        "Seis en el cuarto lugar: Aferrarse a él exteriormente. La perseverancia trae buena fortuna.",
+        "Nueve en el quinto lugar: Manifestación de aferrarse juntos. El rey urge a sus batidores a conducir la caza solo en tres direcciones, y permite que la caza escape ante él. La gente del pueblo no necesita advertencia. Buena fortuna.",
+        "Seis en lo alto: No encuentra cabeza para aferrarse juntos. Desgracia."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Aggrapparsi a lui in verità e lealtà; questo è senza colpa. Verità, come una ciotola di terra piena: così alla fine la buona fortuna viene da fuori.",
+        "Sei al secondo posto: Aggrapparsi a lui interiormente. La perseveranza porta buona fortuna.",
+        "Sei al terzo posto: Ti aggrappi alle persone sbagliate.",
+        "Sei al quarto posto: Aggrapparsi a lui esteriormente. La perseveranza porta buona fortuna.",
+        "Nove al quinto posto: Manifestazione di aggrapparsi insieme. Il re esorta i suoi battitori a guidare la caccia solo in tre direzioni, e permette che la caccia scappi davanti a lui. La gente del villaggio non ha bisogno di avvertimento. Buona fortuna.",
+        "Sei in cima: Non trova testa per aggrapparsi insieme. Sventura."
+      ]
     },
     "9": {
       "number": 9,
@@ -542,7 +652,25 @@
       ],
       "element": "Metal",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "Éxito. Nubes densas, sin lluvia de nuestro territorio occidental.",
+      "judgment_it": "Successo. Nuvole fitte, senza pioggia dal nostro territorio occidentale.",
+      "lines_es": [
+        "Nueve al principio: Volver al camino. ¿Cómo podría haber culpa en esto? Buena fortuna.",
+        "Nueve en el segundo lugar: Se permite ser atraído a regresar. Buena fortuna.",
+        "Nueve en el tercer lugar: Los rayos salen de las ruedas del carro. El hombre y la mujer giran los ojos.",
+        "Seis en el cuarto lugar: Si eres sincero, la sangre desaparece y el miedo cede. Sin culpa.",
+        "Nueve en el quinto lugar: Si eres sincero y lealmente apegado, eres rico en tu vecino.",
+        "Nueve en lo alto: Viene la lluvia, hay descanso. Esto se debe al efecto duradero del carácter. La perseverancia trae a la mujer al peligro. La luna está casi llena. Si el hombre superior persiste, viene la desgracia."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Tornare al cammino. Come potrebbe esserci colpa in questo? Buona fortuna.",
+        "Nove al secondo posto: Si permette di essere attratto a tornare. Buona fortuna.",
+        "Nove al terzo posto: I raggi escono dalle ruote del carro. L'uomo e la donna girano gli occhi.",
+        "Sei al quarto posto: Se sei sincero, il sangue svanisce e la paura cede. Nessuna colpa.",
+        "Nove al quinto posto: Se sei sincero e lealmente attaccato, sei ricco nel tuo vicino.",
+        "Nove in cima: Arriva la pioggia, c'è riposo. Questo è dovuto all'effetto duraturo del carattere. La perseveranza porta la donna nel pericolo. La luna è quasi piena. Se l'uomo nobile persiste, viene la sventura."
+      ]
     },
     "10": {
       "number": 10,
@@ -597,7 +725,25 @@
       ],
       "element": "Metal",
       "bagua_area": "NW",
-      "feng_shui_area": "Helpful People & Travel"
+      "feng_shui_area": "Helpful People & Travel",
+      "judgment_es": "Pisando sobre la cola del tigre. No muerde al hombre. Éxito.",
+      "judgment_it": "Pestando sulla coda della tigre. Non morde l'uomo. Successo.",
+      "lines_es": [
+        "Nueve al principio: Conducta simple. Progreso sin culpa.",
+        "Nueve en el segundo lugar: Pisar un curso liso y nivelado. La perseverancia de un hombre oscuro trae buena fortuna.",
+        "Seis en el tercer lugar: Un hombre tuerto puede ver, un hombre cojo puede pisar. Pisa sobre la cola del tigre. El tigre muerde al hombre. Desgracia. Así actúa un guerrero en nombre de su gran príncipe.",
+        "Nueve en el cuarto lugar: Pisa sobre la cola del tigre. La cautela y la circunspección llevan finalmente a la buena fortuna.",
+        "Nueve en el quinto lugar: Conducta resuelta. Perseverancia con conciencia del peligro.",
+        "Nueve en lo alto: Mira tu conducta y pesa las señales favorables. Cuando todo se cumple, viene la suprema buena fortuna."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Condotta semplice. Progresso senza colpa.",
+        "Nove al secondo posto: Pestare un corso liscio e livellato. La perseveranza di un uomo oscuro porta buona fortuna.",
+        "Sei al terzo posto: Un uomo guercio può vedere, un uomo zoppo può pestare. Pesta sulla coda della tigre. La tigre morde l'uomo. Sventura. Così agisce un guerriero a nome del suo gran principe.",
+        "Nove al quarto posto: Pesta sulla coda della tigre. La cautela e la circospezione portano infine alla buona fortuna.",
+        "Nove al quinto posto: Condotta risoluta. Perseveranza con consapevolezza del pericolo.",
+        "Nove in cima: Guarda la tua condotta e pesa i segni favorevoli. Quando tutto si compie, viene la suprema buona fortuna."
+      ]
     },
     "11": {
       "number": 11,
@@ -657,7 +803,25 @@
       ],
       "element": "Metal",
       "bagua_area": "SW",
-      "feng_shui_area": "Love & Relationships"
+      "feng_shui_area": "Love & Relationships",
+      "judgment_es": "Lo pequeño se va, lo grande se acerca. Buena fortuna. Éxito.",
+      "judgment_it": "Il piccolo se ne va, il grande si avvicina. Buona fortuna. Successo.",
+      "lines_es": [
+        "Nueve al principio: Cuando se arranca la hierba de la cinta, viene el césped con ella. Cada uno según su clase. Las empresas traen buena fortuna.",
+        "Nueve en el segundo lugar: Soportar a los incultos con gentileza, vadear el río con resolución, no descuidar lo distante, no mirar a los compañeros: así uno puede lograr caminar en el medio.",
+        "Nueve en el tercer lugar: No hay llano que no sea seguido por una pendiente. No hay ir que no sea seguido por un retorno. Quien permanece perseverante en el peligro está sin culpa. No te quejes de esta verdad; disfruta la buena fortuna que aún posees.",
+        "Seis en el cuarto lugar: Él desciende aleteando, no jactándose de su riqueza, junto con su vecino, sin malicia y sincero.",
+        "Seis en el quinto lugar: El soberano Yo da su hija en matrimonio. Esto trae bendición y suprema buena fortuna.",
+        "Seis en lo alto: El muro de la ciudad cae en el foso. No uses ejército ahora. Haz conocer tus órdenes dentro de tu propia ciudad. La perseverancia trae humillación."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Quando si strappa l'erba del nastro, viene il prato con essa. Ciascuno secondo il suo genere. Le imprese portano buona fortuna.",
+        "Nove al secondo posto: Sopportare gli incolti con gentilezza, guadare il fiume con risoluzione, non trascurare ciò che è lontano, non guardare i compagni: così si può riuscire a camminare nel mezzo.",
+        "Nove al terzo posto: Non c'è pianura che non sia seguita da un pendio. Non c'è andare che non sia seguito da un ritorno. Chi rimane perseverante nel pericolo è senza colpa. Non lamentarti di questa verità; goditi la buona fortuna che ancora possiedi.",
+        "Sei al quarto posto: Egli discende sbattendo le ali, non vantandosi della sua ricchezza, insieme al suo vicino, senza malizia e sincero.",
+        "Sei al quinto posto: Il sovrano Io dà sua figlia in matrimonio. Questo porta benedizione e suprema buona fortuna.",
+        "Sei in cima: Il muro della città cade nel fossato. Non usare l'esercito ora. Fai conoscere i tuoi ordini dentro la tua città. La perseveranza porta umiliazione."
+      ]
     },
     "12": {
       "number": 12,
@@ -712,7 +876,25 @@
       ],
       "element": "Metal",
       "bagua_area": "NW",
-      "feng_shui_area": "Helpful People & Travel"
+      "feng_shui_area": "Helpful People & Travel",
+      "judgment_es": "Estancamiento. Las personas malvadas no favorecen la perseverancia del hombre superior. Lo grande se va; lo pequeño se acerca.",
+      "judgment_it": "Stasi. Le persone malvagie non favoriscono la perseveranza dell'uomo nobile. Il grande se ne va; il piccolo si avvicina.",
+      "lines_es": [
+        "Seis al principio: Cuando se arranca la hierba de la cinta, viene el césped con ella. Cada uno según su clase. La perseverancia trae buena fortuna y éxito.",
+        "Seis en el segundo lugar: Ellos soportan y resisten; esto significa buena fortuna para las personas inferiores. El estancamiento sirve para ayudar al gran hombre al éxito.",
+        "Seis en el tercer lugar: Ellos soportan vergüenza.",
+        "Nueve en el cuarto lugar: Quien actúa por mandato de lo más alto permanece sin culpa. Los de igual mente participan de la bendición.",
+        "Nueve en el quinto lugar: El estancamiento está cediendo. Buena fortuna para el gran hombre. '¿Y si fallara, y si fallara?' De esta manera lo ata a un manojo de brotes de morera.",
+        "Nueve en lo alto: El estancamiento llega a su fin. Primero estancamiento, luego buena fortuna."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Quando si strappa l'erba del nastro, viene il prato con essa. Ciascuno secondo il suo genere. La perseveranza porta buona fortuna e successo.",
+        "Sei al secondo posto: Essi sopportano e resistono; questo significa buona fortuna per le persone inferiori. La stasi serve ad aiutare il gran uomo al successo.",
+        "Sei al terzo posto: Essi sopportano la vergogna.",
+        "Nove al quarto posto: Chi agisce per mandato del più alto rimane senza colpa. Quelli della stessa mente partecipano della benedizione.",
+        "Nove al quinto posto: La stasi sta cedendo. Buona fortuna per il gran uomo. 'E se fallisse, e se fallisse?' In questo modo lo lega a un mazzetto di germogli di gelso.",
+        "Nove in cima: La stasi giunge alla fine. Prima stasi, poi buona fortuna."
+      ]
     },
     "13": {
       "number": 13,
@@ -767,7 +949,25 @@
       ],
       "element": "Fire",
       "bagua_area": "NW",
-      "feng_shui_area": "Helpful People & Travel"
+      "feng_shui_area": "Helpful People & Travel",
+      "judgment_es": "Compañerismo con hombres a la luz del día. Éxito. Favorece al hombre cruzar la gran agua. La perseverancia del hombre superior favorece.",
+      "judgment_it": "Compagnia con uomini alla luce del giorno. Successo. È favorevole all'uomo attraversare la grande acqua. La perseveranza dell'uomo nobile favorisce.",
+      "lines_es": [
+        "Nueve al principio: Compañerismo con hombres en la puerta. Sin culpa.",
+        "Seis en el segundo lugar: Compañerismo con hombres en el clan. Humillación.",
+        "Nueve en el tercer lugar: Esconde armas en el matorral; sube la colina alta delante de ella. Por tres años no se levanta.",
+        "Nueve en el cuarto lugar: Sube sobre su muro; no puede atacar. Buena fortuna.",
+        "Nueve en el quinto lugar: Hombres unidos en compañerismo primero lloran y lamentan, pero después ríen. Después de grandes luchas logran encontrarse.",
+        "Nueve en lo alto: Compañerismo con hombres en el prado. Sin remordimiento."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Compagnia con uomini alla porta. Nessuna colpa.",
+        "Sei al secondo posto: Compagnia con uomini nel clan. Umiliazione.",
+        "Nove al terzo posto: Nasconde armi nel cespuglio; sale la collina alta davanti ad essa. Per tre anni non si alza.",
+        "Nove al quarto posto: Sale sul suo muro; non può attaccare. Buona fortuna.",
+        "Nove al quinto posto: Uomini uniti in compagnia prima piangono e si lamentano, ma poi ridono. Dopo grandi lotte riescono a incontrarsi.",
+        "Nove in cima: Compagnia con uomini nel prato. Nessun rimorso."
+      ]
     },
     "14": {
       "number": 14,
@@ -822,7 +1022,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "Supremo éxito.",
+      "judgment_it": "Supremo successo.",
+      "lines_es": [
+        "Nueve al principio: Ninguna relación con lo dañino; no hay culpa en esto. Si uno permanece consciente de la dificultad, permanece sin culpa.",
+        "Nueve en el segundo lugar: Un carro grande para cargar. Uno puede emprender algo. Sin culpa.",
+        "Nueve en el tercer lugar: Un príncipe lo ofrece al Hijo del Cielo. Un hombre mezquino no puede hacer esto.",
+        "Nueve en el cuarto lugar: Hace una diferencia entre sí mismo y su vecino. Sin culpa.",
+        "Seis en el quinto lugar: Aquel cuya verdad es accesible, pero dignificada, tiene buena fortuna.",
+        "Nueve en lo alto: Es bendecido por el cielo. Buena fortuna. Nada que no favorezca."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Nessuna relazione con ciò che è nocivo; non c'è colpa in questo. Se uno rimane consapevole della difficoltà, rimane senza colpa.",
+        "Nove al secondo posto: Un grande carro per caricare. Uno può intraprendere qualcosa. Nessuna colpa.",
+        "Nove al terzo posto: Un principe lo offre al Figlio del Cielo. Un uomo meschino non può fare questo.",
+        "Nove al quarto posto: Fa una differenza tra sé e il suo vicino. Nessuna colpa.",
+        "Sei al quinto posto: Colui la cui verità è accessibile, ma dignitosa, ha buona fortuna.",
+        "Nove in cima: È benedetto dal cielo. Buona fortuna. Nulla che non favorisca."
+      ]
     },
     "15": {
       "number": 15,
@@ -877,7 +1095,25 @@
       ],
       "element": "Earth",
       "bagua_area": "SW",
-      "feng_shui_area": "Love & Relationships"
+      "feng_shui_area": "Love & Relationships",
+      "judgment_es": "Éxito. El hombre superior lleva las cosas a término.",
+      "judgment_it": "Successo. L'uomo nobile porta le cose a termine.",
+      "lines_es": [
+        "Seis al principio: Un hombre superior modesto sobre su modestia puede cruzar la gran agua. Buena fortuna.",
+        "Seis en el segundo lugar: Modestia que viene a expresión. La perseverancia trae buena fortuna.",
+        "Nueve en el tercer lugar: Un hombre superior de modestia y mérito lleva las cosas a conclusión. Buena fortuna.",
+        "Seis en el cuarto lugar: Nada que no favoreciera la modestia en el movimiento.",
+        "Seis en el quinto lugar: No jactarse de la riqueza ante el vecino. Es favorable atacar con fuerza. Nada que no favoreciera.",
+        "Seis en lo alto: Modestia que viene a expresión. Es favorable poner ejércitos en marcha para castigar a la propia ciudad y al propio país."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Un uomo nobile modesto riguardo alla sua modestia può attraversare la grande acqua. Buona fortuna.",
+        "Sei al secondo posto: Modestia che viene a espressione. La perseveranza porta buona fortuna.",
+        "Nove al terzo posto: Un uomo nobile di modestia e merito porta le cose a conclusione. Buona fortuna.",
+        "Sei al quarto posto: Nulla che non favorisca la modestia nel movimento.",
+        "Sei al quinto posto: Non vantarsi della ricchezza davanti al vicino. È favorevole attaccare con forza. Nulla che non favorisca.",
+        "Sei in cima: Modestia che viene a espressione. È favorevole mettere eserciti in marcia per castigare la propria città e il proprio paese."
+      ]
     },
     "16": {
       "number": 16,
@@ -932,7 +1168,25 @@
       ],
       "element": "Wood",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "Favorece al hombre instalar ayudantes y poner ejércitos en marcha.",
+      "judgment_it": "È favorevole all'uomo installare aiutanti e mettere eserciti in marcia.",
+      "lines_es": [
+        "Seis al principio: El entusiasmo que se expresa trae desgracia.",
+        "Seis en el segundo lugar: Firme como una roca. Ni un día entero. La perseverancia trae buena fortuna.",
+        "Seis en el tercer lugar: El entusiasmo que mira hacia arriba crea remordimiento. La vacilación trae remordimiento.",
+        "Nueve en el cuarto lugar: La fuente del entusiasmo. Él logra grandes cosas. No dudes. Reúnes amigos a tu alrededor como una pinza de pelo reúne el pelo.",
+        "Seis en el quinto lugar: Persistentemente enfermo, y aún no muere.",
+        "Seis en lo alto: Entusiasmo ilusorio. Pero si después de completarlo uno cambia, no hay culpa."
+      ],
+      "lines_it": [
+        "Sei all'inizio: L'entusiasmo che si esprime porta sventura.",
+        "Sei al secondo posto: Fermo come una roccia. Nemmeno un giorno intero. La perseveranza porta buona fortuna.",
+        "Sei al terzo posto: L'entusiasmo che guarda verso l'alto crea rimorso. L'esitazione porta rimorso.",
+        "Nove al quarto posto: La fonte dell'entusiasmo. Egli ottiene grandi cose. Non dubitare. Raduni amici intorno a te come una pinza per capelli raccoglie i capelli.",
+        "Sei al quinto posto: Persistentemente malato, e ancora non muore.",
+        "Sei in cima: Entusiasmo illusorio. Ma se dopo averlo completato uno cambia, non c'è colpa."
+      ]
     },
     "17": {
       "number": 17,
@@ -987,7 +1241,25 @@
       ],
       "element": "Metal",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "Supremo éxito. La perseverancia favorece. Sin culpa.",
+      "judgment_it": "Supremo successo. La perseveranza favorisce. Nessuna colpa.",
+      "lines_es": [
+        "Nueve al principio: El estándar está cambiando. La perseverancia trae buena fortuna. Salir por la puerta en compañerismo produce obras.",
+        "Seis en el segundo lugar: Si te aferras al niño pequeño, pierdes al hombre fuerte.",
+        "Seis en el tercer lugar: Si te aferras al hombre fuerte, pierdes al niño pequeño. A través de seguir encuentras lo que buscas. Favorece al hombre permanecer perseverante.",
+        "Nueve en el cuarto lugar: Seguir crea éxito. La perseverancia trae desgracia. Ir por tu camino con sinceridad trae claridad. ¿Qué podría haber que culpar?",
+        "Nueve en el quinto lugar: Sincero en el bien. Buena fortuna.",
+        "Seis en lo alto: Encuentra lealtad firme y está aún más atado. El rey lo presenta a la Montaña Occidental."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Lo standard sta cambiando. La perseveranza porta buona fortuna. Uscire dalla porta in compagnia produce opere.",
+        "Sei al secondo posto: Se ti aggrappi al bambino piccolo, perdi l'uomo forte.",
+        "Sei al terzo posto: Se ti aggrappi all'uomo forte, perdi il bambino piccolo. Attraverso il seguire trovi ciò che cerchi. È favorevole all'uomo rimanere perseverante.",
+        "Nove al quarto posto: Seguire crea successo. La perseveranza porta sventura. Andare per la propria strada con sincerità porta chiarezza. Cosa potrebbe esserci da biasimare?",
+        "Nove al quinto posto: Sincero nel bene. Buona fortuna.",
+        "Sei in cima: Incontra lealtà ferma ed è ancora più legato. Il re lo presenta alla Montagna Occidentale."
+      ]
     },
     "18": {
       "number": 18,
@@ -1042,7 +1314,25 @@
       ],
       "element": "Wood",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "Supremo éxito. Favorece al hombre cruzar la gran agua. Antes del punto de partida, tres días. Después del punto de partida, tres días.",
+      "judgment_it": "Supremo successo. È favorevole all'uomo attraversare la grande acqua. Prima del punto di partenza, tre giorni. Dopo il punto di partenza, tre giorni.",
+      "lines_es": [
+        "Seis al principio: Corregir lo que ha sido estropeado por el padre. Si hay un hijo, no recae culpa sobre el padre fallecido. Peligro. Al final buena fortuna.",
+        "Nueve en el segundo lugar: Corregir lo que ha sido estropeado por la madre. No debe ser demasiado perseverante.",
+        "Nueve en el tercer lugar: Corregir lo que ha sido estropeado por el padre. Habrá un poco de remordimiento. Ninguna gran culpa.",
+        "Seis en el cuarto lugar: Tolerar lo que ha sido estropeado por el padre. Al continuar se ve humillación.",
+        "Seis en el quinto lugar: Corregir lo que ha sido estropeado por el padre. Uno encuentra alabanza.",
+        "Nueve en lo alto: No sirve a reyes y príncipes. Se fija metas más altas."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Correggere ciò che è stato guastato dal padre. Se c'è un figlio, non ricade colpa sul padre defunto. Pericolo. Alla fine buona fortuna.",
+        "Nove al secondo posto: Correggere ciò che è stato guastato dalla madre. Non deve essere troppo perseverante.",
+        "Nove al terzo posto: Correggere ciò che è stato guastato dal padre. Ci sarà un po' di rimorso. Nessuna grande colpa.",
+        "Sei al quarto posto: Tolerare ciò che è stato guastato dal padre. Nel continuare si vede umiliazione.",
+        "Sei al quinto posto: Correggere ciò che è stato guastato dal padre. Si incontra lode.",
+        "Nove in cima: Non serve re e principi. Si fissa mete più alte."
+      ]
     },
     "19": {
       "number": 19,
@@ -1097,7 +1387,25 @@
       ],
       "element": "Metal",
       "bagua_area": "SW",
-      "feng_shui_area": "Love & Relationships"
+      "feng_shui_area": "Love & Relationships",
+      "judgment_es": "Gran éxito. La perseverancia favorece. Cuando llegue el octavo mes, habrá desgracia.",
+      "judgment_it": "Gran successo. La perseveranza favorisce. Quando arriverà l'ottavo mese, ci sarà sventura.",
+      "lines_es": [
+        "Nueve al principio: Aproximación conjunta. La perseverancia trae buena fortuna.",
+        "Nueve en el segundo lugar: Aproximación conjunta. Buena fortuna. Todo favorece.",
+        "Seis en el tercer lugar: Aproximación cómoda. Nada que favoreciera. Si uno es inducido a lamentarlo, se libera de culpa.",
+        "Seis en el cuarto lugar: Aproximación completa. Sin culpa.",
+        "Seis en el quinto lugar: Aproximación sabia. Esto es correcto para un gran príncipe. Buena fortuna.",
+        "Seis en lo alto: Aproximación magnánima. Buena fortuna. Sin culpa."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Avvicinamento congiunto. La perseveranza porta buona fortuna.",
+        "Nove al secondo posto: Avvicinamento congiunto. Buona fortuna. Tutto favorisce.",
+        "Sei al terzo posto: Avvicinamento comodo. Nulla che favorisca. Se uno è indotto a lamentarsene, si libera da colpa.",
+        "Sei al quarto posto: Avvicinamento completo. Nessuna colpa.",
+        "Sei al quinto posto: Avvicinamento saggio. Questo è corretto per un gran principe. Buona fortuna.",
+        "Sei in cima: Avvicinamento magnanimo. Buona fortuna. Nessuna colpa."
+      ]
     },
     "20": {
       "number": 20,
@@ -1152,7 +1460,25 @@
       ],
       "element": "Wood",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "La ablución ha sido hecha, pero aún no la ofrenda. Llenos de confianza le miran a él.",
+      "judgment_it": "L'abluzione è stata fatta, ma non ancora l'offerta. Pieni di fiducia lo guardano.",
+      "lines_es": [
+        "Seis al principio: Contemplación de niño. Para un hombre inferior, sin culpa. Para un hombre superior, humillación.",
+        "Seis en el segundo lugar: Contemplación a través de la rendija de la puerta. Favorecedor para la perseverancia de una mujer.",
+        "Seis en el tercer lugar: La contemplación de mi vida decide la elección entre avanzar y retroceder.",
+        "Seis en el cuarto lugar: Contemplación de la luz del reino. Favorece al hombre ejercer influencia como huésped de un rey.",
+        "Nueve en el quinto lugar: Contemplación de mi vida. El hombre superior está sin culpa.",
+        "Nueve en lo alto: Contemplación de su vida. El hombre superior está sin culpa."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Contemplazione da bambino. Per un uomo inferiore, nessuna colpa. Per un uomo nobile, umiliazione.",
+        "Sei al secondo posto: Contemplazione attraverso la fessura della porta. Favorevole per la perseveranza di una donna.",
+        "Sei al terzo posto: La contemplazione della mia vita decide la scelta tra avanzare e retrocedere.",
+        "Sei al quarto posto: Contemplazione della luce del regno. È favorevole all'uomo esercitare influenza come ospite di un re.",
+        "Nove al quinto posto: Contemplazione della mia vita. L'uomo nobile è senza colpa.",
+        "Nove in cima: Contemplazione della sua vita. L'uomo nobile è senza colpa."
+      ]
     },
     "21": {
       "number": 21,
@@ -1207,7 +1533,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "Éxito. Es favorable dejar que se administre justicia.",
+      "judgment_it": "Successo. È favorevole lasciare che venga amministrata giustizia.",
+      "lines_es": [
+        "Nueve al principio: Sus pies están sujetos en el cepo, de modo que sus dedos desaparecen. Sin culpa.",
+        "Seis en el segundo lugar: Muerde carne tierna, de modo que su nariz desaparece. Sin culpa.",
+        "Seis en el tercer lugar: Muerde carne seca vieja y golpea algo venenoso. Ligera humillación. Sin culpa.",
+        "Nueve en el cuarto lugar: Muerde carne seca cartilaginosa. Recibe flechas metálicas. Favorece al hombre ser consciente de las dificultades y ser perseverante. Buena fortuna.",
+        "Seis en el quinto lugar: Muerde carne magra seca. Recibe oro amarillo. Firmemente consciente del peligro. Sin culpa.",
+        "Nueve en lo alto: Su cuello está sujeto en el cangue de madera, de modo que sus orejas desaparecen. Desgracia."
+      ],
+      "lines_it": [
+        "Nove all'inizio: I suoi piedi sono legati nelle gogne, in modo che le sue dita spariscano. Nessuna colpa.",
+        "Sei al secondo posto: Morde carne tenera, in modo che il suo naso sparisca. Nessuna colpa.",
+        "Sei al terzo posto: Morde carne secca vecchia e colpisce qualcosa di velenoso. Leggera umiliazione. Nessuna colpa.",
+        "Nove al quarto posto: Morde carne secca cartilaginea. Riceve frecce metalliche. È favorevole all'uomo essere consapevole delle difficoltà e essere perseverante. Buona fortuna.",
+        "Sei al quinto posto: Morde carne magra secca. Riceve oro giallo. Fermamente consapevole del pericolo. Nessuna colpa.",
+        "Nove in cima: Il suo collo è legato nella gogna di legno, in modo che le sue orecchie spariscano. Sventura."
+      ]
     },
     "22": {
       "number": 22,
@@ -1262,7 +1606,25 @@
       ],
       "element": "Fire",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "Éxito. En asuntos pequeños es favorable emprender algo.",
+      "judgment_it": "Successo. In questioni piccole è favorevole intraprendere qualcosa.",
+      "lines_es": [
+        "Nueve al principio: Presta gracia a sus dedos de los pies, deja el carro, y camina.",
+        "Seis en el segundo lugar: Presta gracia a la barba en su mentón.",
+        "Nueve en el tercer lugar: Gracioso y húmedo. Perseverancia constante trae buena fortuna.",
+        "Seis en el cuarto lugar: ¿Gracia o sencillez? Un caballo blanco viene como si tuviera alas. No es un ladrón, cortejará en el momento adecuado.",
+        "Seis en el quinto lugar: Gracia en colinas y jardines. El rollo de seda es escaso y pequeño. Humillación, pero al final buena fortuna.",
+        "Nueve en lo alto: Gracia sencilla. Sin culpa."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Presta grazia alle sue dita dei piedi, lascia il carro, e cammina.",
+        "Sei al secondo posto: Presta grazia alla barba sul suo mento.",
+        "Nove al terzo posto: Grazioso e umido. Perseveranza costante porta buona fortuna.",
+        "Sei al quarto posto: Grazia o semplicità? Un cavallo bianco viene come se avesse ali. Non è un ladro, corteggerà al momento opportuno.",
+        "Sei al quinto posto: Grazia in colline e giardini. Il rotolo di seta è scarso e piccolo. Umiliazione, ma alla fine buona fortuna.",
+        "Nove in cima: Grazia semplice. Nessuna colpa."
+      ]
     },
     "23": {
       "number": 23,
@@ -1317,7 +1679,25 @@
       ],
       "element": "Earth",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "No favorece al hombre ir a ninguna parte.",
+      "judgment_it": "Non è favorevole all'uomo andare da nessuna parte.",
+      "lines_es": [
+        "Seis al principio: La pata de la cama está partida. Aquellos que perseveran son destruidos. Desgracia.",
+        "Seis en el segundo lugar: La cama está partida en el borde. Aquellos que perseveran son destruidos. Desgracia.",
+        "Seis en el tercer lugar: Él se separa con ellos. Sin culpa.",
+        "Seis en el cuarto lugar: La cama está partida hasta la piel. Desgracia.",
+        "Seis en el quinto lugar: Un cardumen de peces. El favor viene a través de las damas de la corte. Todo actúa para favorecer.",
+        "Nueve en lo alto: Hay una fruta grande aún no comida. El hombre superior recibe un carro. La casa del hombre inferior se parte."
+      ],
+      "lines_it": [
+        "Sei all'inizio: La gamba del letto è spaccata. Coloro che perseverano sono distrutti. Sventura.",
+        "Sei al secondo posto: Il letto è spaccato sul bordo. Coloro che perseverano sono distrutti. Sventura.",
+        "Sei al terzo posto: Egli si separa con loro. Nessuna colpa.",
+        "Sei al quarto posto: Il letto è spaccato fino alla pelle. Sventura.",
+        "Sei al quinto posto: Un banco di pesci. Il favore viene attraverso le dame di corte. Tutto agisce per favorire.",
+        "Nove in cima: C'è un frutto grande ancora non mangiato. L'uomo nobile riceve un carro. La casa dell'uomo inferiore si spacca."
+      ]
     },
     "24": {
       "number": 24,
@@ -1372,7 +1752,25 @@
       ],
       "element": "Wood",
       "bagua_area": "SW",
-      "feng_shui_area": "Love & Relationships"
+      "feng_shui_area": "Love & Relationships",
+      "judgment_es": "Éxito. Salir y entrar sin error. Los amigos vienen sin culpa. De aquí para allá va el camino. Al séptimo día viene el retorno. Favorece al hombre tener adónde ir.",
+      "judgment_it": "Successo. Uscire ed entrare senza errore. Gli amici vengono senza colpa. Di qua e di là va il cammino. Al settimo giorno viene il ritorno. È favorevole all'uomo avere dove andare.",
+      "lines_es": [
+        "Nueve al principio: Retorno desde una distancia corta. No hay necesidad de remordimiento. Gran buena fortuna.",
+        "Seis en el segundo lugar: Retorno tranquilo. Buena fortuna.",
+        "Seis en el tercer lugar: Retorno repetido. Peligro. Sin culpa.",
+        "Seis en el cuarto lugar: Caminando en medio de otros, uno regresa solo.",
+        "Seis en el quinto lugar: Retorno de corazón noble. Sin remordimiento.",
+        "Seis en lo alto: Perder el retorno. Desgracia. Terror de dentro y de fuera. Si se ponen en movimiento ejércitos, uno sufrirá al final una gran derrota, desastrosa para el gobernante del país. Por diez años no será posible atacar de nuevo."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Ritorno da una distanza corta. Non c'è bisogno di rimorso. Gran buona fortuna.",
+        "Sei al secondo posto: Ritorno tranquillo. Buona fortuna.",
+        "Sei al terzo posto: Ritorno ripetuto. Pericolo. Nessuna colpa.",
+        "Sei al quarto posto: Camminando in mezzo agli altri, uno ritorna solo.",
+        "Sei al quinto posto: Ritorno di cuore nobile. Nessun rimorso.",
+        "Sei in cima: Perdere il ritorno. Sventura. Terrore di dentro e di fuori. Se si mettono in moto eserciti, uno soffrirà alla fine una grande sconfitta, disastrosa per il governante del paese. Per dieci anni non sarà possibile attaccare di nuovo."
+      ]
     },
     "25": {
       "number": 25,
@@ -1427,7 +1825,25 @@
       ],
       "element": "Metal",
       "bagua_area": "NW",
-      "feng_shui_area": "Helpful People & Travel"
+      "feng_shui_area": "Helpful People & Travel",
+      "judgment_es": "Supremo éxito. La perseverancia favorece. Si alguien no es como debería ser, tiene desgracia. No favorece al hombre emprender nada.",
+      "judgment_it": "Supremo successo. La perseveranza favorisce. Se qualcuno non è come dovrebbe essere, ha sventura. Non è favorevole all'uomo intraprendere nulla.",
+      "lines_es": [
+        "Nueve al principio: Conducta inocente. Buena fortuna.",
+        "Seis en el segundo lugar: Si uno no cuenta con la cosecha mientras ara, ni con el uso del suelo mientras lo limpia, favorece al hombre emprender algo.",
+        "Seis en el tercer lugar: Desgracia inmerecida. La vaca que fue atada por alguien es la ganancia del caminante, la pérdida del ciudadano.",
+        "Nueve en el cuarto lugar: Quien puede ser perseverante permanece sin culpa.",
+        "Nueve en el quinto lugar: No uses medicina en una enfermedad contraída sin culpa tuya. Pasará por sí misma.",
+        "Nueve en lo alto: La acción inocente trae desgracia. Nada que favoreciera."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Condotta innocente. Buona fortuna.",
+        "Sei al secondo posto: Se uno non conta sul raccolto mentre ara, né sull'uso del terreno mentre lo pulisce, è favorevole all'uomo intraprendere qualcosa.",
+        "Sei al terzo posto: Sventura immeritata. La mucca che fu legata da qualcuno è il guadagno del viandante, la perdita del cittadino.",
+        "Nove al quarto posto: Chi può essere perseverante rimane senza colpa.",
+        "Nove al quinto posto: Non usare medicina in una malattia contratta senza colpa tua. Passerà da sé.",
+        "Nove in cima: L'azione innocente porta sventura. Nulla che favorisca."
+      ]
     },
     "26": {
       "number": 26,
@@ -1482,7 +1898,25 @@
       ],
       "element": "Metal",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "La perseverancia favorece. No comer en casa trae buena fortuna. Favorece al hombre cruzar la gran agua.",
+      "judgment_it": "La perseveranza favorisce. Non mangiare in casa porta buona fortuna. È favorevole all'uomo attraversare la grande acqua.",
+      "lines_es": [
+        "Nueve al principio: El peligro está a la mano. Favorece al hombre desistir.",
+        "Nueve en el segundo lugar: Los ejes son quitados del carro.",
+        "Nueve en el tercer lugar: Un buen caballo que sigue a otros. Conciencia del peligro, con perseverancia, favorece. Practica el manejo del carro y la defensa armada diariamente. Favorece al hombre tener adónde ir.",
+        "Seis en el cuarto lugar: La cabecera de un toro joven. Gran buena fortuna.",
+        "Seis en el quinto lugar: El colmillo de un jabalí castrado. Buena fortuna.",
+        "Nueve en lo alto: Uno alcanza el camino del cielo. Éxito."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Il pericolo è a portata di mano. È favorevole all'uomo desistere.",
+        "Nove al secondo posto: Gli assi sono tolti dal carro.",
+        "Nove al terzo posto: Un buon cavallo che segue gli altri. Consapevolezza del pericolo, con perseveranza, favorisce. Pratica la guida del carro e la difesa armata quotidianamente. È favorevole all'uomo avere dove andare.",
+        "Sei al quarto posto: La testiera di un toro giovane. Gran buona fortuna.",
+        "Sei al quinto posto: La zanna di un cinghiale castrato. Buona fortuna.",
+        "Nove in cima: Si raggiunge la via del cielo. Successo."
+      ]
     },
     "27": {
       "number": 27,
@@ -1537,7 +1971,25 @@
       ],
       "element": "Wood",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "La perseverancia trae buena fortuna. Presta atención al proporcionar sustento y a lo que el hombre busca para llenar su propia boca.",
+      "judgment_it": "La perseveranza porta buona fortuna. Presta attenzione al fornire sostentamento e a ciò che l'uomo cerca per riempire la propria bocca.",
+      "lines_es": [
+        "Nueve al principio: Dejas ir tu tortuga mágica, y me miras con las comisuras de tu boca caídas. Desgracia.",
+        "Seis en el segundo lugar: Volviéndose a la cumbre para sustento, desviándose del camino. Buscar sustento de la colina. Continuar haciendo esto trae desgracia.",
+        "Seis en el tercer lugar: Apartándose del sustento. La perseverancia trae desgracia. No actúes así por diez años. Nada sirve para favorecer.",
+        "Seis en el cuarto lugar: Volviéndose a la cumbre para provisión trae buena fortuna. Espiando con ojos afilados como un tigre con anhelo insaciable. Sin culpa.",
+        "Seis en el quinto lugar: Apartándose del camino. Permanecer perseverante trae buena fortuna. No debe cruzar la gran agua.",
+        "Nueve en lo alto: La fuente del sustento. Conciencia del peligro trae buena fortuna. Favorece al hombre cruzar la gran agua."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Lasci andare la tua tartaruga magica, e mi guardi con le commissure della bocca cadenti. Sventura.",
+        "Sei al secondo posto: Rivolgendosi alla cima per sostentamento, deviandosi dal cammino. Cercare sostentamento dalla collina. Continuare a farlo porta sventura.",
+        "Sei al terzo posto: Allontanandosi dal sostentamento. La perseveranza porta sventura. Non agire così per dieci anni. Nulla serve a favorire.",
+        "Sei al quarto posto: Rivolgendosi alla cima per provvigione porta buona fortuna. Spiano con occhi affilati come una tigre con brama insaziabile. Nessuna colpa.",
+        "Sei al quinto posto: Allontanandosi dal cammino. Rimanere perseverante porta buona fortuna. Non deve attraversare la grande acqua.",
+        "Nove in cima: La fonte del sostentamento. Consapevolezza del pericolo porta buona fortuna. È favorevole all'uomo attraversare la grande acqua."
+      ]
     },
     "28": {
       "number": 28,
@@ -1592,7 +2044,25 @@
       ],
       "element": "Metal",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "La viga del techo se comba hasta el punto de ruptura. Favorece al hombre tener adónde ir. Éxito.",
+      "judgment_it": "La trave del tetto si incurva fino al punto di rottura. È favorevole all'uomo avere dove andare. Successo.",
+      "lines_es": [
+        "Seis al principio: Poner juncos blancos debajo. Sin culpa.",
+        "Nueve en el segundo lugar: Un álamo seco brota en la raíz. Un hombre mayor toma una esposa joven. Todo favorece.",
+        "Nueve en el tercer lugar: La viga del techo se comba hasta el punto de ruptura. Desgracia.",
+        "Nueve en el cuarto lugar: La viga del techo está apuntalada. Buena fortuna. Si hay motivos ocultos, es humillante.",
+        "Nueve en el quinto lugar: Un álamo marchito produce flores. Una mujer mayor toma un esposo. Sin culpa. Sin alabanza.",
+        "Seis en lo alto: Debe pasar por el agua. Le va por encima de la cabeza. Desgracia. Sin culpa."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Mettere giunchi bianchi sotto. Nessuna colpa.",
+        "Nove al secondo posto: Un pioppo secco germoglia alla radice. Un uomo anziano prende una moglie giovane. Tutto favorisce.",
+        "Nove al terzo posto: La trave del tetto si incurva fino al punto di rottura. Sventura.",
+        "Nove al quarto posto: La trave del tetto è puntellata. Buona fortuna. Se ci sono motivi nascosti, è umiliante.",
+        "Nove al quinto posto: Un pioppo appassito produce fiori. Una donna anziana prende un marito. Nessuna colpa. Nessuna lode.",
+        "Sei in cima: Deve passare per l'acqua. Gli va sopra la testa. Sventura. Nessuna colpa."
+      ]
     },
     "29": {
       "number": 29,
@@ -1647,7 +2117,25 @@
       ],
       "element": "Water",
       "bagua_area": "N",
-      "feng_shui_area": "Career & Life Path"
+      "feng_shui_area": "Career & Life Path",
+      "judgment_es": "Lo Abismal repetido. Si eres sincero, tienes éxito en tu corazón, y todo lo que haces tiene éxito.",
+      "judgment_it": "L'Abissale ripetuto. Se sei sincero, hai successo nel tuo cuore, e tutto ciò che fai ha successo.",
+      "lines_es": [
+        "Seis al principio: Repetición de lo Abismal. En el abismo uno cae en un hoyo. Desgracia.",
+        "Nueve en el segundo lugar: El abismo es peligroso. Uno debe esforzarse por lograr solo cosas pequeñas.",
+        "Seis en el tercer lugar: Hacia adelante y hacia atrás, abismo sobre abismo. En peligro como este, pausa primero y espera, de lo contrario caerás en un hoyo en el abismo. No actúes de esta manera.",
+        "Seis en el cuarto lugar: Una jarra de vino, un cuenco de arroz con ella; vasijas de tierra simplemente pasadas por la ventana. Ciertamente no hay culpa en esto.",
+        "Nueve en el quinto lugar: El abismo no se llena hasta desbordarse, se llena solo hasta el borde. Sin culpa.",
+        "Seis en lo alto: Atado con cuerdas y sogas, encerrado entre muros de prisión de setos espinosos: por tres años uno no encuentra el camino. Desgracia."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Ripetizione dell'Abissale. Nell'abisso uno cade in un pozzo. Sventura.",
+        "Nove al secondo posto: L'abisso è pericoloso. Uno deve sforzarsi di ottenere solo cose piccole.",
+        "Sei al terzo posto: Avanti e indietro, abisso su abisso. In pericolo come questo, pausa prima e aspetta, altrimenti cadrai in un pozzo nell'abisso. Non agire in questo modo.",
+        "Sei al quarto posto: Un brocca di vino, una ciotola di riso con essa; vasellame di terra semplicemente passato attraverso la finestra. Certamente non c'è colpa in questo.",
+        "Nove al quinto posto: L'abisso non si riempie fino a traboccare, si riempie solo fino all'orlo. Nessuna colpa.",
+        "Sei in cima: Legato con corde e funi, rinchiuso tra muri di prigione di siepi spinose: per tre anni uno non trova la via. Sventura."
+      ]
     },
     "30": {
       "number": 30,
@@ -1702,7 +2190,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "La perseverancia favorece. Trae éxito. El cuidado de la vaca trae buena fortuna.",
+      "judgment_it": "La perseveranza favorisce. Porta successo. La cura della mucca porta buona fortuna.",
+      "lines_es": [
+        "Nueve al principio: Las huellas corren cruzadas. Si uno está seriamente intencionado, sin culpa.",
+        "Seis en el segundo lugar: Luz amarilla. Suprema buena fortuna.",
+        "Nueve en el tercer lugar: A la luz del sol poniente, los hombres o golpean la olla y cantan o lloran en voz alta la llegada de la vejez. Desgracia.",
+        "Nueve en el cuarto lugar: Su llegada es repentina; llamea, se apaga, es desechada.",
+        "Seis en el quinto lugar: Lágrimas en inundaciones, suspiros y lamentos. Buena fortuna.",
+        "Nueve en lo alto: El rey lo usa para marchar y castigar. Entonces es mejor matar a los líderes y tomar cautivos a los seguidores. Sin culpa."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Le impronte corrono incrociate. Se uno è seriamente intenzionato, nessuna colpa.",
+        "Sei al secondo posto: Luce gialla. Suprema buona fortuna.",
+        "Nove al terzo posto: Alla luce del sole al tramonto, gli uomini o battono la pentola e cantano o piangono ad alta voce l'arrivo della vecchiaia. Sventura.",
+        "Nove al quarto posto: Il suo arrivo è repentino; fiammeggia, si spegne, è gettata via.",
+        "Sei al quinto posto: Lacrime in inondazioni, sospiri e lamenti. Buona fortuna.",
+        "Nove in cima: Il re lo usa per marciare e castigare. Allora è meglio uccidere i leader e prendere prigionieri i seguaci. Nessuna colpa."
+      ]
     },
     "31": {
       "number": 31,
@@ -1757,7 +2263,25 @@
       ],
       "element": "Metal",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "Éxito. La perseverancia favorece. Tomar a una doncella como esposa trae buena fortuna.",
+      "judgment_it": "Successo. La perseveranza favorisce. Prendere una fanciulla come moglie porta buona fortuna.",
+      "lines_es": [
+        "Seis al principio: La influencia se muestra en el dedo gordo del pie.",
+        "Seis en el segundo lugar: La influencia se muestra en las pantorrillas. Desgracia. La demora trae buena fortuna.",
+        "Nueve en el tercer lugar: La influencia se muestra en los muslos. Se aferra a lo que le sigue. Continuar es humillante.",
+        "Nueve en el cuarto lugar: La perseverancia trae buena fortuna. El remordimiento desaparece. Si la mente de un hombre es vacilante, yendo y viniendo, solo aquellos amigos a quienes dirige sus pensamientos conscientes lo seguirán.",
+        "Nueve en el quinto lugar: La influencia se muestra en la nuca. Sin remordimiento.",
+        "Seis en lo alto: La influencia se muestra en las mandíbulas, mejillas y lengua."
+      ],
+      "lines_it": [
+        "Sei all'inizio: L'influenza si mostra nel dito grosso del piede.",
+        "Sei al secondo posto: L'influenza si mostra nei polpacci. Sventura. L'indugio porta buona fortuna.",
+        "Nove al terzo posto: L'influenza si mostra nelle cosce. Si aggrappa a ciò che la segue. Continuare è umiliante.",
+        "Nove al quarto posto: La perseveranza porta buona fortuna. Il rimorso svanisce. Se la mente di un uomo è esitante, andando e venendo, solo quegli amici a cui dirige i suoi pensieri coscienti lo seguiranno.",
+        "Nove al quinto posto: L'influenza si mostra nella nuca. Nessun rimorso.",
+        "Sei in cima: L'influenza si mostra nelle mascelle, guance e lingua."
+      ]
     },
     "32": {
       "number": 32,
@@ -1812,7 +2336,25 @@
       ],
       "element": "Wood",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "Éxito. Sin culpa. La perseverancia favorece. Favorece al hombre tener adónde ir.",
+      "judgment_it": "Successo. Nessuna colpa. La perseveranza favorisce. È favorevole all'uomo avere dove andare.",
+      "lines_es": [
+        "Seis al principio: Buscar duración demasiado apresuradamente trae desgracia persistentemente. Nada que favoreciera.",
+        "Nueve en el segundo lugar: El remordimiento desaparece.",
+        "Nueve en el tercer lugar: Quien no da duración a su carácter encuentra desgracia. Humillación persistente.",
+        "Nueve en el cuarto lugar: No hay presa en el campo.",
+        "Seis en el quinto lugar: Dando duración al carácter a través de la perseverancia. Esto es buena fortuna para una mujer, desgracia para un hombre.",
+        "Seis en lo alto: La inquietud como condición duradera trae desgracia."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Cercare durata troppo frettolosamente porta sventura persistentemente. Nulla che favorisca.",
+        "Nove al secondo posto: Il rimorso svanisce.",
+        "Nove al terzo posto: Chi non dà durata al suo carattere incontra disgrazia. Umiliazione persistente.",
+        "Nove al quarto posto: Non c'è preda nel campo.",
+        "Sei al quinto posto: Dare durata al carattere attraverso la perseveranza. Questo è buona fortuna per una donna, sventura per un uomo.",
+        "Sei in cima: L'inquietudine come condizione durevole porta sventura."
+      ]
     },
     "33": {
       "number": 33,
@@ -1867,7 +2409,25 @@
       ],
       "element": "Metal",
       "bagua_area": "NW",
-      "feng_shui_area": "Helpful People & Travel"
+      "feng_shui_area": "Helpful People & Travel",
+      "judgment_es": "Éxito. En lo que es pequeño, la perseverancia favorece.",
+      "judgment_it": "Successo. In ciò che è piccolo, la perseveranza favorisce.",
+      "lines_es": [
+        "Seis al principio: En la cola en retirada. Esto es peligroso. No debe desear emprender nada.",
+        "Seis en el segundo lugar: Él lo sujeta fuerte con piel de buey amarilla. Nadie puede arrancarlo.",
+        "Nueve en el tercer lugar: Una retirada detenida es desgastante y peligrosa. Retener personas como sirvientes trae buena fortuna.",
+        "Nueve en el cuarto lugar: La retirada voluntaria trae buena fortuna al hombre superior y caída al hombre inferior.",
+        "Nueve en el quinto lugar: Retirada amigable. La perseverancia trae buena fortuna.",
+        "Nueve en lo alto: Retirada alegre. Todo sirve para favorecer."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Nella coda in ritirata. Questo è pericoloso. Non deve desiderare intraprendere nulla.",
+        "Sei al secondo posto: Egli lo tiene stretto con pelle di bue gialla. Nessuno può strapparlo.",
+        "Nove al terzo posto: Una ritirata fermata è snervante e pericolosa. Trattenere persone come servitori porta buona fortuna.",
+        "Nove al quarto posto: La ritirata volontaria porta buona fortuna all'uomo nobile e rovina all'uomo inferiore.",
+        "Nove al quinto posto: Ritirata amichevole. La perseveranza porta buona fortuna.",
+        "Nove in cima: Ritirata allegra. Tutto serve a favorire."
+      ]
     },
     "34": {
       "number": 34,
@@ -1922,7 +2482,25 @@
       ],
       "element": "Metal",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "La perseverancia favorece.",
+      "judgment_it": "La perseveranza favorisce.",
+      "lines_es": [
+        "Nueve al principio: Poder en los dedos de los pies. Continuar trae desgracia. Esto es ciertamente cierto.",
+        "Nueve en el segundo lugar: La perseverancia trae buena fortuna.",
+        "Nueve en el tercer lugar: El hombre inferior trabaja a través del poder. El hombre superior no actúa así. Continuar es peligroso. Una cabra embiste contra un seto y se enreda los cuernos.",
+        "Nueve en el cuarto lugar: La perseverancia trae buena fortuna. El remordimiento desaparece. El seto se abre; no hay enredo. El poder depende del eje de un carro grande.",
+        "Seis en el quinto lugar: Pierde la cabra con facilidad. Sin remordimiento.",
+        "Seis en lo alto: Una cabra embiste contra un seto. No puede ir hacia atrás, no puede ir hacia adelante. Nada sirve para favorecer. Si uno nota la dificultad, esto trae buena fortuna."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Potere nelle dita dei piedi. Continuare porta sventura. Questo è certamente vero.",
+        "Nove al secondo posto: La perseveranza porta buona fortuna.",
+        "Nove al terzo posto: L'uomo inferiore lavora attraverso il potere. L'uomo nobile non agisce così. Continuare è pericoloso. Una capra cozza contro una siepe e si impiglia le corna.",
+        "Nove al quarto posto: La perseveranza porta buona fortuna. Il rimorso svanisce. La siepe si apre; non c'è impiccio. Il potere dipende dall'asse di un grande carro.",
+        "Sei al quinto posto: Perde la capra con facilità. Nessun rimorso.",
+        "Sei in cima: Una capra cozza contro una siepe. Non può andare indietro, non può andare avanti. Nulla serve a favorire. Se uno nota la difficoltà, questo porta buona fortuna."
+      ]
     },
     "35": {
       "number": 35,
@@ -1977,7 +2555,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "El príncipe poderoso es honrado con caballos en gran número. En un solo día se le concede audiencia tres veces.",
+      "judgment_it": "Il principe potente è onorato con cavalli in gran numero. In un solo giorno gli è concessa udienza tre volte.",
+      "lines_es": [
+        "Seis al principio: Progresando, pero devuelto. La perseverancia trae buena fortuna. Si uno encuentra sin confianza, debe permanecer calmado. Sin culpa.",
+        "Seis en el segundo lugar: Progresando, pero en pesar. La perseverancia trae buena fortuna. Entonces uno obtiene gran felicidad de su abuela.",
+        "Seis en el tercer lugar: Todos están de acuerdo. El remordimiento desaparece.",
+        "Nueve en el cuarto lugar: Progreso como un hámster. La perseverancia trae peligro.",
+        "Seis en el quinto lugar: El remordimiento desaparece. No tomes ganancia y pérdida a corazón. Las empresas traen buena fortuna. Todo sirve para favorecer.",
+        "Nueve en lo alto: Hacer progreso con los cuernos es permisible solo con el propósito de castigar a la propia ciudad. Ser consciente del peligro trae buena fortuna. Sin culpa. La perseverancia trae humillación."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Progredendo, ma rispedito indietro. La perseveranza porta buona fortuna. Se uno incontra senza fiducia, deve rimanere calmo. Nessuna colpa.",
+        "Sei al secondo posto: Progredendo, ma nel dolore. La perseveranza porta buona fortuna. Allora uno ottiene gran felicità dalla nonna.",
+        "Sei al terzo posto: Tutti sono d'accordo. Il rimorso svanisce.",
+        "Nove al quarto posto: Progresso come un criceto. La perseveranza porta pericolo.",
+        "Sei al quinto posto: Il rimorso svanisce. Non prendere guadagno e perdita a cuore. Le imprese portano buona fortuna. Tutto serve a favorire.",
+        "Nove in cima: Fare progresso con le corna è permesso solo allo scopo di punire la propria città. Essere consapevoli del pericolo porta buona fortuna. Nessuna colpa. La perseveranza porta umiliazione."
+      ]
     },
     "36": {
       "number": 36,
@@ -2032,7 +2628,25 @@
       ],
       "element": "Fire",
       "bagua_area": "SW",
-      "feng_shui_area": "Love & Relationships"
+      "feng_shui_area": "Love & Relationships",
+      "judgment_es": "En la adversidad favorece al hombre ser perseverante.",
+      "judgment_it": "Nell'avversità è favorevole all'uomo essere perseverante.",
+      "lines_es": [
+        "Nueve al principio: Oscurecimiento de la luz durante el vuelo. Él baja sus alas. El hombre superior no come por tres días en sus andanzas. Pero tiene adónde ir. El anfitrión tiene ocasión de chismear sobre él.",
+        "Seis en el segundo lugar: Oscurecimiento de la luz le hiere en el muslo izquierdo. Él da ayuda con la fuerza de un caballo. Buena fortuna.",
+        "Nueve en el tercer lugar: Oscurecimiento de la luz durante la caza en el sur. Su gran líder es capturado. No debe esperarse perseverancia demasiado pronto.",
+        "Seis en el cuarto lugar: Él penetra el lado izquierdo del vientre. Uno llega al corazón mismo del oscurecimiento de la luz, y deja la puerta y el patio.",
+        "Seis en el quinto lugar: Oscurecimiento de la luz como con el Príncipe Chi. La perseverancia favorece.",
+        "Seis en lo alto: No luz sino oscuridad. Primero subió al cielo, luego se sumergió en las profundidades de la tierra."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Offuscamento della luce durante il volo. Egli abbassa le ali. L'uomo nobile non mangia per tre giorni nelle sue peregrinazioni. Ma ha dove andare. L'ospite ha occasione di sparlare di lui.",
+        "Sei al secondo posto: Offuscamento della luce lo ferisce nella coscia sinistra. Egli dà aiuto con la forza di un cavallo. Buona fortuna.",
+        "Nove al terzo posto: Offuscamento della luce durante la caccia nel sud. Il loro gran leader è catturato. Non deve aspettarsi perseveranza troppo presto.",
+        "Sei al quarto posto: Egli penetra il lato sinistro della pancia. Si arriva al cuore stesso dell'offuscamento della luce, e si lasciano porta e cortile.",
+        "Sei al quinto posto: Offuscamento della luce come con il Principe Chi. La perseveranza favorisce.",
+        "Sei in cima: Non luce ma oscurità. Prima salì in cielo, poi si immerse nelle profondità della terra."
+      ]
     },
     "37": {
       "number": 37,
@@ -2087,7 +2701,25 @@
       ],
       "element": "Fire",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "La perseverancia de la mujer favorece.",
+      "judgment_it": "La perseveranza della donna favorisce.",
+      "lines_es": [
+        "Nueve al principio: Reclusión firme dentro de la familia. El remordimiento desaparece.",
+        "Seis en el segundo lugar: Ella no debe seguir sus caprichos. Debe atender dentro a la comida. La perseverancia trae buena fortuna.",
+        "Nueve en el tercer lugar: Cuando los temperamentos se encienden en la familia, demasiada severidad trae remordimiento. Buena fortuna de todos modos. Cuando mujer y niño juegan y ríen, lleva al final a humillación.",
+        "Seis en el cuarto lugar: Ella es el tesoro de la casa. Gran buena fortuna.",
+        "Nueve en el quinto lugar: Como rey se acerca a su familia. No temas. Buena fortuna.",
+        "Nueve en lo alto: Su trabajo merece respeto. Al final viene la buena fortuna."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Reclusione ferma dentro la famiglia. Il rimorso svanisce.",
+        "Sei al secondo posto: Lei non deve seguire i suoi capricci. Deve attendere dentro al cibo. La perseveranza porta buona fortuna.",
+        "Nove al terzo posto: Quando i temperamenti si accendono nella famiglia, troppa severità porta rimorso. Buona fortuna comunque. Quando donna e bambino scherzano e ridono, porta alla fine all'umiliazione.",
+        "Sei al quarto posto: Lei è il tesoro della casa. Gran buona fortuna.",
+        "Nove al quinto posto: Come re si avvicina alla sua famiglia. Non temere. Buona fortuna.",
+        "Nove in cima: Il suo lavoro merita rispetto. Alla fine viene la buona fortuna."
+      ]
     },
     "38": {
       "number": 38,
@@ -2142,7 +2774,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "En asuntos pequeños, buena fortuna.",
+      "judgment_it": "In questioni piccole, buona fortuna.",
+      "lines_es": [
+        "Nueve al principio: El remordimiento desaparece. Si pierdes tu caballo, no corras tras él; volverá por sí mismo. Cuando veas personas malvadas, guárdate de cometer errores.",
+        "Nueve en el segundo lugar: Uno encuentra a su señor en una calle estrecha. Sin culpa.",
+        "Seis en el tercer lugar: Uno ve el carro arrastrado hacia atrás, los bueyes detenidos, el pelo y la nariz de un hombre cortados. No es un buen comienzo, pero un buen fin.",
+        "Nueve en el cuarto lugar: Aislado a través de la oposición. Uno encuentra a un hombre de igual mente con quien puede asociarse de buena fe. A pesar del peligro, sin culpa.",
+        "Seis en el quinto lugar: El remordimiento desaparece. El compañero muerde su camino a través de los envoltorios. Si uno va a él, ¿cómo podría ser un error?",
+        "Nueve en lo alto: Aislado a través de la oposición. Uno ve a su compañero como un cerdo cubierto de suciedad, como un carro lleno de demonios. Primero arma un arco contra él, luego deja el arco a un lado. No es un ladrón; cortejará en el momento adecuado. Al ir, cae la lluvia; entonces viene la buena fortuna."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Il rimorso svanisce. Se perdi il tuo cavallo, non corrergli dietro; tornerà da sé. Quando vedi persone malvagie, guardati dal commettere errori.",
+        "Nove al secondo posto: Si incontra il proprio signore in una strada stretta. Nessuna colpa.",
+        "Sei al terzo posto: Si vede il carro trascinato indietro, i buoi fermi, i capelli e il naso di un uomo tagliati. Non è un buon inizio, ma una buona fine.",
+        "Nove al quarto posto: Isolato attraverso l'opposizione. Si incontra un uomo della stessa mente con cui si può associarsi in buona fede. Nonostante il pericolo, nessuna colpa.",
+        "Sei al quinto posto: Il rimorso svanisce. Il compagno morde il suo cammino attraverso gli involucri. Se uno va da lui, come potrebbe essere un errore?",
+        "Nove in cima: Isolato attraverso l'opposizione. Si vede il proprio compagno come un maiale coperto di sporcizia, come un carro pieno di demoni. Prima arma un arco contro di lui, poi posa l'arco da parte. Non è un ladro; corteggerà al momento opportuno. Nell'andare, cade la pioggia; allora viene la buona fortuna."
+      ]
     },
     "39": {
       "number": 39,
@@ -2197,7 +2847,25 @@
       ],
       "element": "Water",
       "bagua_area": "N",
-      "feng_shui_area": "Career & Life Path"
+      "feng_shui_area": "Career & Life Path",
+      "judgment_es": "El suroeste favorece. El noreste no favorece. Favorece al hombre ver al gran hombre. La perseverancia trae buena fortuna.",
+      "judgment_it": "Il sud-ovest favorisce. Il nord-est non favorisce. È favorevole all'uomo vedere il grande uomo. La perseveranza porta buona fortuna.",
+      "lines_es": [
+        "Seis al principio: Ir conduce a obstrucciones, venir encuentra alabanza.",
+        "Seis en el segundo lugar: El sirviente del rey es asediado por obstrucción sobre obstrucción, pero no es culpa suya.",
+        "Nueve en el tercer lugar: Ir conduce a obstrucciones; por tanto regresa.",
+        "Seis en el cuarto lugar: Ir conduce a obstrucciones, venir conduce a unión.",
+        "Nueve en el quinto lugar: En medio de las mayores obstrucciones, vienen amigos.",
+        "Seis en lo alto: Ir conduce a obstrucciones, venir conduce a gran buena fortuna. Favorece al hombre ver al gran hombre."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Andare conduce a ostruzioni, venire incontra lode.",
+        "Sei al secondo posto: Il servo del re è assediato da ostruzione su ostruzione, ma non è colpa sua.",
+        "Nove al terzo posto: Andare conduce a ostruzioni; quindi ritorna.",
+        "Sei al quarto posto: Andare conduce a ostruzioni, venire conduce a unione.",
+        "Nove al quinto posto: In mezzo alle maggiori ostruzioni, vengono amici.",
+        "Sei in cima: Andare conduce a ostruzioni, venire conduce a gran buona fortuna. È favorevole all'uomo vedere il grande uomo."
+      ]
     },
     "40": {
       "number": 40,
@@ -2252,7 +2920,25 @@
       ],
       "element": "Water",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "El suroeste favorece. Si ya no hay nada adónde uno tenga que ir, el retorno trae buena fortuna. Si aún hay algo adónde uno tenga que ir, la prisa trae buena fortuna.",
+      "judgment_it": "Il sud-ovest favorisce. Se non c'è più nulla dove uno debba andare, il ritorno porta buona fortuna. Se c'è ancora qualcosa dove uno debba andare, la fretta porta buona fortuna.",
+      "lines_es": [
+        "Seis al principio: Sin culpa.",
+        "Nueve en el segundo lugar: Uno mata tres zorros en el campo y recibe una flecha amarilla. La perseverancia trae buena fortuna.",
+        "Seis en el tercer lugar: Si un hombre lleva una carga sobre su espalda y sin embargo monta en un carruaje, así alienta a los ladrones a acercarse. La perseverancia conduce a humillación.",
+        "Nueve en el cuarto lugar: Libérate de tu dedo gordo del pie. Entonces viene el compañero, y a él puedes confiar.",
+        "Seis en el quinto lugar: Si solo el hombre superior puede liberarse, trae buena fortuna. Así demuestra a los hombres inferiores que es serio.",
+        "Seis en lo alto: El príncipe dispara a un halcón en un muro alto. Lo mata. Todo sirve para favorecer."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Nessuna colpa.",
+        "Nove al secondo posto: Si uccidono tre volpi nel campo e si riceve una freccia gialla. La perseveranza porta buona fortuna.",
+        "Sei al terzo posto: Se un uomo porta un carico sulla sua schiena e ciononostante cavalca in carrozza, così incoraggia i ladri ad avvicinarsi. La perseveranza conduce all'umiliazione.",
+        "Nove al quarto posto: Liberati dal tuo dito grosso del piede. Poi viene il compagno, e a lui puoi fidarti.",
+        "Sei al quinto posto: Se solo l'uomo nobile può liberarsi, porta buona fortuna. Così dimostra agli uomini inferiori che è serio.",
+        "Sei in cima: Il principe spara a un falco su un muro alto. Lo uccide. Tutto serve a favorire."
+      ]
     },
     "41": {
       "number": 41,
@@ -2307,7 +2993,25 @@
       ],
       "element": "Metal",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "La disminución combinada con sinceridad trae suprema buena fortuna sin culpa. Uno puede ser perseverante en esto. Favorece al hombre emprender algo. ¿Cómo debe llevarse esto a cabo? Uno puede usar dos pequeños cuencos para el sacrificio.",
+      "judgment_it": "La diminuzione combinata con sincerità porta suprema buona fortuna senza colpa. Si può essere perseveranti in questo. È favorevole all'uomo intraprendere qualcosa. Come deve essere portato a termine? Si possono usare due piccole coppe per il sacrificio.",
+      "lines_es": [
+        "Nueve al principio: Ir rápidamente cuando las tareas están terminadas es sin culpa. Pero uno debe reflexionar sobre cuánto puede disminuir a otros.",
+        "Nueve en el segundo lugar: La perseverancia favorece. Emprender algo trae desgracia. Sin disminuirse a sí mismo, uno es capaz de traer aumento a otros.",
+        "Seis en el tercer lugar: Cuando tres personas viajan juntas, su número disminuye en uno. Cuando un hombre viaja solo, encuentra un compañero.",
+        "Seis en el cuarto lugar: Si un hombre disminuye sus faltas, hace que el otro se apresure a venir y regocijarse. Sin culpa.",
+        "Seis en el quinto lugar: Alguien de hecho lo aumenta. Diez pares de tortugas no pueden oponerse. Suprema buena fortuna.",
+        "Nueve en lo alto: Si uno es aumentado sin que otros sean disminuidos, no hay culpa. La perseverancia trae buena fortuna. Favorece al hombre emprender algo. Uno obtiene sirvientes pero ya no tiene un hogar separado."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Andare velocemente quando i compiti sono finiti è senza colpa. Ma uno deve riflettere su quanto può diminuire gli altri.",
+        "Nove al secondo posto: La perseveranza favorisce. Intraprendere qualcosa porta sventura. Senza diminuire se stesso, uno è capace di portare incremento ad altri.",
+        "Sei al terzo posto: Quando tre persone viaggiano insieme, il loro numero diminuisce di uno. Quando un uomo viaggia solo, trova un compagno.",
+        "Sei al quarto posto: Se un uomo diminuisce le sue colpe, fa sì che l'altro si affretti a venire e rallegrarsi. Nessuna colpa.",
+        "Sei al quinto posto: Qualcuno di fatto lo aumenta. Dieci paia di tartarughe non possono opporsi. Suprema buona fortuna.",
+        "Nove in cima: Se uno è aumentato senza che altri siano diminuiti, non c'è colpa. La perseveranza porta buona fortuna. È favorevole all'uomo intraprendere qualcosa. Si ottengono servitori ma non si ha più una casa separata."
+      ]
     },
     "42": {
       "number": 42,
@@ -2362,7 +3066,25 @@
       ],
       "element": "Wood",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "Favorece al hombre emprender algo. Favorece al hombre cruzar la gran agua.",
+      "judgment_it": "È favorevole all'uomo intraprendere qualcosa. È favorevole all'uomo attraversare la grande acqua.",
+      "lines_es": [
+        "Nueve al principio: Favorece al hombre realizar grandes obras. Suprema buena fortuna. Sin culpa.",
+        "Seis en el segundo lugar: Alguien de hecho lo aumenta; diez pares de tortugas no pueden oponerse. Perseverancia constante trae buena fortuna. El rey lo presenta ante Dios. Buena fortuna.",
+        "Seis en el tercer lugar: Uno se enriquece a través de eventos desafortunados. Sin culpa, si eres sincero y caminas en el medio, e informas con un sello al príncipe.",
+        "Seis en el cuarto lugar: Si caminas en el medio e informas al príncipe, él seguirá. Favorece al hombre ser usado en el traslado de la capital.",
+        "Nueve en el quinto lugar: Si en verdad tienes un corazón bondadoso, no preguntes. Suprema buena fortuna. Verdaderamente, la confianza se acercará a tu virtud.",
+        "Nueve en lo alto: Él no trae aumento a nadie. De hecho, alguien incluso lo golpea. Él no mantiene su corazón constantemente firme. Desgracia."
+      ],
+      "lines_it": [
+        "Nove all'inizio: È favorevole all'uomo realizzare grandi opere. Suprema buona fortuna. Nessuna colpa.",
+        "Sei al secondo posto: Qualcuno di fatto lo aumenta; dieci paia di tartarughe non possono opporsi. Perseveranza costante porta buona fortuna. Il re lo presenta davanti a Dio. Buona fortuna.",
+        "Sei al terzo posto: Si arricchisce attraverso eventi sfortunati. Nessuna colpa, se sei sincero e cammini nel mezzo, e informi con un sigillo al principe.",
+        "Sei al quarto posto: Se cammini nel mezzo e informi il principe, lui seguirà. È favorevole all'uomo essere usato nello spostamento della capitale.",
+        "Nove al quinto posto: Se in verità hai un cuore gentile, non chiedere. Suprema buona fortuna. Veramente, la fiducia si avvicinerà alla tua virtù.",
+        "Nove in cima: Egli non porta incremento a nessuno. Di fatto, qualcuno perfino lo colpisce. Egli non mantiene il suo cuore costantemente fermo. Sventura."
+      ]
     },
     "43": {
       "number": 43,
@@ -2417,7 +3139,25 @@
       ],
       "element": "Metal",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "Uno debe resueltamente hacer saber el asunto en la corte del rey. Debe ser anunciado verazmente. Peligro. Es necesario notificar a la propia ciudad. No favorece recurrir a las armas. Favorece al hombre emprender algo.",
+      "judgment_it": "Si deve risolutamente far conoscere la questione alla corte del re. Deve essere annunciata veracemente. Pericolo. È necessario notificare la propria città. Non favorisce ricorrere alle armi. È favorevole all'uomo intraprendere qualcosa.",
+      "lines_es": [
+        "Nueve al principio: Poderoso en los dedos de los pies que avanzan. Cuando uno va y no es igual a la tarea, comete un error.",
+        "Nueve en el segundo lugar: Un grito de alarma. Armas en la tarde y en la noche. No temas nada.",
+        "Nueve en el tercer lugar: Ser poderoso en los pómulos trae desgracia. El hombre superior está firmemente resuelto. Camina solo y es atrapado por la lluvia. Es salpicado, y la gente murmura contra él. Sin culpa.",
+        "Nueve en el cuarto lugar: No hay piel en sus muslos, y caminar es difícil. Si un hombre se dejara guiar como una oveja, el remordimiento desaparecería. Pero si estas palabras son oídas no serán creídas.",
+        "Nueve en el quinto lugar: Al lidiar con malezas, es necesaria resolución firme. Caminar en el medio permanece libre de culpa.",
+        "Seis en lo alto: No hay grito. Al final viene la desgracia."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Potente nelle dita dei piedi che avanzano. Quando uno va e non è all'altezza del compito, commette un errore.",
+        "Nove al secondo posto: Un grido d'allarme. Armi alla sera e di notte. Non temere nulla.",
+        "Nove al terzo posto: Essere potente nelle guance porta sventura. L'uomo nobile è fermamente risoluto. Cammina solo ed è colto dalla pioggia. È schizzato, e la gente mormora contro di lui. Nessuna colpa.",
+        "Nove al quarto posto: Non c'è pelle sulle sue cosce, e camminare è difficile. Se un uomo si lasciasse guidare come una pecora, il rimorso svanirebbe. Ma se queste parole sono udite non saranno credute.",
+        "Nove al quinto posto: Nel trattare con erbacce, è necessaria risoluzione ferma. Camminare nel mezzo rimane libero da colpa.",
+        "Sei in cima: Non c'è grido. Alla fine viene la sventura."
+      ]
     },
     "44": {
       "number": 44,
@@ -2472,7 +3212,25 @@
       ],
       "element": "Metal",
       "bagua_area": "NW",
-      "feng_shui_area": "Helpful People & Travel"
+      "feng_shui_area": "Helpful People & Travel",
+      "judgment_es": "La doncella es poderosa. No debe casarse con tal doncella.",
+      "judgment_it": "La fanciulla è potente. Non si deve sposare tale fanciulla.",
+      "lines_es": [
+        "Seis al principio: Debe ser frenado con un freno de bronce. La perseverancia trae buena fortuna. Si uno lo deja seguir su curso, experimenta desgracia. Incluso un cerdo flaco tiene en sí para enfurecerse.",
+        "Nueve en el segundo lugar: Hay un pez en el tanque. Sin culpa. No favorece huéspedes.",
+        "Nueve en el tercer lugar: No hay piel en sus muslos, y caminar es difícil. Si uno es consciente del peligro, no se comete gran error.",
+        "Nueve en el cuarto lugar: No hay pez en el tanque. Esto conduce a desgracia.",
+        "Nueve en el quinto lugar: Un melón cubierto con hojas de sauce. Líneas ocultas. Entonces cae a uno desde el cielo.",
+        "Nueve en lo alto: Viene a encontrar con sus cuernos. Humillación. Sin culpa."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Deve essere frenato con un freno di bronzo. La perseveranza porta buona fortuna. Se uno lo lascia seguire il suo corso, sperimenta sventura. Perfino un maiale magro ha in sé da infuriarsi.",
+        "Nove al secondo posto: C'è un pesce nel bacino. Nessuna colpa. Non favorisce ospiti.",
+        "Nove al terzo posto: Non c'è pelle sulle sue cosce, e camminare è difficile. Se uno è consapevole del pericolo, non si commette gran errore.",
+        "Nove al quarto posto: Non c'è pesce nel bacino. Questo conduce a sventura.",
+        "Nove al quinto posto: Un melone coperto con foglie di salice. Linee nascoste. Allora cade a uno dal cielo.",
+        "Nove in cima: Viene ad incontrare con le sue corna. Umiliazione. Nessuna colpa."
+      ]
     },
     "45": {
       "number": 45,
@@ -2527,7 +3285,25 @@
       ],
       "element": "Metal",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "Éxito. El rey se acerca a su templo. Favorece al hombre ver al gran hombre. Esto trae éxito. La perseverancia favorece. Traer grandes ofrendas crea buena fortuna. Favorece al hombre emprender algo.",
+      "judgment_it": "Successo. Il re si avvicina al suo tempio. È favorevole all'uomo vedere il grande uomo. Questo porta successo. La perseveranza favorisce. Portare grandi offerte crea buona fortuna. È favorevole all'uomo intraprendere qualcosa.",
+      "lines_es": [
+        "Seis al principio: Si eres sincero, pero no hasta el final, habrá a veces confusión, a veces reunión. Si llamas, entonces después de un apretón de manos puedes reír de nuevo. No te arrepientas. Ir es sin culpa.",
+        "Seis en el segundo lugar: Dejarse llevar trae buena fortuna y permanece sin culpa. Si uno es sincero, favorece al hombre traer incluso una pequeña ofrenda.",
+        "Seis en el tercer lugar: Reunión entre suspiros. Nada que favoreciera. Ir es sin culpa. Ligera humillación.",
+        "Nueve en el cuarto lugar: Gran buena fortuna. Sin culpa.",
+        "Nueve en el quinto lugar: Si al reunirse uno tiene posición, esto no trae culpa. Si hay algunos que aún no están sinceramente en el trabajo, se necesita perseverancia sublime y duradera. Entonces el remordimiento desaparece.",
+        "Seis en lo alto: Lamentándose y suspirando, torrentes de lágrimas. Sin culpa."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Se sei sincero, ma non fino in fondo, ci sarà a volte confusione, a volte riunione. Se chiami, allora dopo una stretta di mano puoi ridere di nuovo. Non pentirti. Andare è senza colpa.",
+        "Sei al secondo posto: Lasciarsi trascinare porta buona fortuna e rimane senza colpa. Se uno è sincero, è favorevole all'uomo portare anche una piccola offerta.",
+        "Sei al terzo posto: Riunione tra sospiri. Nulla che favorisca. Andare è senza colpa. Leggera umiliazione.",
+        "Nove al quarto posto: Gran buona fortuna. Nessuna colpa.",
+        "Nove al quinto posto: Se nel riunirsi uno ha posizione, questo non porta colpa. Se ci sono alcuni che non sono ancora sinceramente nel lavoro, è necessaria perseveranza sublime e duratura. Allora il rimorso svanisce.",
+        "Sei in cima: Lamentarsi e sospirare, torrenti di lacrime. Nessuna colpa."
+      ]
     },
     "46": {
       "number": 46,
@@ -2582,7 +3358,25 @@
       ],
       "element": "Wood",
       "bagua_area": "SW",
-      "feng_shui_area": "Love & Relationships"
+      "feng_shui_area": "Love & Relationships",
+      "judgment_es": "Supremo éxito. Uno debe ver al gran hombre. No temas. La partida hacia el sur trae buena fortuna.",
+      "judgment_it": "Supremo successo. Si deve vedere il grande uomo. Non temere. La partenza verso sud porta buona fortuna.",
+      "lines_es": [
+        "Seis al principio: Empujar hacia arriba que encuentra confianza trae gran buena fortuna.",
+        "Nueve en el segundo lugar: Si uno es sincero, favorece al hombre traer incluso una pequeña ofrenda. Sin culpa.",
+        "Nueve en el tercer lugar: Uno empuja hacia arriba en una ciudad vacía.",
+        "Seis en el cuarto lugar: El rey le ofrece el Monte Ch'i. Buena fortuna. Sin culpa.",
+        "Seis en el quinto lugar: La perseverancia trae buena fortuna. Uno empuja hacia arriba por pasos.",
+        "Seis en lo alto: Empujar hacia arriba en la oscuridad. Favorece al hombre ser incansablemente perseverante."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Spingere verso l'alto che trova fiducia porta gran buona fortuna.",
+        "Nove al secondo posto: Se uno è sincero, è favorevole all'uomo portare anche una piccola offerta. Nessuna colpa.",
+        "Nove al terzo posto: Si spinge verso l'alto in una città vuota.",
+        "Sei al quarto posto: Il re gli offre il Monte Ch'i. Buona fortuna. Nessuna colpa.",
+        "Sei al quinto posto: La perseveranza porta buona fortuna. Si spinge verso l'alto per passi.",
+        "Sei in cima: Spingere verso l'alto nell'oscurità. È favorevole all'uomo essere instancabilmente perseverante."
+      ]
     },
     "47": {
       "number": 47,
@@ -2637,7 +3431,25 @@
       ],
       "element": "Water",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "Éxito. Perseverancia. El gran hombre trae buena fortuna. Sin culpa. Cuando uno tiene algo que decir, no es creído.",
+      "judgment_it": "Successo. Perseveranza. Il gran uomo porta buona fortuna. Nessuna colpa. Quando uno ha qualcosa da dire, non è creduto.",
+      "lines_es": [
+        "Seis al principio: Uno se sienta oprimido bajo un árbol desnudo y se extravía en un valle sombrío. Por tres años uno no ve nada.",
+        "Nueve en el segundo lugar: Uno es oprimido mientras come y bebe. El hombre con las bandas rojizas de la rodilla acaba de venir. Favorece al hombre ofrecer sacrificio. Empezar trae desgracia. Sin culpa.",
+        "Seis en el tercer lugar: Un hombre se permite ser oprimido por la piedra, y se apoya en espinas y cardos. Entra en su casa y no ve a su esposa. Desgracia.",
+        "Nueve en el cuarto lugar: Él viene muy silenciosamente, oprimido en un carruaje dorado. Humillación, pero el fin es alcanzado.",
+        "Nueve en el quinto lugar: Su nariz y pies están cortados. Opresión a manos del hombre con las bandas púrpuras de la rodilla. La alegría viene suavemente. Favorece al hombre hacer ofrendas y libaciones.",
+        "Seis en lo alto: Él es oprimido por enredaderas trepadoras. Se mueve inseguro y dice: 'El movimiento trae remordimiento.' Si uno siente remordimiento por esto y hace un comienzo, viene la buena fortuna."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Si siede oppresso sotto un albero nudo e si smarrisce in una valle ombrosa. Per tre anni uno non vede nulla.",
+        "Nove al secondo posto: Si è oppressi mentre si mangia e si beve. L'uomo con le fasce rossicce del ginocchio sta proprio arrivando. È favorevole all'uomo offrire sacrificio. Iniziare porta sventura. Nessuna colpa.",
+        "Sei al terzo posto: Un uomo si permette di essere oppresso dalla pietra, e si appoggia su spine e cardi. Entra in casa sua e non vede sua moglie. Sventura.",
+        "Nove al quarto posto: Egli viene molto silenziosamente, oppresso in un carro dorato. Umiliazione, ma la fine è raggiunta.",
+        "Nove al quinto posto: Il suo naso e i piedi sono tagliati. Oppressione per mano dell'uomo con le fasce porporine del ginocchio. La gioia viene dolcemente. È favorevole all'uomo fare offerte e libagioni.",
+        "Sei in cima: Egli è oppresso da viti rampicanti. Si muove insicuro e dice: 'Il movimento porta rimorso.' Se uno sente rimorso per questo e fa un inizio, viene la buona fortuna."
+      ]
     },
     "48": {
       "number": 48,
@@ -2692,7 +3504,25 @@
       ],
       "element": "Water",
       "bagua_area": "N",
-      "feng_shui_area": "Career & Life Path"
+      "feng_shui_area": "Career & Life Path",
+      "judgment_es": "El pueblo puede ser cambiado, pero el pozo no puede ser cambiado. Ni disminuye ni aumenta. Vienen y van y extraen del pozo. Si uno baja casi hasta el agua y la cuerda no llega todo el camino, o el cántaro se rompe, trae desgracia.",
+      "judgment_it": "Il paese può essere cambiato, ma il pozzo non può essere cambiato. Né diminuisce né aumenta. Vanno e vengono e attingono dal pozzo. Se uno scende quasi fino all'acqua e la corda non arriva fino in fondo, o il brocca si rompe, porta sventura.",
+      "lines_es": [
+        "Seis al principio: Uno no bebe el lodo del pozo. Ningún animal viene a un pozo viejo.",
+        "Nueve en el segundo lugar: En la boca del pozo uno dispara peces. El cántaro está roto y gotea.",
+        "Nueve en el tercer lugar: El pozo está limpio, pero nadie bebe de él. Esta es la tristeza de mi corazón, pues podría extraerse de él. Si el rey fuera de mente clara, la buena fortuna podría disfrutarse en común.",
+        "Seis en el cuarto lugar: El pozo está siendo revestido. Sin culpa.",
+        "Nueve en el quinto lugar: En el pozo hay un manantial claro y frío del que uno puede beber.",
+        "Seis en lo alto: Uno extrae del pozo sin impedimento. Es confiable. Suprema buena fortuna."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Non si beve il fango del pozzo. Nessun animale viene a un pozzo vecchio.",
+        "Nove al secondo posto: Alla bocca del pozzo si sparano pesci. La brocca è rotta e gocciola.",
+        "Nove al terzo posto: Il pozzo è pulito, ma nessuno beve da esso. Questa è la tristezza del mio cuore, poiché si potrebbe attingere da esso. Se il re fosse di mente chiara, la buona fortuna potrebbe essere goduta in comune.",
+        "Sei al quarto posto: Il pozzo viene rivestito. Nessuna colpa.",
+        "Nove al quinto posto: Nel pozzo c'è una sorgente chiara e fredda dalla quale si può bere.",
+        "Sei in cima: Si attinge dal pozzo senza impedimento. È affidabile. Suprema buona fortuna."
+      ]
     },
     "49": {
       "number": 49,
@@ -2747,7 +3577,25 @@
       ],
       "element": "Fire",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "En tu propio día eres creído. Supremo éxito, favoreciendo a través de la perseverancia. El remordimiento desaparece.",
+      "judgment_it": "Nel tuo giorno sei creduto. Supremo successo, favorendo attraverso la perseveranza. Il rimorso svanisce.",
+      "lines_es": [
+        "Nueve al principio: Envuelto en la piel de una vaca amarilla.",
+        "Seis en el segundo lugar: Cuando viene el propio día de uno, uno puede crear revolución. Comenzar trae buena fortuna. Sin culpa.",
+        "Nueve en el tercer lugar: Comenzar trae desgracia. La perseverancia trae peligro. Cuando la charla de revolución ha dado tres vueltas, uno puede comprometerse, y los hombres lo creerán.",
+        "Nueve en el cuarto lugar: El remordimiento desaparece. Los hombres lo creen. Cambiar la forma de gobierno trae buena fortuna.",
+        "Nueve en el quinto lugar: El gran hombre cambia como un tigre. Incluso antes de que consulte el oráculo es creído.",
+        "Seis en lo alto: El hombre superior cambia como una pantera. El hombre inferior muda in faccia. Comenzar trae desgracia. Permanecer perseverante trae buena fortuna."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Avvolto nella pelle di una vacca gialla.",
+        "Sei al secondo posto: Quando viene il proprio giorno di uno, si può creare rivoluzione. Iniziare porta buona fortuna. Nessuna colpa.",
+        "Nove al terzo posto: Iniziare porta sventura. La perseveranza porta pericolo. Quando il chiacchiericcio di rivoluzione ha fatto tre giri, ci si può impegnare, e gli uomini lo crederanno.",
+        "Nove al quarto posto: Il rimorso svanisce. Gli uomini lo credono. Cambiare la forma di governo porta buona fortuna.",
+        "Nove al quinto posto: Il gran uomo cambia come una tigre. Anche prima che consulti l'oracolo è creduto.",
+        "Sei in cima: L'uomo nobile cambia come una pantera. L'uomo inferiore muta in faccia. Iniziare porta sventura. Rimanere perseverante porta buona fortuna."
+      ]
     },
     "50": {
       "number": 50,
@@ -2802,7 +3650,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "Suprema buena fortuna. Éxito.",
+      "judgment_it": "Suprema buona fortuna. Successo.",
+      "lines_es": [
+        "Seis al principio: Un ting con las patas vueltas hacia arriba. Favorece la remoción de cosas estancadas. Uno toma una concubina por el bien de su hijo. Sin culpa.",
+        "Nueve en el segundo lugar: Hay comida en el ting. Mis camaradas son envidiosos, pero no pueden hacerme daño. Buena fortuna.",
+        "Nueve en el tercer lugar: El asa del ting está alterada. Uno es impedido en su modo de vida. La grasa del faisán no se come. Una vez que cae la lluvia, el remordimiento se gasta. La buena fortuna viene al final.",
+        "Nueve en el cuarto lugar: Las patas del ting están rotas. La comida del príncipe se derrama y su persona se ensucia. Desgracia.",
+        "Seis en el quinto lugar: El ting tiene asas amarillas, anillos dorados para llevar. La perseverancia favorece.",
+        "Nueve en lo alto: El ting tiene anillos de jade. Gran buena fortuna. Nada que no favoreciera."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Un ting con le gambe rivolte verso l'alto. Favorisce la rimozione di cose stagnanti. Si prende una concubina per il bene di suo figlio. Nessuna colpa.",
+        "Nove al secondo posto: C'è cibo nel ting. I miei compagni sono invidiosi, ma non possono farmi male. Buona fortuna.",
+        "Nove al terzo posto: Il manico del ting è alterato. Si è impediti nel proprio modo di vita. Il grasso del fagiano non si mangia. Una volta che cade la pioggia, il rimorso si consuma. La buona fortuna viene alla fine.",
+        "Nove al quarto posto: Le gambe del ting sono rotte. Il pasto del principe si rovescia e la sua persona si sporca. Sventura.",
+        "Sei al quinto posto: Il ting ha manici gialli, anelli dorati per portare. La perseveranza favorisce.",
+        "Nove in cima: Il ting ha anelli di giada. Gran buona fortuna. Nulla che non favorisca."
+      ]
     },
     "51": {
       "number": 51,
@@ -2857,7 +3723,25 @@
       ],
       "element": "Wood",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "Éxito. Viene el trueno —¡Pérdida! ¡Pérdida! Palabras riendo —¡Pérdida! ¡Pérdida! El trueno aterroriza por cien millas, y él no deja caer la cuchara y el cáliz sacrificiales.",
+      "judgment_it": "Successo. Arriva il tuono —Perdita! Perdita! Parole ridendo —Perdita! Perdita! Il tuono terrorizza per cento miglia, e egli non lascia cadere il cucchiaio e il calice sacrificale.",
+      "lines_es": [
+        "Nueve al principio: Viene el shock —¡oh, oh! Luego siguen palabras riendo —¡ja, ja! Buena fortuna.",
+        "Seis en el segundo lugar: El shock viene trayendo peligro. Cien mil veces pierdes tus tesoros y debes subir las nueve colinas. No vayas en su búsqueda. Después de siete días los recuperarás.",
+        "Seis en el tercer lugar: El shock viene y vuelve a uno distraught. Si el shock estimula a la acción uno permanece libre de desgracia.",
+        "Nueve en el cuarto lugar: El shock está atascado.",
+        "Seis en el quinto lugar: El shock va de acá para allá. Peligro. Sin embargo, nada en absoluto se pierde. Aún así hay cosas que hacer.",
+        "Seis en lo alto: El shock trae ruina y miradas aterrorizadas alrededor. Ir adelante trae desgracia. Si aún no ha tocado el propio cuerpo pero ha alcanzado primero al vecino, no hay culpa. Los compañeros tienen algo de qué hablar."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Arriva lo shock —oh, oh! Poi seguono parole ridendo —ha, ha! Buona fortuna.",
+        "Sei al secondo posto: Lo shock arriva portando pericolo. Centomila volte perdi i tuoi tesori e devi salire le nove colline. Non andare in loro ricerca. Dopo sette giorni li recupererai.",
+        "Sei al terzo posto: Lo shock arriva e rende uno distrutto. Se lo shock stimola all'azione uno rimane libero da sventura.",
+        "Nove al quarto posto: Lo shock è bloccato.",
+        "Sei al quinto posto: Lo shock va di qua e di là. Pericolo. Tuttavia, nulla affatto si perde. Eppure ci sono cose da fare.",
+        "Sei in cima: Lo shock porta rovina e sguardi terrorizzati intorno. Andare avanti porta sventura. Se non ha ancora toccato il proprio corpo ma ha raggiunto prima il vicino, non c'è colpa. I compagni hanno qualcosa di cui parlare."
+      ]
     },
     "52": {
       "number": 52,
@@ -2912,7 +3796,25 @@
       ],
       "element": "Earth",
       "bagua_area": "NE",
-      "feng_shui_area": "Knowledge & Wisdom"
+      "feng_shui_area": "Knowledge & Wisdom",
+      "judgment_es": "Manteniendo su espalda quieta de modo que ya no siente su cuerpo. Él entra en su patio y no ve a su gente. Sin culpa.",
+      "judgment_it": "Tenendo la sua schiena ferma in modo che non senta più il suo corpo. Egli entra nel suo cortile e non vede la sua gente. Nessuna colpa.",
+      "lines_es": [
+        "Seis al principio: Manteniendo sus dedos de los pies quietos. Sin culpa. Continuada perseverancia favorece.",
+        "Seis en el segundo lugar: Manteniendo sus pantorrillas quietas. No puede rescatar a quien sigue. Su corazón no está alegre.",
+        "Nueve en el tercer lugar: Manteniendo sus caderas quietas. Haciendo su sacro rígido. Peligrooso. El corazón se ahoga.",
+        "Seis en el cuarto lugar: Manteniendo su tronco quieto. Sin culpa.",
+        "Seis en el quinto lugar: Manteniendo sus mandíbulas quietas. Las palabras tienen orden. El remordimiento desaparece.",
+        "Nueve en lo alto: Manteniendo quieto de corazón noble. Buena fortuna."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Tenendo le dita dei piedi ferme. Nessuna colpa. Continuata perseveranza favorisce.",
+        "Sei al secondo posto: Tenendo i polpacci fermi. Non può salvare chi segue. Il suo cuore non è allegro.",
+        "Nove al terzo posto: Tenendo i fianchi fermi. Rendendo il sacro rigido. Pericoloso. Il cuore soffoca.",
+        "Sei al quarto posto: Tenendo il tronco fermo. Nessuna colpa.",
+        "Sei al quinto posto: Tenendo le mascelle ferme. Le parole hanno ordine. Il rimorso svanisce.",
+        "Nove in cima: Tenendo fermo di cuore nobile. Buona fortuna."
+      ]
     },
     "53": {
       "number": 53,
@@ -2967,7 +3869,25 @@
       ],
       "element": "Wood",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "La doncella es dada en matrimonio. Buena fortuna. La perseverancia favorece.",
+      "judgment_it": "La fanciulla è data in matrimonio. Buona fortuna. La perseveranza favorisce.",
+      "lines_es": [
+        "Seis al principio: El ganso silvestre se acerca gradualmente a la orilla. El hijo joven está en peligro. Hay charla. Sin culpa.",
+        "Seis en el segundo lugar: El ganso silvestre se acerca gradualmente al acantilado. Comiendo y bebiendo en paz y concordia. Buena fortuna.",
+        "Nueve en el tercer lugar: El ganso silvestre se acerca gradualmente a la meseta. El hombre sale y no regresa. La mujer lleva un niño pero no lo trae al mundo. Desgracia. Favorece al hombre combatir ladrones.",
+        "Seis en el cuarto lugar: El ganso silvestre se acerca gradualmente al árbol. Quizás encontrará una rama plana. Sin culpa.",
+        "Nueve en el quinto lugar: El ganso silvestre se acerca gradualmente a la cumbre. Por tres años la mujer no tiene hijo. Al final nada puede impedirla. Buena fortuna.",
+        "Nueve en lo alto: El ganso silvestre se acerca gradualmente a las alturas de las nubes. Sus plumas pueden usarse para la danza sagrada. Buena fortuna."
+      ],
+      "lines_it": [
+        "Sei all'inizio: L'oca selvatica si avvicina gradualmente alla riva. Il figlio giovane è in pericolo. C'è chiacchiericcio. Nessuna colpa.",
+        "Sei al secondo posto: L'oca selvatica si avvicina gradualmente alla scogliera. Mangiando e bevendo in pace e concordia. Buona fortuna.",
+        "Nove al terzo posto: L'oca selvatica si avvicina gradualmente all'altopiano. L'uomo esce e non ritorna. La donna porta un bambino ma non lo porta al mondo. Sventura. È favorevole all'uomo combattere ladri.",
+        "Sei al quarto posto: L'oca selvatica si avvicina gradualmente all'albero. Forse troverà un ramo piatto. Nessuna colpa.",
+        "Nove al quinto posto: L'oca selvatica si avvicina gradualmente alla cima. Per tre anni la donna non ha figli. Alla fine nulla può impedirle. Buona fortuna.",
+        "Nove in cima: L'oca selvatica si avvicina gradualmente alle altezze delle nuvole. Le sue piume possono essere usate per la danza sacra. Buona fortuna."
+      ]
     },
     "54": {
       "number": 54,
@@ -3022,7 +3942,25 @@
       ],
       "element": "Metal",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "Las empresas traen desgracia. Nada que favoreciera.",
+      "judgment_it": "Le imprese portano sventura. Nulla che favorisca.",
+      "lines_es": [
+        "Nueve al principio: La doncella que se casa como concubina. Un hombre cojo que es capaz de pisar. Las empresas traen buena fortuna.",
+        "Nueve en el segundo lugar: Un hombre tuerto que es capaz de ver. La perseverancia de un hombre oscuro trae buena fortuna.",
+        "Seis en el tercer lugar: La doncella que se casa como esclava. Ella se casa como concubina.",
+        "Nueve en el cuarto lugar: La doncella que se casa prolonga el tiempo asignado. Un matrimonio tardío llega a su debido tiempo.",
+        "Seis en el quinto lugar: El soberano Yo dio su hija en matrimonio. Las vestiduras bordadas de la princesa no eran tan hermosas como las de la criada. La luna que está casi llena trae buena fortuna.",
+        "Seis en lo alto: La mujer sostiene la canasta, pero no hay frutos en ella. El hombre apuñala la oveja, pero no fluye sangre. Nada que actúe para favorecer."
+      ],
+      "lines_it": [
+        "Nove all'inizio: La fanciulla che si sposa come concubina. Un uomo zoppo che è capace di pestare. Le imprese portano buona fortuna.",
+        "Nove al secondo posto: Un uomo guercio che è capace di vedere. La perseveranza di un uomo oscuro porta buona fortuna.",
+        "Sei al terzo posto: La fanciulla che si sposa come schiava. Lei si sposa come concubina.",
+        "Nove al quarto posto: La fanciulla che si sposa prolunga il tempo assegnato. Un matrimonio tardivo arriva al momento dovuto.",
+        "Sei al quinto posto: Il sovrano Io diede sua figlia in matrimonio. I vestiti ricamati della principessa non erano così bellissimi come quelli della cameriera. La luna che è quasi piena porta buona fortuna.",
+        "Sei in cima: La donna tiene il cestino, ma non ci sono frutti in esso. L'uomo pugnala la pecora, ma non scorre sangue. Nulla che agisca per favorire."
+      ]
     },
     "55": {
       "number": 55,
@@ -3077,7 +4015,25 @@
       ],
       "element": "Fire",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "Éxito. El rey alcanza la abundancia. No estés triste. Sé como el sol al mediodía.",
+      "judgment_it": "Successo. Il re raggiunge l'abbondanza. Non essere triste. Sii come il sole a mezzogiorno.",
+      "lines_es": [
+        "Nueve al principio: Cuando un hombre encuentra a su gobernante destinado, pueden estar juntos diez días, y no es un error. Ir encuentra reconocimiento.",
+        "Seis en el segundo lugar: La cortina es de tal plenitud que las estrellas polares pueden verse al mediodía. A través de ir uno encuentra desconfianza y odio. Si uno lo despierta a través de la verdad, viene la buena fortuna.",
+        "Nueve en el tercer lugar: La maleza es de tal abundancia que las estrellas pequeñas pueden verse al mediodía. Él rompe su brazo derecho. Sin culpa.",
+        "Nueve en el cuarto lugar: La cortina es de tal plenitud que las estrellas polares pueden verse al mediodía. Él encuentra a su gobernante, que es de su clase. Buena fortuna.",
+        "Seis en el quinto lugar: Las líneas vienen, la bendición y la fama se acercan. Buena fortuna.",
+        "Seis en lo alto: Su casa está en un estado de abundancia. Él protege a su familia. Mira a través de la puerta y ya no percibe a nadie. Por tres años no ve nada. Desgracia."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Quando un uomo incontra il suo governante destinato, possono stare insieme dieci giorni, e non è un errore. Andare incontra riconoscimento.",
+        "Sei al secondo posto: La tenda è di tale pienezza che le stelle polari possono essere viste a mezzogiorno. Attraverso l'andare uno incontra diffidenza e odio. Se uno lo sveglia attraverso la verità, viene la buona fortuna.",
+        "Nove al terzo posto: Il sottobosco è di tale abbondanza che le stelle piccole possono essere viste a mezzogiorno. Egli rompe il suo braccio destro. Nessuna colpa.",
+        "Nove al quarto posto: La tenda è di tale pienezza che le stelle polari possono essere viste a mezzogiorno. Egli incontra il suo governante, che è della sua specie. Buona fortuna.",
+        "Sei al quinto posto: Le linee vengono, la benedizione e la fama si avvicinano. Buona fortuna.",
+        "Sei in cima: La sua casa è in uno stato di abbondanza. Egli protegge la sua famiglia. Guarda attraverso la porta e non percepisce più nessuno. Per tre anni non vede nulla. Sventura."
+      ]
     },
     "56": {
       "number": 56,
@@ -3132,7 +4088,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "Éxito a través de la pequeñez. La perseverancia trae buena fortuna al caminante.",
+      "judgment_it": "Successo attraverso la piccolezza. La perseveranza porta buona fortuna al viandante.",
+      "lines_es": [
+        "Seis al principio: Si el caminante se ocupa de cosas triviales, atrae la desgracia sobre sí mismo.",
+        "Seis en el segundo lugar: El caminante llega a una posada. Tiene sus pertenencias con él. Gana la constancia de un joven sirviente.",
+        "Nueve en el tercer lugar: La posada del caminante se quema. Pierde la constancia de su joven sirviente. Peligro.",
+        "Nueve en el cuarto lugar: El caminante descansa en un refugio. Obtiene sus pertenencias y un hacha. Mi corazón no está alegre.",
+        "Seis en el quinto lugar: Él dispara a un faisán. Caé con la primera flecha. Al final esto trae tanto alabanza como oficio.",
+        "Nueve en lo alto: El nido del pájaro se quema. El caminante ríe primero, luego debe lamentarse y llorar. A través de la descuido pierde su vaca. Desgracia."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Se il viandante si occupa di cose banali, attira la sventura su sé stesso.",
+        "Sei al secondo posto: Il viandante arriva a una locanda. Ha i suoi averi con sé. Vince la costanza di un giovane servitore.",
+        "Nove al terzo posto: La locanda del viandante brucia. Perde la costanza del suo giovane servitore. Pericolo.",
+        "Nove al quarto posto: Il viandante riposa in un rifugio. Ottiene i suoi averi e un'ascia. Il mio cuore non è allegro.",
+        "Sei al quinto posto: Egli spara a un fagiano. Cade con la prima freccia. Alla fine questo porta sia lode che carica.",
+        "Nove in cima: Il nido dell'uccello brucia. Il viandante ride prima, poi deve lamentarsi e piangere. Attraverso la trascuratezza perde la sua mucca. Sventura."
+      ]
     },
     "57": {
       "number": 57,
@@ -3187,7 +4161,25 @@
       ],
       "element": "Wood",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "Éxito a través de lo que es pequeño. Favorece al hombre tener adónde ir. Favorece al hombre ver al gran hombre.",
+      "judgment_it": "Successo attraverso ciò che è piccolo. È favorevole all'uomo avere dove andare. È favorevole all'uomo vedere il grande uomo.",
+      "lines_es": [
+        "Seis al principio: Al avanzar y al retroceder, la perseverancia de un guerrero favorece.",
+        "Nueve en el segundo lugar: Penetración bajo la cama. Sacerdotes y magos son usados en gran número. Buena fortuna. Sin culpa.",
+        "Nueve en el tercer lugar: Penetración repetida. Humillación.",
+        "Seis en el cuarto lugar: El remordimiento desaparece. Durante la caza se capturan tres tipos de presa.",
+        "Nueve en el quinto lugar: La perseverancia trae buena fortuna. El remordimiento desaparece. Nada que no favoreciera. No hay comienzo, pero un fin. Antes del cambio, tres días. Después del cambio, tres días. Buena fortuna.",
+        "Nueve en lo alto: Penetración bajo la cama. Pierde sus pertenencias y su hacha. La perseverancia trae desgracia."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Nell'avanzare e nel retrocedere, la perseveranza di un guerriero favorisce.",
+        "Nove al secondo posto: Penetrazione sotto il letto. Sacerdoti e maghi sono usati in gran numero. Buona fortuna. Nessuna colpa.",
+        "Nove al terzo posto: Penetrazione ripetuta. Umiliazione.",
+        "Sei al quarto posto: Il rimorso svanisce. Durante la caccia si catturano tre tipi di preda.",
+        "Nove al quinto posto: La perseveranza porta buona fortuna. Il rimorso svanisce. Nulla che non favorisca. Non c'è inizio, ma una fine. Prima del cambiamento, tre giorni. Dopo il cambiamento, tre giorni. Buona fortuna.",
+        "Nove in cima: Penetrazione sotto il letto. Perde i suoi averi e la sua ascia. La perseveranza porta sventura."
+      ]
     },
     "58": {
       "number": 58,
@@ -3242,7 +4234,25 @@
       ],
       "element": "Metal",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "Éxito. La perseverancia es favorable.",
+      "judgment_it": "Successo. La perseveranza è favorevole.",
+      "lines_es": [
+        "Nueve al principio: Alegría contenta. Buena fortuna.",
+        "Nueve en el segundo lugar: Alegría sincera. Buena fortuna. El remordimiento desaparece.",
+        "Seis en el tercer lugar: Alegría venidera. Desgracia.",
+        "Nueve en el cuarto lugar: Alegría que es ponderada no está en paz. Después de librarse de errores un hombre tiene alegría.",
+        "Nueve en el quinto lugar: Sinceridad hacia influencias disgregantes es peligrosa.",
+        "Seis en lo alto: Alegría seductora."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Gioia contenta. Buona fortuna.",
+        "Nove al secondo posto: Gioia sincera. Buona fortuna. Il rimorso svanisce.",
+        "Sei al terzo posto: Gioia veniente. Sventura.",
+        "Nove al quarto posto: Gioia che è ponderata non è in pace. Dopo essersi liberato di errori un uomo ha gioia.",
+        "Nove al quinto posto: Sincerità verso influenze disgreganti è pericolosa.",
+        "Sei in cima: Gioia seducente."
+      ]
     },
     "59": {
       "number": 59,
@@ -3297,7 +4307,25 @@
       ],
       "element": "Water",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "Éxito. El rey se acerca a su templo. Favorece al hombre cruzar la gran agua. La perseverancia favorece.",
+      "judgment_it": "Successo. Il re si avvicina al suo tempio. È favorevole all'uomo attraversare la grande acqua. La perseveranza favorisce.",
+      "lines_es": [
+        "Seis al principio: Él trae ayuda con la fuerza de un caballo. Buena fortuna.",
+        "Nueve en el segundo lugar: En la disolución, él se apresura a aquello que lo apoya. El remordimiento desaparece.",
+        "Seis en el tercer lugar: Él disuelve su yo. Sin remordimiento.",
+        "Seis en el cuarto lugar: Él disuelve su vínculo con su grupo. Suprema buena fortuna. La dispersión conduce a su vez a la acumulación. Esto es algo que los hombres ordinarios no piensan.",
+        "Nueve en el quinto lugar: Sus gritos fuertes son tan disolventes como el sudor. ¡Disolución! Un rey permanece sin culpa.",
+        "Nueve en lo alto: Él disuelve su sangre. Partir, manteniendo distancia, salir, es sin culpa."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Egli porta aiuto con la forza di un cavallo. Buona fortuna.",
+        "Nove al secondo posto: Nella dissoluzione, egli si affretta verso ciò che lo sostiene. Il rimorso svanisce.",
+        "Sei al terzo posto: Egli dissolve il suo sé. Nessun rimorso.",
+        "Sei al quarto posto: Egli dissolve il suo legame con il suo gruppo. Suprema buona fortuna. La dispersione conduce a sua volta all'accumulo. Questo è qualcosa che gli uomini ordinari non pensano.",
+        "Nove al quinto posto: Le sue grida forti sono tanto dissolventi quanto il sudore. Dissoluzione! Un re permane senza colpa.",
+        "Nove in cima: Egli dissolve il suo sangue. Partire, mantenendo distanza, uscire, è senza colpa."
+      ]
     },
     "60": {
       "number": 60,
@@ -3352,7 +4380,25 @@
       ],
       "element": "Water",
       "bagua_area": "W",
-      "feng_shui_area": "Children & Creativity"
+      "feng_shui_area": "Children & Creativity",
+      "judgment_es": "Éxito. La limitación que irrita no debe ser perseverada.",
+      "judgment_it": "Successo. La limitazione che irrita non deve essere perseverata.",
+      "lines_es": [
+        "Nueve al principio: No salir de la puerta y el patio es sin culpa.",
+        "Nueve en el segundo lugar: No salir de la puerta y el patio trae desgracia.",
+        "Seis en el tercer lugar: Quien no conoce limitación tendrá causa para lamentarse. Sin culpa.",
+        "Seis en el cuarto lugar: Limitación contenta. Éxito.",
+        "Nueve en el quinto lugar: Limitación dulce trae buena fortuna. Ir trae estima.",
+        "Seis en lo alto: Limitación que irrita. La perseverancia trae desgracia. El remordimiento desaparece."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Non uscire dalla porta e dal cortile è senza colpa.",
+        "Nove al secondo posto: Non uscire dal cancello e dal cortile porta sventura.",
+        "Sei al terzo posto: Chi non conosce limitazione avrà causa per lamentarsi. Nessuna colpa.",
+        "Sei al quarto posto: Limitazione contenta. Successo.",
+        "Nove al quinto posto: Limitazione dolce porta buona fortuna. Andare porta stima.",
+        "Sei in cima: Limitazione che irrita. La perseveranza porta sventura. Il rimorso svanisce."
+      ]
     },
     "61": {
       "number": 61,
@@ -3407,7 +4453,25 @@
       ],
       "element": "Metal",
       "bagua_area": "SE",
-      "feng_shui_area": "Wealth & Abundance"
+      "feng_shui_area": "Wealth & Abundance",
+      "judgment_es": "Cerdos y peces. Buena fortuna. Favorece al hombre cruzar la gran agua. La perseverancia favorece.",
+      "judgment_it": "Maiali e pesci. Buona fortuna. È favorevole all'uomo attraversare la grande acqua. La perseveranza favorisce.",
+      "lines_es": [
+        "Nueve al principio: Estar preparado trae buena fortuna. Si hay designios secretos, es inquietante.",
+        "Nueve en el segundo lugar: Una grulla llamando en la sombra. Su cría le responde. Tengo una buena copa. La compartiré contigo.",
+        "Seis en el tercer lugar: Él encuentra un camarada. Ahora toca el tambor, ahora se detiene. Ahora solloza, ahora canta.",
+        "Seis en el cuarto lugar: La luna está casi llena. El caballo de tiro se extravía. Sin culpa.",
+        "Nueve en el quinto lugar: Él posee verdad, que une. Sin culpa.",
+        "Nueve en lo alto: Canto de gallo perforando al cielo. La perseverancia trae desgracia."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Essere preparati porta buona fortuna. Se ci sono disegni segreti, è inquietante.",
+        "Nove al secondo posto: Una gru che chiama nell'ombra. Il suo piccolo le risponde. Ho una buona coppa. La condividerò con te.",
+        "Sei al terzo posto: Egli trova un camerata. Ora batte il tamburo, ora si ferma. Ora singhiozza, ora canta.",
+        "Sei al quarto posto: La luna è quasi piena. Il cavallo da tiro si smarrisce. Nessuna colpa.",
+        "Nove al quinto posto: Egli possiede verità, che unisce. Nessuna colpa.",
+        "Nove in cima: Canto di gallo che perfora il cielo. La perseveranza porta sventura."
+      ]
     },
     "62": {
       "number": 62,
@@ -3462,7 +4526,25 @@
       ],
       "element": "Wood",
       "bagua_area": "E",
-      "feng_shui_area": "Family & Health"
+      "feng_shui_area": "Family & Health",
+      "judgment_es": "Éxito. La perseverancia favorece. Las cosas pequeñas pueden hacerse; las grandes no deben hacerse. El pájaro volador trae el mensaje: No es bueno esforzarse hacia arriba, es bueno permanecer abajo. Gran buena fortuna.",
+      "judgment_it": "Successo. La perseveranza favorisce. Le cose piccole possono essere fatte; le grandi non devono essere fatte. L'uccello volante porta il messaggio: Non è bene sforzarsi verso l'alto, è bene rimanere in basso. Gran buona fortuna.",
+      "lines_es": [
+        "Seis al principio: El pájaro volador trae desgracia sobre sí mismo.",
+        "Seis en el segundo lugar: Ella pasa por su ancestro y encuentra a su ancestria. Él no alcanza a su príncipe y encuentra al oficial. Sin culpa.",
+        "Nueve en el tercer lugar: Si uno no es extraordinariamente cuidadoso, alguien puede venir por detrás y golpearlo. Desgracia.",
+        "Nueve en el cuarto lugar: Sin culpa. Lo encuentra sin pasar de largo. Ir trae peligro. Debe estar en guardia. No actúe. Sea constantemente perseverante.",
+        "Seis en el quinto lugar: Nubes densas, sin lluvia de nuestro territorio occidental. El príncipe dispara y acierta a quien está en la cueva.",
+        "Seis en lo alto: Él lo pasa de largo, sin encontrarlo. El pájaro volador lo deja. Desgracia. Esto significa mala suerte y lesión."
+      ],
+      "lines_it": [
+        "Sei all'inizio: L'uccello volante porta sventura su sé stesso.",
+        "Sei al secondo posto: Lei passa davanti al suo antenato e incontra la sua antenata. Egli non raggiunge il suo principe e incontra l'ufficiale. Nessuna colpa.",
+        "Nove al terzo posto: Se uno non è straordinariamente cauto, qualcuno può venire da dietro e colpirlo. Sventura.",
+        "Nove al quarto posto: Nessuna colpa. Lo incontra senza passare oltre. Andare porta pericolo. Deve stare in guardia. Non agire. Sii costantemente perseverante.",
+        "Sei al quinto posto: Nuvole fitte, senza pioggia dal nostro territorio occidentale. Il principe spara e colpisce chi è nella caverna.",
+        "Sei in cima: Egli lo passa oltre, senza incontrarlo. L'uccello volante lo lascia. Sventura. Questo significa sfortuna e ferita."
+      ]
     },
     "63": {
       "number": 63,
@@ -3522,7 +4604,25 @@
       ],
       "element": "Fire",
       "bagua_area": "N",
-      "feng_shui_area": "Career & Life Path"
+      "feng_shui_area": "Career & Life Path",
+      "judgment_es": "Éxito en asuntos pequeños. La perseverancia favorece. Al principio buena fortuna. Al final desorden.",
+      "judgment_it": "Successo in questioni piccole. La perseveranza favorisce. All'inizio buona fortuna. Alla fine disordine.",
+      "lines_es": [
+        "Nueve al principio: Él frena sus ruedas. Mete su cola en el agua. Sin culpa.",
+        "Seis en el segundo lugar: La mujer pierde la cortina de su carruaje. No corras tras ella; al séptimo día la conseguirás.",
+        "Nueve en el tercer lugar: El Ancestro Ilustre disciplina al País del Diablo. Después de tres años lo conquista. No deben emplearse personas inferiores.",
+        "Seis en el cuarto lugar: Las ropas más finas se convierten en harapos. Ten cuidado todo el día.",
+        "Nueve en el quinto lugar: El vecino del este que sacrifica un buey no alcanza tanta felicidad real como el vecino del oeste con su pequeña ofrenda.",
+        "Seis en lo alto: Mete su cabeza en el agua. Peligro."
+      ],
+      "lines_it": [
+        "Nove all'inizio: Egli frena le sue ruote. Mette la sua coda nell'acqua. Nessuna colpa.",
+        "Sei al secondo posto: La donna perde la tendina del suo carro. Non corrergli dietro; al settimo giorno la otterrai.",
+        "Nove al terzo posto: L'Antenato Illustre disciplina il Paese del Diavolo. Dopo tre anni lo conquista. Non devono essere impiegate persone inferiori.",
+        "Sei al quarto posto: I vestiti più fini si trasformano in stracci. Stai attento tutto il giorno.",
+        "Nove al quinto posto: Il vicino di est che sacrifica un bue non raggiunge tanta felicità reale quanto il vicino di ovest con la sua piccola offerta.",
+        "Sei in cima: Mette la testa nell'acqua. Pericolo."
+      ]
     },
     "64": {
       "number": 64,
@@ -3582,7 +4682,25 @@
       ],
       "element": "Fire",
       "bagua_area": "S",
-      "feng_shui_area": "Fame & Reputation"
+      "feng_shui_area": "Fame & Reputation",
+      "judgment_es": "Éxito. Pero si el pequeño zorro, después de casi completar el cruce, mete su cola en el agua, no hay nada que favoreciera.",
+      "judgment_it": "Successo. Ma se la piccola volpe, dopo aver quasi completato la traversata, mette la coda nell'acqua, non c'è nulla che favorisca.",
+      "lines_es": [
+        "Seis al principio: Mete su cola en el agua. Humillante.",
+        "Nueve en el segundo lugar: Él frena sus ruedas. La perseverancia trae buena fortuna.",
+        "Seis en el tercer lugar: Antes de la terminación, atacar trae desgracia. Favorece al hombre cruzar la gran agua.",
+        "Nueve en el cuarto lugar: La perseverancia trae buena fortuna. El remordimiento desaparece. Shock, así para disciplinar al País del Diablo. Por tres años, grandes reinos son otorgados.",
+        "Seis en el quinto lugar: La perseverancia trae buena fortuna. Sin remordimiento. La luz del hombre superior es verdadera. Buena fortuna.",
+        "Nueve en lo alto: Hay bebida de vino en genuina confianza. Sin culpa. Pero si uno moja su cabeza, la pierde, en verdad."
+      ],
+      "lines_it": [
+        "Sei all'inizio: Mette la coda nell'acqua. Umiliante.",
+        "Nove al secondo posto: Egli frena le sue ruote. La perseveranza porta buona fortuna.",
+        "Sei al terzo posto: Prima del completamento, attaccare porta sventura. È favorevole all'uomo attraversare la grande acqua.",
+        "Nove al quarto posto: La perseveranza porta buona fortuna. Il rimorso svanisce. Shock, così per disciplinare il Paese del Diavolo. Per tre anni, grandi regni sono assegnati.",
+        "Sei al quinto posto: La perseveranza porta buona fortuna. Nessun rimorso. La luce dell'uomo nobile è vera. Buona fortuna.",
+        "Nove in cima: C'è bevuta di vino in genuina fiducia. Nessuna colpa. Ma se uno bagna la testa, la perde, in verità."
+      ]
     }
   },
   "trigram_reference": {
