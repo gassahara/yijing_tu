@@ -1833,6 +1833,25 @@ class UI {
                 }).catch(err => console.error('[UI] Failed to translate remedy content:', err));
             }
 
+            // Get instructions or generate type-specific fallback
+            let instructionsText = remedy.instructions || remedy.application || fuluContent.instructions;
+            if (!instructionsText) {
+                if (typeof DAOIST_REMEDIES_DB !== 'undefined') {
+                    let localRecord = null;
+                    if (isTalisman && DAOIST_REMEDIES_DB.fulu) {
+                        localRecord = DAOIST_REMEDIES_DB.fulu.find(f => f.id === remedy.id);
+                    } else if (isFengShui && DAOIST_REMEDIES_DB.fengshui) {
+                        localRecord = DAOIST_REMEDIES_DB.fengshui.find(f => f.id === remedy.id);
+                    }
+                    if (localRecord?.instructions) {
+                        instructionsText = localRecord.instructions;
+                    }
+                }
+                if (!instructionsText) {
+                    instructionsText = this._generateTypeSpecificInstructions(remedy, displayLang);
+                }
+            }
+
             html += `<div class="remedy-item-wrapper ${accentClass}">
                 <div class="remedy-type-header"><span class="remedy-icon-circle">${icon}</span><h3>${typeLabel}</h3></div>
                 <div class="remedy-relevance-box"><span class="relevance-label">${t.relevance || 'Relevance'}:</span><p>${this.formatMarkdownInline(remedy.relevance || remedy.description || t.noRelevanceAvailable || 'This remedy supports energetic balance based on the hexagram wisdom.')}</p></div>
@@ -1845,7 +1864,7 @@ class UI {
                         <div class="remedy-name-title"><span class="zh">${remedyNameZh}</span>${remedyNameZh ? `<span class="pinyin">(${remedy.pinyin || ''})</span>` : ''}<div class="en">${remedyName}</div></div>
                         <div class="remedy-description-text">${this.formatParagraphs(remedy.description)}</div>
                         ${remedy.application ? `<div class="remedy-detail-block"><strong>${t.application}:</strong><p>${this.formatMarkdownInline(remedy.application)}</p></div>` : ''}
-                        ${remedy.instructions ? `<div class="remedy-instructions-box"><strong>${t.instructions}:</strong><p>${this.formatMarkdownInline(remedy.instructions)}</p></div>` : ''}
+                        <div class="remedy-instructions-box"><strong>${t.instructions}:</strong><p>${this.formatMarkdownInline(instructionsText)}</p></div>
                         <div class="remedy-source-footer"><strong>${t.source}:</strong> ${this._formatSource(remedy.source)}${remedy.verification ? ` <span class="verif-tag">${remedy.verification}</span>` : ''}</div>
                     </div>
                 </div>
@@ -2196,6 +2215,42 @@ class UI {
             return translation || remedy.name;
         }
         return String(remedy.name);
+    }
+
+    /**
+     * Generate type-specific instructions when none are available from the database.
+     * Provides meaningful fallback content instead of generic placeholder text.
+     */
+    static _generateTypeSpecificInstructions(remedy, lang) {
+        const t = I18N[lang] || I18N['en'];
+        const tEn = I18N['en'];
+        const type = remedy?.type || 'general';
+        const remedyName = this._resolveRemedyName(remedy, 'en');
+        
+        const instructions = {
+            fulu: {
+                en: `**Preparation:** Purify the space and gather rice paper, cinnabar ink, and a brush consecrated through meditation.\n\n**Invocation:** Face the direction associated with your Day Master element. Recite the remedy name three times to activate its energy signature.\n\n**Application:** The ${remedyName} talisman works on the energetic level to harmonize imbalances indicated in your reading. Display in the appropriate sector or carry with intention.\n\n**Duration:** Allow 49 days (one complete qi cycle) for full energetic integration. Refresh or replace seasonally.`,
+                es: `**Preparación:** Purifica el espacio y reúne papel de arroz, tinta de cinabrio y un pincel consagrado mediante la meditación.\n\n**Invocación:** Enfrenta la dirección asociada con el elemento de tu Amo del Día. Recita el nombre del remedio tres veces para activar su firma energética.\n\n**Aplicación:** El talismán ${remedyName} funciona a nivel energético para armonizar desequilibrios indicados en tu lectura. Muéstralo en el sector apropiado o llévalo con intención.\n\n**Duración:** Permite 49 días (un ciclo de qi completo) para la integración energética completa. Renueva o reemplaza estacionalmente.`,
+                it: `**Preparazione:** Purifica lo spazio e raccogli carta di riso, inchiostro di cinabro e un pennello consacrato attraverso la meditazione.\n\n**Invocazione:** Rivolgiti verso la direzione associata all'elemento del tuo Signore del Giorno. Recita il nome del rimedio tre volte per attivare la sua firma energetica.\n\n**Applicazione:** Il talismano ${remedyName} agisce a livello energetico per armonizzare gli squilibri indicati nella tua lettura. Esporlo nel settore appropriato o portarlo con intenzione.\n\n**Durata:** Consenti 49 giorni (un ciclo qi completo) per l'integrazione energetica completa. Rinnovare o sostituire stagionalmente.`,
+                zh: `**准备：**净化空间，准备宣纸、朱砂墨和通过冥想 consecrated 的毛笔。\n\n** invocation：**面向与你日主元素相关的方向。念诵 remedy 名称三次以激活其能量特征。\n\n**应用：**${remedyName} 符箓在能量层面运作，以协调解读中指示的不平衡。展示在适当的 sector 或带着 intention 携带。\n\n**持续时间：**允许 49 天（一个完整的 qi 周期）以进行完全的能量整合。季节性刷新或更换。`
+            },
+            fengshui: {
+                en: `**Space Assessment:** Identify the bagua sectors mentioned in your reading that need energetic balancing. Note any conflicting elements in your current space arrangement.\n\n**Implementation:** Place the ${remedyName} remedy in the designated sector (refer to the bagua diagram). Ensure the area is clean and unobstructed.\n\n**Activation:** On an auspicious day (avoid personal clash days), open windows to allow qi flow. Position the remedy while focusing on your intention from the reading.\n\n**Maintenance:** Keep the space dust-free. Replace or refresh the remedy when you notice diminished effectiveness or at seasonal transitions.`,
+                es: `**Evaluación del Espacio:** Identifica los sectores del bagua mencionados en tu lectura que necesitan equilibrio energético. Observa cualquier elemento conflictivo en tu disposición actual del espacio.\n\n**Implementación:** Coloca el remedio ${remedyName} en el sector designado (consulta el diagrama del bagua). Asegúrate de que el área esté limpia y despejada.\n\n**Activación:** En un día auspicioso (evita días de conflicto personal), abre las ventanas para permitir el flujo de qi. Posiciona el remedio mientras te enfocas en tu intención de la lectura.\n\n**Mantenimiento:** Mantén el espacio libre de polvo. Reemplaza o renueva el remedio cuando notes eficacia disminuida o en transiciones estacionales.`,
+                it: `**Valutazione dello Spazio:** Identifica i settori del bagua menzionati nella tua lettura che necessitano equilibrio energetico. Osserva eventuali elementi in conflitto nella tua disposizione spaziale attuale.\n\n**Implementazione:** Posiziona il rimedio ${remedyName} nel settore designato (consulta il diagramma del bagua). Assicurati che l'area sia pulita e priva di ostacoli.\n\n**Attivazione:** In un giorno propizio (evita i giorni di conflitto personale), apri le finestre per permettere il flusso di qi. Posiziona il rimedio concentrandoti sull'intenzione della tua lettura.\n\n**Manutenzione:** Mantieni lo spazio privo di polvere. Sostituisci o rinnova il rimedio quando noti efficacia diminuita o alle transizioni stagionali.`,
+                zh: `**空间评估：**识别解读中提到的需要能量平衡的八卦 sector。注意当前空间布置中的任何冲突元素。\n\n**实施：**将 ${remedyName} remedy 放置在指定的 sector（参考八卦图）。确保区域清洁无障碍。\n\n**激活：**在吉利的日子（避免个人冲煞日），打开窗户让 qi 流动。放置 remedy 时专注于解读中的 intention。\n\n**维护：**保持空间无尘。当注意到效果减弱或在季节转换时更换或刷新 remedy。`
+            },
+            medicine: {
+                en: `**Constitutional Assessment:** Consider your Five Elements balance from the reading. The ${remedyName} addresses patterns related to your dominant or deficient elements.\n\n**Preparation:** Source high-quality ingredients from reputable suppliers. Follow traditional preparation methods - timing matters (morning for yang tonics, evening for yin nourishments).\n\n**Administration:** Begin with small amounts to test tolerance. Best taken on an empty stomach or as directed by the specific formula.\n\n**Contraindications:** Not recommended during acute illness, pregnancy, or without consultation if taking pharmaceuticals. Discontinue if adverse reactions occur.`,
+                es: `**Evaluación Constitucional:** Considera tu equilibrio de los Cinco Elementos de la lectura. El ${remedyName} aborda patrones relacionados con tus elementos dominantes o deficientes.\n\n**Preparación:** Obtén ingredientes de alta calidad de proveedores reputados. Sigue métodos de preparación tradicionales - el tiempo importa (mañana para tónicos yang, noche para nutriciones yin).\n\n**Administración:** Comienza con pequeñas cantidades para probar la tolerancia. Mejor tomar con el estómago vacío o según lo indicado por la fórmula específica.\n\n**Contraindicaciones:** No recomendado durante enfermedad aguda, embarazo o sin consulta si tomas medicamentos. Suspender si ocurren reacciones adversas.`,
+                it: `**Valutazione Costituzionale:** Considera il tuo equilibrio dei Cinque Elementi dalla lettura. Il ${remedyName} affronta schemi legati ai tuoi elementi dominanti o carenti.\n\n**Preparazione:** Procurati ingredienti di alta qualità da fornitori affidabili. Segui i metodi di preparazione tradizionali - la tempistica conta (mattina per i tonici yang, sera per i nutrimenti yin).\n\n**Somministrazione:** Inizia con piccole quantità per testare la tolleranza. Meglio assumere a stomaco vuoto o come indicato dalla formula specifica.\n\n**Controindicazioni:** Non raccomandato durante malattia acuta, gravidanza o senza consulto se si assumono farmaci. Sospendere in caso di reazioni avverse.`,
+                zh: `**体质评估：**考虑解读中你的五行平衡。${remedyName} 解决与你主导或不足元素相关的模式。\n\n**准备：**从信誉良好的供应商处获取高质量成分。遵循传统制备方法 - 时间很重要（早上用于 yang 补品，晚上用于 yin 滋养）。\n\n**服用：**从小量开始测试耐受性。最好空腹服用或按照特定 formula 的指示。\n\n**禁忌：**急性疾病、怀孕期间或如果服用药物未经咨询不推荐。如果出现不良反应则停止。`
+            }
+        };
+        
+        // Get instructions for the specific type and language, fallback to English
+        const typeInstructions = instructions[type] || instructions.fulu;
+        return typeInstructions[lang] || typeInstructions.en;
     }
 
     // Format source object or string for display
@@ -3908,13 +3963,37 @@ class UI {
                                 <strong>${t.application}:</strong>
                                 <p>${this.formatMarkdownInline(remedy.application)}</p>
                             </div>` : ''}
-                            ${(remedy.instructions || remedy.application) ? `<div class="remedy-instructions-box">
+                            ${(() => {
+                                // Get instructions from various sources or generate type-specific fallback
+                                let instructionsText = remedy.instructions || remedy.application || fuluContent.instructions;
+                                let isGenerated = false;
+                                
+                                if (!instructionsText) {
+                                    // Try to find in local DB
+                                    if (typeof DAOIST_REMEDIES_DB !== 'undefined') {
+                                        let localRecord = null;
+                                        if (isTalisman && DAOIST_REMEDIES_DB.fulu) {
+                                            localRecord = DAOIST_REMEDIES_DB.fulu.find(f => f.id === remedy.id);
+                                        } else if (isFengShui && DAOIST_REMEDIES_DB.fengshui) {
+                                            localRecord = DAOIST_REMEDIES_DB.fengshui.find(f => f.id === remedy.id);
+                                        }
+                                        if (localRecord?.instructions) {
+                                            instructionsText = localRecord.instructions;
+                                        }
+                                    }
+                                    
+                                    // Generate type-specific instructions as last resort
+                                    if (!instructionsText) {
+                                        instructionsText = this._generateTypeSpecificInstructions(remedy, displayLang);
+                                        isGenerated = true;
+                                    }
+                                }
+                                
+                                return `<div class="remedy-instructions-box ${isGenerated ? 'remedy-instructions-generated' : ''}">
                                 <strong>${t.instructions || 'Instructions'}:</strong>
-                                <p>${this.formatMarkdownInline(remedy.instructions || remedy.application || t.noInstructionsAvailable || 'Apply according to traditional practice.')}</p>
-                            </div>` : `<div class="remedy-instructions-box remedy-instructions-missing">
-                                <strong>${t.instructions || 'Instructions'}:</strong>
-                                <p class="instructions-placeholder">${t.noInstructionsAvailable || 'Instructions not available. Apply according to traditional practice or consult a qualified practitioner.'}</p>
-                            </div>`}
+                                ${this.formatMarkdownInline(instructionsText)}
+                            </div>`;
+                            })()}
                             <div class="remedy-source-footer">
                                 <strong>${t.source}:</strong> ${this._formatSource(remedy.source)}${remedy.verification ? ` <span class="verif-tag">${remedy.verification}</span>` : ''}
                             </div>
