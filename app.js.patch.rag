@@ -1,0 +1,51 @@
+--- a/yijing_tu/app.js
++++ b/yijing_tu/app.js
+@@ -1053,6 +1053,23 @@ class App {
+             // COMPOUNDED ANALYSIS PIPELINE
+             console.log('[App.performCast] Starting Compounded Analysis Pipeline...');
+             this.loadingOverlay.logDebug('Initiating core astrological compounding...', 'info');
++            
++            // ==========================================
++            // RAG PRE-FETCH: Fetch relevant facts in parallel
++            // This reduces backend function time by providing
++            // pre-filtered context
++            // ==========================================
++            const ragPromise = (async () => {
++                if (window.ragIntegration && this.currentReading?.question) {
++                    this.loadingOverlay.addProcess('rag', 'Fetching relevant knowledge...');
++                    const ragData = await window.ragIntegration.fetchRelevantFacts({
++                        question: this.currentReading.question,
++                        hex: this.currentReading.hex,
++                        tradition: 'daoist'
++                    });
++                    this.ragContext = ragData; // Store for later use
++                    this.loadingOverlay.completeProcess('rag');
++                    console.log(`[RAG] Pre-fetched ${ragData.facts?.length || 0} relevant facts`);
++                }
++            })();
+ 
+             this.loadingOverlay.addProcess('astrology', 'Querying Chinese astrology data (BaZi, PaGua, Five Elements)');
+             this.loadingOverlay.addProcess('ai', 'Requesting AI interpretation with compounded context');
+@@ -2347,6 +2364,22 @@ class App {
+             // STEP 1: Get AI response (with retry)
+             console.log('[PIPELINE] Step 1/3: Getting AI response...');
+             
++            // ==========================================
++            // Add RAG context to request if available
++            // ==========================================
++            if (this.ragContext && this.ragContext.context) {
++                cleanRequest.ragContext = this.ragContext.context;
++                cleanRequest.ragSources = this.ragContext.sources;
++                cleanRequest.useProvidedContext = true; // Tell backend to skip its RAG lookup
++                console.log('[PIPELINE] Including RAG context:', 
++                    this.ragContext.context.substring(0, 100) + '...');
++            }
++            
++            // Also add local remedies from DB
++            if (window.DAOIST_REMEDIES_DB && this.currentReading?.hex?.number) {
++                cleanRequest.localRemedies = this.generateFallbackRemedies(true);
++            }
++            
+             const startTime = performance.now();
+             let selectData = null;
+             let usedFallback = false;
