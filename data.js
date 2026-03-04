@@ -17,6 +17,7 @@
         SHARED_RNG_URL: env.SHARED_RNG_URL || base + "/functions/v1/shared-rng",
         SHARED_EXPORT_URL: env.SHARED_EXPORT_URL || base + "/functions/v1/shared-export",
         SHARED_CACHE_URL: env.SHARED_CACHE_URL || base + "/functions/v1/shared-cache",
+        SHARED_RAG_URL: env.SHARED_RAG_URL || base + "/functions/v1/shared-rag",
 
         // Split Function Endpoints
         HEXAGRAM_FUNCTION_URL: env.HEXAGRAM_FUNCTION_URL || base + "/functions/v1/yijingtu",
