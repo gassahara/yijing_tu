@@ -19,14 +19,28 @@ class IChingCaster {
     }
 
     static async castLines() {
-        // Fetch from quantum/random API (Supabase backend handles NIST/Drand to avoid CORS)
-        const response = await fetch(CONFIG.API_URL);
-        if (!response.ok) throw new Error("Casting failed");
+        // Use shared-rng service for superior entropy (multi-source: NIST + drand + local)
+        const rngUrl = CONFIG.SHARED_RNG_URL || CONFIG.API_URL;
+        const fullUrl = rngUrl.includes('?') ? rngUrl : `${rngUrl}?bits=512&format=binary`;
+        
+        console.log('[IChingCaster] Fetching entropy from:', fullUrl);
+        
+        const response = await fetch(fullUrl);
+        if (!response.ok) throw new Error("Casting failed: " + response.statusText);
 
         const result = await response.json();
         
-        // Handle new API response format (result.data.binaryString) or legacy format
-        const binaryString = result.data?.binaryString || result.binaryString;
+        // Handle shared-rng format (result.data.entropy) or legacy format (result.data.binaryString)
+        let binaryString;
+        if (result.data?.entropy) {
+            // New shared-rng format: hex string to binary
+            const hex = result.data.entropy;
+            binaryString = hex.split('').map(h => parseInt(h, 16).toString(2).padStart(4, '0')).join('');
+        } else {
+            // Legacy format
+            binaryString = result.data?.binaryString || result.binaryString;
+        }
+        
         const timestamp = result.data?.timestamp || result.timestamp;
         
         if (!binaryString) {

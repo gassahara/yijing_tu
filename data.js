@@ -13,6 +13,11 @@
         // Hexagram JSON dataset
         DB_URL: base + bucketPath,
 
+        // Shared Services (cross-project)
+        SHARED_RNG_URL: env.SHARED_RNG_URL || base + "/functions/v1/shared-rng",
+        SHARED_EXPORT_URL: env.SHARED_EXPORT_URL || base + "/functions/v1/shared-export",
+        SHARED_CACHE_URL: env.SHARED_CACHE_URL || base + "/functions/v1/shared-cache",
+
         // Split Function Endpoints
         HEXAGRAM_FUNCTION_URL: env.HEXAGRAM_FUNCTION_URL || base + "/functions/v1/yijingtu",
         TRANSLATE_FUNCTION_URL: env.TRANSLATE_FUNCTION_URL || base + "/functions/v1/yijingtu-translate",
@@ -24,7 +29,8 @@
         ADVICE_FUNCTION_URL: env.ADVICE_FUNCTION_URL || base + "/functions/v1/yijingtu-advice",
 
         // Legacy aliases (backward compat)
-        API_URL: (env.HEXAGRAM_FUNCTION_URL || base + "/functions/v1/yijingtu") + "/random",
+        // Note: /random endpoint now proxies to shared-rng for superior entropy
+        API_URL: (env.SHARED_RNG_URL || base + "/functions/v1/shared-rng") + "?bits=512&format=binary",
         SUPABASE_FUNCTION_URL: env.HEXAGRAM_FUNCTION_URL || base + "/functions/v1/yijingtu",
 
         // Legacy direct API keys (not used in client — kept for reference only)

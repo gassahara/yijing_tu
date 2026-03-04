@@ -176,6 +176,7 @@ function clearMemoryCache(): void {
 const DEEPSEEK_API_KEY = Deno.env.get("DEEPSEEK_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "https://vflkhntzwfovnuyccxow.supabase.co";
 const HEXAGRAM_BUCKET_PATH = "/storage/v1/object/public/bucket/hexagrams.json";
+const SHARED_RNG_URL = Deno.env.get("SHARED_RNG_URL") || `${SUPABASE_URL}/functions/v1/shared-rng`;
 const API_VERSION = "v2.1";
 
 // Timeout configuration
@@ -3548,76 +3549,86 @@ function generateFengShuiDiagram(favorable: string[], unfavorable: string[], ins
 // ============================================================================
 
 async function handleRandomBeacon(requestId: string, startTime: number): Promise<Response> {
-  log(4, `[RANDOM] Fetching NIST beacon`);
+  log(4, `[RANDOM] Calling shared-rng service`);
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-    const nistResponse = await fetch('https://beacon.nist.gov/beacon/2.0/pulse/last', {
+    // Call the shared RNG service for superior entropy mixing
+    const sharedRngResponse = await fetch(`${SHARED_RNG_URL}?bits=512&format=binary`, {
       method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-
-    if (nistResponse.ok) {
-      const nistData = await nistResponse.json();
-
-      if (nistData.pulse && nistData.pulse.outputValue) {
-        const binaryString = nistData.pulse.outputValue
-          .split('')
-          .map((hex: string) => parseInt(hex, 16).toString(2).padStart(4, '0'))
-          .join('');
-
-        const response = {
-          binaryString,
-          timestamp: nistData.pulse.timeStamp,
-          source: "NIST_beacon",
-          pulseIndex: nistData.pulse.pulseIndex
-        };
-
-        return new Response(
-          JSON.stringify(createSuccessResponse(response, requestId, startTime)),
-          { headers: { "Content-Type": "application/json" } }
-        );
+      headers: { 
+        'Accept': 'application/json',
+        'X-Request-ID': requestId
       }
+    });
+
+    if (!sharedRngResponse.ok) {
+      throw new Error(`shared-rng returned ${sharedRngResponse.status}`);
     }
 
-    log(4, `[RANDOM] NIST beacon unavailable, will use fallback`);
-  } catch (error: any) {
-    log(4, `[RANDOM] NIST beacon error: ${error.message}`);
-  }
+    const rngData = await sharedRngResponse.json();
+    
+    if (!rngData.success || !rngData.data?.entropy) {
+      throw new Error('Invalid response from shared-rng');
+    }
 
-  log(4, `[RANDOM] Using crypto fallback`);
+    const binaryString = rngData.data.entropy;
+    const sources = rngData.data.sources || ['unknown'];
+    const qualityScore = rngData.data.quality_score || 0;
 
-  try {
-    const randomBytes = new Uint8Array(64);
-    crypto.getRandomValues(randomBytes);
+    log(4, `[RANDOM] Received entropy from shared-rng`, { 
+      sources: sources.join(', '),
+      quality: qualityScore 
+    });
 
-    const binaryString = Array.from(randomBytes)
-      .map(byte => byte.toString(2).padStart(8, '0'))
-      .join('');
-
+    // Map to legacy response format for backward compatibility
     const response = {
       binaryString,
-      timestamp: new Date().toISOString(),
-      source: "crypto_fallback",
-      note: "NIST beacon unavailable, using cryptographically secure random"
+      timestamp: rngData.data.timestamp || new Date().toISOString(),
+      source: sources.includes('NIST') ? 'NIST_beacon' : 
+              sources.includes('drand') ? 'drand_beacon' : 
+              'shared_crypto',
+      sources,  // New field for enhanced clients
+      qualityScore,  // New field for enhanced clients
+      pulseIndex: rngData.meta?.requestId || requestId
     };
 
     return new Response(
       JSON.stringify(createSuccessResponse(response, requestId, startTime)),
       { headers: { "Content-Type": "application/json" } }
     );
-  } catch (cryptoError: any) {
-    log(4, `[RANDOM] Crypto fallback failed: ${cryptoError.message}`);
-    throw new AppError(
-      "Failed to generate randomness",
-      500,
-      "RANDOM_GENERATION_FAILED",
-      { originalError: cryptoError.message }
-    );
+
+  } catch (error: any) {
+    log(3, `[RANDOM] shared-rng error: ${error.message}, falling back to local crypto`);
+
+    // Fallback to local crypto (original Yijing behavior)
+    try {
+      const randomBytes = new Uint8Array(64);
+      crypto.getRandomValues(randomBytes);
+
+      const binaryString = Array.from(randomBytes)
+        .map(byte => byte.toString(2).padStart(8, '0'))
+        .join('');
+
+      const response = {
+        binaryString,
+        timestamp: new Date().toISOString(),
+        source: "crypto_fallback",
+        note: "shared-rng unavailable, using local cryptographically secure random"
+      };
+
+      return new Response(
+        JSON.stringify(createSuccessResponse(response, requestId, startTime)),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    } catch (cryptoError: any) {
+      log(0, `[RANDOM] Local crypto fallback failed: ${cryptoError.message}`);
+      throw new AppError(
+        "Failed to generate randomness",
+        500,
+        "RANDOM_GENERATION_FAILED",
+        { originalError: cryptoError.message, sharedRngError: error.message }
+      );
+    }
   }
 }
 
