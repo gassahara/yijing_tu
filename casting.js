@@ -18,22 +18,77 @@ class IChingCaster {
         }
     }
 
-    static async castLines() {
-        // Use shared-rng service for superior entropy (multi-source: NIST + drand + local)
-        const rngUrl = CONFIG.SHARED_RNG_URL || CONFIG.API_URL;
-        const fullUrl = rngUrl.includes('?') ? rngUrl : `${rngUrl}?bits=512&format=binary`;
+    // Get secure random integer using Web Crypto API
+    static async getSecureRandomInt(min, max) {
+        const range = max - min + 1;
+        if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            const maxValid = Math.floor(0x100000000 / range) * range;
+            let randomValue = array[0];
+            while (randomValue >= maxValid) {
+                crypto.getRandomValues(array);
+                randomValue = array[0];
+            }
+            return min + (randomValue % range);
+        }
+        // Fallback
+        return Math.floor(Math.random() * range) + min;
+    }
+
+    // Mix multiple entropy sources using XOR
+    static mixEntropy(binaryStrings) {
+        if (binaryStrings.length === 0) return '';
+        if (binaryStrings.length === 1) return binaryStrings[0];
         
-        console.log('[IChingCaster] Fetching entropy from:', fullUrl);
+        // Find minimum length
+        const minLength = Math.min(...binaryStrings.map(s => s.length));
+        let result = '';
+        
+        // XOR all bits together
+        for (let i = 0; i < minLength; i++) {
+            let xorResult = 0;
+            for (const str of binaryStrings) {
+                xorResult ^= parseInt(str[i], 10);
+            }
+            result += xorResult.toString();
+        }
+        
+        return result;
+    }
+
+    static async castLines() {
+        // Fetch from 2 sources with mode=multiple for enhanced entropy
+        const rngUrl = CONFIG.SHARED_RNG_URL || CONFIG.API_URL;
+        const baseUrl = rngUrl.split('?')[0]; // Remove any existing query params
+        const fullUrl = `${baseUrl}?mode=multiple&count=2`;
+        
+        console.log('[IChingCaster] Fetching entropy from 2 sources:', fullUrl);
         
         const response = await fetch(fullUrl);
         if (!response.ok) throw new Error("Casting failed: " + response.statusText);
 
         const result = await response.json();
         
-        // Handle shared-rng format (result.data.entropy) or legacy format (result.data.binaryString)
+        if (!result.success) {
+            throw new Error(result.error?.message || "RNG service returned error");
+        }
+        
+        // Log warning if present
+        if (result.data?.warning) {
+            console.warn('[IChingCaster] RNG Warning:', result.data.warning);
+        }
+        
+        // Handle multi-source response
         let binaryString;
-        if (result.data?.entropy) {
-            // New shared-rng format: hex string to binary
+        const sources = result.data?.sources || [];
+        
+        if (sources.length > 1 && result.data?.source === 'mixed') {
+            // Multiple sources were mixed server-side
+            binaryString = result.data.binaryString;
+            console.log('[IChingCaster] Using server-mixed entropy from', sources.length, 'sources:', sources.join(', '));
+        } else if (result.data?.entropy) {
+            // Single source with hex format
             const hex = result.data.entropy;
             binaryString = hex.split('').map(h => parseInt(h, 16).toString(2).padStart(4, '0')).join('');
         } else {
@@ -42,17 +97,31 @@ class IChingCaster {
         }
         
         const timestamp = result.data?.timestamp || result.timestamp;
+        const totalBits = result.data?.totalBits || binaryString?.length || 0;
         
         if (!binaryString) {
             throw new Error("Invalid response: binaryString not found");
         }
 
-        // Generate 18 bits (6 lines × 3 coins)
-        const rawBits = [];
-        for (let i = 0; i < 18; i++) {
-            const char = binaryString[i % binaryString.length];
-            rawBits.push(char === '1' ? '1' : '0');
+        console.log('[IChingCaster] Received', totalBits, 'bits of entropy from', sources.join(', '));
+
+        // Consume ALL available entropy for maximum randomness
+        // We mix all entropy together using XOR folding to extract 18 bits
+        const entropyLength = binaryString.length;
+        
+        // Fold all entropy down to 18 bits using XOR
+        // This ensures every bit of entropy influences the final result
+        const foldedBits = new Array(18).fill(0);
+        
+        for (let i = 0; i < entropyLength; i++) {
+            const bitValue = parseInt(binaryString[i], 10);
+            const position = i % 18;
+            foldedBits[position] ^= bitValue;
         }
+        
+        const rawBits = foldedBits.map(b => b.toString());
+        
+        console.log('[IChingCaster] Folded', entropyLength, 'bits into 18 bits via XOR mixing');
 
         // Calculate lines (bottom to top)
         const lines = [];
@@ -76,7 +145,10 @@ class IChingCaster {
             lines,
             rawBits,
             binaryKey,
-            timestamp
+            timestamp,
+            entropyBits: totalBits,
+            sources: sources,
+            qualityScore: result.data?.qualityScore
         };
     }
 

@@ -81,6 +81,12 @@ class TranslationService {
             fields: ['judgment', 'image', 'lines'],
             frontendFields: ['judgment', 'image', 'lines'],
             selector: '[data-translatable-section="classical"]'
+        },
+        // MD-LDL layout - special handling for structure-aware translation
+        mdldl: {
+            fields: ['mdlLayout'],
+            frontendFields: ['mdlLayout'],
+            selector: '[data-md-ldl-container]'
         }
     };
 
@@ -245,6 +251,15 @@ class TranslationService {
             interpretation[k] && (typeof interpretation[k] === 'string' ? interpretation[k].length > 0 : true)
         );
 
+        // SPECIAL HANDLING for MD-LDL section
+        if (sectionId === 'mdldl') {
+            if (interpretation.mdlLayout && typeof interpretation.mdlLayout === 'string' && interpretation.mdlLayout.length > 100) {
+                console.log(`[TranslationService] mdldl: found mdlLayout (${interpretation.mdlLayout.length} chars)`);
+                return { mdlLayout: interpretation.mdlLayout };
+            }
+            return null;
+        }
+
         // SPECIAL HANDLING for classical section - extract text from nested structure
         if (sectionId === 'classical') {
             // Classical texts are stored as {en, es, it, zh} objects
@@ -327,6 +342,96 @@ class TranslationService {
 
         this.activeTranslations.set(cacheKey, translationPromise);
         return translationPromise;
+    }
+
+    /**
+     * Translate MD-LDL layout as a single unit
+     * This preserves structure while translating only the content
+     */
+    static async translateMDLDL(readingId, mdlLayout, targetLang, hexagramName) {
+        const cacheKey = `${readingId}_mdldl_${targetLang}`;
+
+        // Check if already translating
+        if (this.activeTranslations.has(cacheKey)) {
+            console.log(`[TranslationService] MD-LDL translation already in progress`);
+            return this.activeTranslations.get(cacheKey);
+        }
+
+        console.log(`[TranslationService] Translating MD-LDL layout to ${targetLang} (${mdlLayout.length} chars)`);
+
+        const translationPromise = this.callTranslateMDLDLAPI(mdlLayout, targetLang, hexagramName)
+            .then(result => {
+                this.activeTranslations.delete(cacheKey);
+                return result;
+            })
+            .catch(error => {
+                this.activeTranslations.delete(cacheKey);
+                throw error;
+            });
+
+        this.activeTranslations.set(cacheKey, translationPromise);
+        return translationPromise;
+    }
+
+    /**
+     * Call the translation API for MD-LDL with retry logic
+     */
+    static async callTranslateMDLDLAPI(mdlLayout, targetLang, hexagramName, maxRetries = 2) {
+        let lastError = null;
+        
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            if (attempt > 0) {
+                console.log(`[TranslationService] MD-LDL retry attempt ${attempt}/${maxRetries} in 3 seconds...`);
+                await new Promise(r => setTimeout(r, 3000));
+            }
+
+            try {
+                // Route to the dedicated translation function
+                const response = await fetch(CONFIG.TRANSLATE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'translate',
+                        content: { mdlLayout },  // Wrap in object for API
+                        targetLang: targetLang,
+                        hexagramName: hexagramName,
+                        section: 'mdldl'  // Special section identifier
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`);
+                }
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error?.message || 'MD-LDL translation failed');
+                }
+
+                // Extract the translated layout from the response
+                const translated = data.translated;
+                if (translated && translated.mdlLayout && translated.mdlLayout.length > 100) {
+                    console.log(`[TranslationService] MD-LDL translation received: ${translated.mdlLayout.length} chars`);
+                    return translated.mdlLayout;
+                } else if (typeof translated === 'string' && translated.length > 100) {
+                    // Direct string return (alternative API format)
+                    console.log(`[TranslationService] MD-LDL translation received (string): ${translated.length} chars`);
+                    return translated;
+                } else {
+                    throw new Error('Invalid MD-LDL translation response');
+                }
+
+            } catch (error) {
+                lastError = error;
+                console.warn(`[TranslationService] MD-LDL translation attempt ${attempt + 1} failed:`, error.message);
+            }
+        }
+
+        throw lastError || new Error('MD-LDL translation failed after all retries');
     }
 
     /**
@@ -493,6 +598,16 @@ class TranslationService {
             }
         }
 
+        // CRITICAL FIX: Parse translated MD-LDL layout
+        if (sectionId === 'mdldl' && targetSection.mdlLayout && typeof LayoutLanguage !== 'undefined') {
+            try {
+                targetSection.mdlParsed = LayoutLanguage.parse(targetSection.mdlLayout);
+                console.log(`[TranslationService] Parsed translated MD-LDL for ${targetLang}`);
+            } catch (e) {
+                console.warn(`[TranslationService] Failed to parse translated MD-LDL:`, e.message);
+            }
+        }
+
         return interpretation;
     }
 
@@ -538,6 +653,9 @@ class TranslationService {
     /**
      * Translate all sections for a reading
      * This is the main entry point
+     * 
+     * MD-LDL OPTIMIZATION: If source has mdlLayout, translate entire layout in ONE call
+     * instead of section-by-section. This preserves structure and reduces API calls.
      */
     static async translateVisibleSections(readingId, interpretation, targetLang, hexagramName) {
         // Interpretation is the full result object with en, es, it, etc.
@@ -556,9 +674,48 @@ class TranslationService {
             return interpretation;
         }
 
-        // Find ALL sections that have content (not just visible ones)
-        // This ensures we translate everything, even if not currently in viewport
+        // MD-LDL OPTIMIZATION: Check if we have MD-LDL layout to translate as single unit
+        if (sourceContent.mdlLayout && sourceContent.mdlLayout.length > 100) {
+            console.log(`[TranslationService] MD-LDL detected! Translating entire layout in ONE call...`);
+            try {
+                const translatedLayout = await this.translateMDLDL(
+                    readingId,
+                    sourceContent.mdlLayout,
+                    targetLang,
+                    hexagramName
+                );
+                
+                // Apply the translated MD-LDL to target language
+                const targetSection = interpretation[targetLang] || (interpretation[targetLang] = {});
+                targetSection.mdlLayout = translatedLayout;
+                
+                // Parse the translated layout
+                if (typeof LayoutLanguage !== 'undefined') {
+                    try {
+                        targetSection.mdlParsed = LayoutLanguage.parse(translatedLayout);
+                        console.log(`[TranslationService] Parsed translated MD-LDL for ${targetLang}`);
+                    } catch (e) {
+                        console.warn(`[TranslationService] Failed to parse translated MD-LDL:`, e.message);
+                    }
+                }
+                
+                // Save to cache
+                this.saveToCache(readingId, targetLang, { mdldl: { mdlLayout: translatedLayout } });
+                this.clearOldCache();
+                
+                console.log(`[TranslationService] MD-LDL translation complete for ${targetLang}`);
+                return interpretation;
+            } catch (error) {
+                console.error(`[TranslationService] MD-LDL translation failed:`, error);
+                console.log(`[TranslationService] Falling back to section-by-section translation...`);
+            }
+        }
+
+        // FALLBACK: Traditional section-by-section translation (for non-MD-LDL content)
         const sectionsToTranslate = Object.keys(this.SECTION_CONFIG).filter(sectionId => {
+            // Skip MD-LDL section if we're doing fallback (it would have been handled above)
+            if (sectionId === 'mdldl') return false;
+            
             // Check if this section has content to translate (from English source)
             const content = this.extractSectionContent(sourceContent, sectionId);
             const hasContent = content && Object.keys(content).length > 0 &&
@@ -820,6 +977,54 @@ class TranslationService {
         }
 
         return null;
+    }
+
+    /**
+     * Translate and format a single text string.
+     * ALL languages including English go through the API for proper formatting/styling.
+     * The API handles both translation (if needed) AND beautifying.
+     * 
+     * @param {string} text - The text to translate/format
+     * @param {string} targetLang - Target language code ('en', 'es', 'it', 'zh')
+     * @param {string} context - Context hint for translation ('ui_content', 'classical', etc.)
+     * @returns {Promise<string>} - Translated/formatted text
+     */
+    static async translateText(text, targetLang, context = 'ui_content') {
+        if (!text || typeof text !== 'string') return text;
+        
+        // Always call the API for formatting/beautifying, even for English
+        // The API handles both translation AND styling
+        try {
+            const response = await fetch(CONFIG.TRANSLATE_FUNCTION_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'translate',
+                    content: { text },
+                    targetLang: targetLang,
+                    section: context
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Translation API error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const translated = result.translated ?? result.data?.translated;
+            
+            if (result.success && translated && translated.text) {
+                return translated.text;
+            }
+            
+            // Fallback to original text
+            return text;
+        } catch (error) {
+            console.warn('[TranslationService] Text translation failed:', error);
+            return text; // Return original on error
+        }
     }
 }
 

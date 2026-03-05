@@ -918,8 +918,8 @@ class App {
         console.log('[DEBUG] Showing meditation overlay');
         overlay.classList.add('active');
 
-        // Meditation timer (25-45 seconds) using cryptographically secure randomness
-        const initialTime = await this.getSecureRandomInt(25, 45);
+        // Meditation timer - First Wait: 45-68 seconds (random)
+        const initialTime = await this.getSecureRandomInt(45, 68);
         let timeLeft = initialTime;
         const disp = document.getElementById('meditation-timer');
         if (disp) {
@@ -1181,7 +1181,7 @@ class App {
      * Translate the Astrology UI tab text nodes using the optimized translation pipeline.
      */
     static async translateAstrologyTab(targetLang) {
-        if (targetLang === 'en') return; // English is the default, no translation needed
+        // Formatting pipeline runs for all languages including English (for beautifying)
         const container = document.getElementById('analysisAstrologyContent');
         if (!container) return;
 
@@ -2615,8 +2615,6 @@ class App {
     // If untranslated, clear them so renderTranslation falls back to DB data.
     // ========================================================================
     static verifyClassicalTranslation(result, targetLang, readingId, hexagramName) {
-        if (targetLang === 'en') return;
-
         // For classical texts, compare against Chinese (the source), not English
         const zh = result.zh || {};
         const target = result[targetLang] || {};
@@ -2831,9 +2829,25 @@ class App {
 
             console.log('[AI:TABS] All tabs fetched successfully');
 
-            // Handle compact format (c,e,a,d,r) or full format (celestial,elements,analysis,advice,quotedReferences)
+            // Handle compact format (c,e,a,d,r), MD-LDL, or full format
             const normalizeInterpretation = (data) => {
                 if (!data) return {};
+                // MD-LDL format
+                if (data.format === 'md-ldl' && data.layout) {
+                    try {
+                        const parsed = LayoutLanguage.parse(data.layout);
+                        return {
+                            celestial: this._extractSectionFromMDL(parsed, 'celestial'),
+                            elements: this._extractSectionFromMDL(parsed, 'elements'),
+                            analysis: this._extractSectionFromMDL(parsed, 'analysis'),
+                            advice: this._extractSectionFromMDL(parsed, 'advice'),
+                            mdlLayout: data.layout,
+                            mdlParsed: parsed
+                        };
+                    } catch (e) {
+                        console.warn('[AI:TABS] MD-LDL parse failed in normalize:', e.message);
+                    }
+                }
                 // Compact format
                 if (data.c || data.e || data.a || data.d) {
                     return {
@@ -2854,20 +2868,79 @@ class App {
                 };
             };
 
+            // Debug: log what we received
+            console.log('[AI:TABS] interpretationResult keys:', Object.keys(interpretationResult || {}));
+            console.log('[AI:TABS] format:', interpretationResult?.format);
+            console.log('[AI:TABS] has layout:', !!interpretationResult?.layout);
+
+            // Handle MD-LDL format from interpretation-tab (fallback to legacy if MD-LDL fails)
+            let mdlLayout = null;
+            let mdlParsed = null;
+            if (interpretationResult.format === 'md-ldl' && interpretationResult.layout) {
+                console.log('[AI:TABS] MD-LDL detected, parsing...');
+                try {
+                    mdlLayout = interpretationResult.layout;
+                    mdlParsed = LayoutLanguage.parse(mdlLayout);
+                    
+                    // Build base content from MD-LDL
+                    const baseContent = {
+                        analysis: this._extractSectionFromMDL(mdlParsed, 'analysis'),
+                        celestial: this._extractSectionFromMDL(mdlParsed, 'celestial'),
+                        elements: this._extractSectionFromMDL(mdlParsed, 'elements'),
+                        advice: this._extractSectionFromMDL(mdlParsed, 'advice'),
+                        mdlLayout: mdlLayout,
+                        mdlParsed: mdlParsed
+                    };
+                    
+                    // Store the MD-LDL layout for rendering in ALL languages
+                    // This ensures language switching can use MD-LDL translation
+                    return {
+                        [this.lang]: baseContent,
+                        // Pre-seed other languages with same content (for fallback)
+                        // They will get proper translation when user switches language
+                        ...(this.lang !== 'en' ? { en: { ...baseContent } } : {}),
+                        ...(this.lang !== 'es' ? { es: { ...baseContent } } : {}),
+                        ...(this.lang !== 'it' ? { it: { ...baseContent } } : {}),
+                        ...(this.lang !== 'zh' ? { zh: { ...baseContent } } : {}),
+                        
+                        remedies: remediesResult ? { [this.lang]: { remedies: remediesResult.remedies || [] } } : null,
+                        baguaMedicine: fengshuiMedicineResult ? {
+                            [this.lang]: {
+                                fengShui: fengshuiMedicineResult.fengshui || fengshuiMedicineResult.fengShui || {},
+                                medicine: fengshuiMedicineResult.medicine || {}
+                            }
+                        } : null
+                    };
+                } catch (e) {
+                    console.warn('[AI:TABS] MD-LDL parsing failed, using legacy:', e.message);
+                }
+            }
+
             const interp = normalizeInterpretation(interpretationResult);
 
             // Build result in the format expected by the UI
-            return {
-                [this.lang]: {
-                    // Main interpretation
-                    analysis: interp.analysis,
-                    celestial: interp.celestial,
-                    elements: interp.elements,
-                    advice: interp.advice,
+            // Include mdlLayout if available from normalizeInterpretation
+            const baseContent = {
+                // Main interpretation
+                analysis: interp.analysis,
+                celestial: interp.celestial,
+                elements: interp.elements,
+                advice: interp.advice,
 
-                    // Quoted references
-                    quotedReferences: interp.quotedReferences
-                },
+                // Quoted references
+                quotedReferences: interp.quotedReferences,
+                
+                // MD-LDL layout (if available)
+                ...(interp.mdlLayout ? { mdlLayout: interp.mdlLayout, mdlParsed: interp.mdlParsed } : {})
+            };
+            
+            return {
+                [this.lang]: baseContent,
+                // Pre-seed other languages with same content (for fallback with MD-LDL)
+                ...(interp.mdlLayout && this.lang !== 'en' ? { en: { ...baseContent } } : {}),
+                ...(interp.mdlLayout && this.lang !== 'es' ? { es: { ...baseContent } } : {}),
+                ...(interp.mdlLayout && this.lang !== 'it' ? { it: { ...baseContent } } : {}),
+                ...(interp.mdlLayout && this.lang !== 'zh' ? { zh: { ...baseContent } } : {}),
 
                 // Remedies - store under current language (dynamic source language support)
                 remedies: remediesResult ? { [this.lang]: { remedies: remediesResult.remedies || [] } } : null,
@@ -2885,6 +2958,26 @@ class App {
             console.error('[AI:TABS] Concurrent fetch failed:', error);
             throw error;
         }
+    }
+
+    // Helper to extract section content from MD-LDL parsed structure
+    static _extractSectionFromMDL(parsed, sectionId) {
+        if (!parsed || !parsed.sections) return '';
+        const section = parsed.sections.find(s => s.id === sectionId);
+        if (!section || !section.layers) return '';
+        
+        // Find the main content layer
+        const contentLayer = section.layers.find(l => 
+            l.layerType === 'analysis' || l.layerType === 'colloquial'
+        );
+        if (!contentLayer || !contentLayer.components) return '';
+        
+        // Get text components
+        const textComps = contentLayer.components.filter(c => 
+            c.type === 'text' || c.type === 'card'
+        );
+        
+        return textComps.map(c => c.content?.raw || c.body?.join('\n') || '').join('\n\n');
     }
 
     // Helper to fetch a single tab with retry logic
@@ -4963,6 +5056,9 @@ class App {
         const cached = this.getCachedTranslation(readingId, targetLang);
         if (cached) {
             console.log(`[TRANSLATE] Using cached ${targetLang}`);
+            // Copy MD-LDL layout from source language for cached translations too
+            const sourceMdlLayout = result[sourceLang]?.mdlLayout;
+            const sourceMdlParsed = result[sourceLang]?.mdlParsed;
             result[targetLang] = {
                 ...result[targetLang],
                 celestial: cached.celestial,
@@ -4970,12 +5066,43 @@ class App {
                 analysis: cached.analysis,
                 advice: cached.advice,
                 symbolism: cached.symbolism,
-                movingLines: cached.movingLines
+                movingLines: cached.movingLines,
+                // Preserve MD-LDL layout from source language
+                mdlLayout: sourceMdlLayout,
+                mdlParsed: sourceMdlParsed
             };
+            console.log(`[TRANSLATE] Cached ${targetLang} MD-LDL:`, !!sourceMdlLayout);
             return result;
         }
 
-        // Need to translate
+        // MD-LDL OPTIMIZATION: If source has MD-LDL, translate entire layout in ONE call
+        const sourceMdlLayout = result[sourceLang]?.mdlLayout;
+        if (sourceMdlLayout && sourceMdlLayout.length > 100) {
+            console.log(`[TRANSLATE] MD-LDL detected! Translating entire layout in ONE call...`);
+            try {
+                const translatedLayout = await TranslationService.translateMDLDL(
+                    readingId,
+                    sourceMdlLayout,
+                    targetLang,
+                    hexagramName
+                );
+                
+                result[targetLang] = {
+                    ...result[targetLang],
+                    mdlLayout: translatedLayout,
+                    mdlParsed: typeof LayoutLanguage !== 'undefined' 
+                        ? LayoutLanguage.parse(translatedLayout) 
+                        : undefined
+                };
+                console.log(`[TRANSLATE] MD-LDL translation to ${targetLang} complete!`);
+                return result;
+            } catch (e) {
+                console.warn(`[TRANSLATE] MD-LDL translation failed:`, e.message);
+                console.log(`[TRANSLATE] Falling back to section-by-section translation...`);
+            }
+        }
+
+        // FALLBACK: Traditional section-by-section translation
         const baseContent = {
             celestialTechnical: result[sourceLang]?.celestialTechnical,
             celestialColloquial: result[sourceLang]?.celestialColloquial,
@@ -4993,7 +5120,7 @@ class App {
             movingLines: result[sourceLang]?.movingLines
         };
 
-        console.log(`[TRANSLATE] Fetching ${targetLang} from API...`);
+        console.log(`[TRANSLATE] Fetching ${targetLang} from API (section-by-section)...`);
 
         try {
             const translated = await this.translateInterpretation(
@@ -5227,18 +5354,10 @@ class App {
 
         langs.forEach(lang => {
             if (!result[lang]) {
-                // Only seed languages that come AFTER the source language
-                // Languages before sourceLang in priority should remain empty
-                // to preserve correct source language detection
-                const sourceIndex = langs.indexOf(sourceLang);
-                const langIndex = langs.indexOf(lang);
-                if (langIndex > sourceIndex) {
-                    // Seed from source language
-                    result[lang] = { ...sourceData };
-                } else {
-                    // Create empty structure for languages before source
-                    result[lang] = {};
-                }
+                // Seed ALL languages from source language
+                // This ensures MD-LDL and other data is available for translation
+                // when user switches to any language
+                result[lang] = { ...sourceData };
             }
             keys.forEach(key => {
                 if (!result[lang][key]) result[lang][key] = "";
@@ -5394,7 +5513,11 @@ class App {
 
                 // Houtian (Later Heaven) analysis based on Bazi
                 houtian: processSection(section.houtian || section.laterHeaven || '', 'houtian'),
-                baziAnalysis: processSection(section.baziAnalysis || '', 'baziAnalysis')
+                baziAnalysis: processSection(section.baziAnalysis || '', 'baziAnalysis'),
+
+                // MD-LDL layout data (preserve for rendering pipeline)
+                mdlLayout: section.mdlLayout,
+                mdlParsed: section.mdlParsed
             };
 
             // Remove empty technical fields to reduce payload

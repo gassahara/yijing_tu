@@ -58,6 +58,7 @@ class SigilTools {
         // 1. Background — FDL background takes priority, then explicit, then dark default
         const fdlBg = fdl ? this.normalizeColor(fdl.background) : null;
         const bg = fdlBg || backgroundColor || '#0a0a0a';
+        console.log('[BG-DEBUG]', 'fdlBg:', fdlBg, 'bg:', bg, 'fdl?.background:', fdl?.background);
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, logicalW, logicalH);
 
@@ -166,23 +167,26 @@ class SigilTools {
      */
     static _recolorFDLForBg(fdl, bg, stroke) {
         if (!fdl?.layers) return;
-        const MIN_RATIO = 3.0;
-        const fixColor = (color) => {
+        const MIN_RATIO = 1.5; // Lower threshold to allow traditional red ink on beige paper
+        const fixColor = (color, context = '') => {
             if (!color || color === 'transparent' || color === 'none') return color;
-            return this._contrastRatio(color, bg) < MIN_RATIO ? stroke : color;
+            const ratio = this._contrastRatio(color, bg);
+            const shouldReplace = ratio < MIN_RATIO;
+            console.log(`[_recolorFDLForBg] ${context}: color=${color} bg=${bg} ratio=${ratio.toFixed(2)} min=${MIN_RATIO} replace=${shouldReplace}`);
+            return shouldReplace ? stroke : color;
         };
-        fdl.layers.forEach(layer => {
+        fdl.layers.forEach((layer, li) => {
             if (!layer.commands) return;
-            layer.commands.forEach(cmd => {
+            layer.commands.forEach((cmd, ci) => {
                 if (cmd.style) {
-                    if (cmd.style.color) cmd.style.color = fixColor(cmd.style.color);
-                    if (cmd.style.stroke) cmd.style.stroke = fixColor(cmd.style.stroke);
+                    if (cmd.style.color) cmd.style.color = fixColor(cmd.style.color, `layer${li}.cmd${ci}.style.color`);
+                    if (cmd.style.stroke) cmd.style.stroke = fixColor(cmd.style.stroke, `layer${li}.cmd${ci}.style.stroke`);
                     // Don't override transparent/semi-transparent fills (sector highlights)
                     if (cmd.style.fill && !cmd.style.fill.endsWith('40') && !cmd.style.fill.endsWith('30')) {
-                        cmd.style.fill = fixColor(cmd.style.fill);
+                        cmd.style.fill = fixColor(cmd.style.fill, `layer${li}.cmd${ci}.style.fill`);
                     }
                 }
-                if (cmd.label?.color) cmd.label.color = fixColor(cmd.label.color);
+                if (cmd.label?.color) cmd.label.color = fixColor(cmd.label.color, `layer${li}.cmd${ci}.label.color`);
             });
         });
     }
@@ -300,7 +304,7 @@ class SigilTools {
             // Draw Earthly Branches (Hours) outside
             if (t.branches) {
                 ctx.font = `${size * 0.05}px "Noto Serif SC", serif`;
-                ctx.fillStyle = '#aaa'; // Dimmer for context
+                ctx.fillStyle = stroke; // Use stroke color for visibility
 
                 // If 1 branch (Cardinals), place straight out
                 // If 2 branches (Intercardinals), split angles
@@ -322,7 +326,7 @@ class SigilTools {
         });
 
         // Compass direction labels (N, S, E, W) at the outer edge
-        ctx.fillStyle = '#aaa';
+        ctx.fillStyle = stroke;
         ctx.font = `bold ${size * 0.055}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -744,12 +748,28 @@ class SigilTools {
                 const ty = cmd.y !== undefined ? sy(cmd.y) : cy;
                 const tStyle = cmd.style || {};
                 const fontSize = tStyle.fontSize || cmd.size || 16;
+                const isVertical = cmd.font && cmd.font.includes('vertical');
                 ctx.save();
                 ctx.fillStyle = tStyle.color || stroke;
+                // Add subtle shadow for better visibility
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = fontSize * 0.1;
+                ctx.shadowOffsetX = fontSize * 0.02;
+                ctx.shadowOffsetY = fontSize * 0.02;
                 ctx.font = `${tStyle.bold ? 'bold ' : ''}${fontSize}px "Noto Serif SC", serif`;
                 ctx.textAlign = tStyle.align || 'center';
                 ctx.textBaseline = tStyle.baseline || 'middle';
-                ctx.fillText(text, tx, ty);
+                if (isVertical) {
+                    // Draw characters vertically (top to bottom)
+                    const chars = text.split('');
+                    const lineHeight = fontSize * 1.1;
+                    const totalHeight = chars.length * lineHeight;
+                    chars.forEach((char, i) => {
+                        ctx.fillText(char, tx, ty - totalHeight/2 + i * lineHeight + lineHeight/2);
+                    });
+                } else {
+                    ctx.fillText(text, tx, ty);
+                }
                 ctx.restore();
                 break;
             }
@@ -928,7 +948,20 @@ class SigilTools {
                 break;
 
             case 'highlight_sector': {
-                const trigrams = FENG_SHUI_DGL_SPEC.trigrams.houtian;
+                // Fallback trigram definitions if FENG_SHUI_DGL_SPEC is not available
+                const defaultTrigrams = [
+                    { name: 'Li', direction: 'S', position: { x: 500, y: 150 }, color: '#F44336' },
+                    { name: 'Xun', direction: 'SE', position: { x: 850, y: 150 }, color: '#8BC34A' },
+                    { name: 'Zhen', direction: 'E', position: { x: 850, y: 500 }, color: '#4CAF50' },
+                    { name: 'Gen', direction: 'NE', position: { x: 850, y: 850 }, color: '#00BCD4' },
+                    { name: 'Kan', direction: 'N', position: { x: 500, y: 850 }, color: '#2196F3' },
+                    { name: 'Qian', direction: 'NW', position: { x: 150, y: 850 }, color: '#FF9800' },
+                    { name: 'Dui', direction: 'W', position: { x: 150, y: 500 }, color: '#FFC107' },
+                    { name: 'Kun', direction: 'SW', position: { x: 150, y: 150 }, color: '#E91E63' }
+                ];
+                const trigrams = (typeof FENG_SHUI_DGL_SPEC !== 'undefined' && FENG_SHUI_DGL_SPEC.trigrams?.houtian) 
+                    ? FENG_SHUI_DGL_SPEC.trigrams.houtian 
+                    : defaultTrigrams;
                 const trigram = trigrams.find(t => t.name === cmd.trigram || t.direction === cmd.direction);
                 if (!trigram) break;
 
@@ -980,7 +1013,20 @@ class SigilTools {
             }
 
             case 'instruction_marker': {
-                const trigrams = FENG_SHUI_DGL_SPEC.trigrams.houtian;
+                // Fallback trigram definitions if FENG_SHUI_DGL_SPEC is not available
+                const defaultTrigrams = [
+                    { name: 'Li', direction: 'S', position: { x: 500, y: 150 }, color: '#F44336' },
+                    { name: 'Xun', direction: 'SE', position: { x: 850, y: 150 }, color: '#8BC34A' },
+                    { name: 'Zhen', direction: 'E', position: { x: 850, y: 500 }, color: '#4CAF50' },
+                    { name: 'Gen', direction: 'NE', position: { x: 850, y: 850 }, color: '#00BCD4' },
+                    { name: 'Kan', direction: 'N', position: { x: 500, y: 850 }, color: '#2196F3' },
+                    { name: 'Qian', direction: 'NW', position: { x: 150, y: 850 }, color: '#FF9800' },
+                    { name: 'Dui', direction: 'W', position: { x: 150, y: 500 }, color: '#FFC107' },
+                    { name: 'Kun', direction: 'SW', position: { x: 150, y: 150 }, color: '#E91E63' }
+                ];
+                const trigrams = (typeof FENG_SHUI_DGL_SPEC !== 'undefined' && FENG_SHUI_DGL_SPEC.trigrams?.houtian) 
+                    ? FENG_SHUI_DGL_SPEC.trigrams.houtian 
+                    : defaultTrigrams;
                 const trigram = trigrams.find(t => t.name === cmd.trigram || t.direction === cmd.direction);
                 if (!trigram) break;
 
@@ -1133,13 +1179,30 @@ class SigilTools {
                 // Support backend font sizes - scale them properly
                 const fontSize = (tStyle.fontSize || cmd.size || 16) * (baseSize / 400);
                 const textColor = tStyle.color || stroke;
-                console.log(`[drawFDL:text] Drawing "${text.substring(0, 15)}..." at ${Math.round(tx)},${Math.round(ty)} size:${Math.round(fontSize)} color:${textColor} canvas:${w}x${h}`);
+                const isVertical = cmd.font && cmd.font.includes('vertical');
+                console.log(`[drawFDL:text] Drawing "${text.substring(0, 15)}..." at ${Math.round(tx)},${Math.round(ty)} size:${Math.round(fontSize)} color:${textColor} vertical:${isVertical} canvas:${w}x${h}`);
                 ctx.save();
                 ctx.fillStyle = textColor;
+                // Add subtle shadow for better visibility against similar backgrounds
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = fontSize * 0.1;
+                ctx.shadowOffsetX = fontSize * 0.02;
+                ctx.shadowOffsetY = fontSize * 0.02;
                 ctx.font = `${tStyle.bold ? 'bold ' : ''}${fontSize}px "Noto Serif SC", serif`;
                 ctx.textAlign = tStyle.align || 'center';
                 ctx.textBaseline = tStyle.baseline || 'middle';
-                ctx.fillText(text, tx, ty);
+                
+                if (isVertical) {
+                    // Draw characters vertically (top to bottom)
+                    const chars = text.split('');
+                    const lineHeight = fontSize * 1.1;
+                    const totalHeight = chars.length * lineHeight;
+                    chars.forEach((char, i) => {
+                        ctx.fillText(char, tx, ty - totalHeight/2 + i * lineHeight + lineHeight/2);
+                    });
+                } else {
+                    ctx.fillText(text, tx, ty);
+                }
                 ctx.restore();
                 break;
             }
@@ -1317,7 +1380,20 @@ class SigilTools {
      * @returns {Object} Position object with x and y
      */
     static getTrigramPos(trigramOrDirection) {
-        const trigrams = FENG_SHUI_DGL_SPEC.trigrams.houtian;
+        // Fallback trigram definitions if FENG_SHUI_DGL_SPEC is not available
+        const defaultTrigrams = [
+            { name: 'Li', direction: 'S', position: { x: 500, y: 150 } },
+            { name: 'Xun', direction: 'SE', position: { x: 850, y: 150 } },
+            { name: 'Zhen', direction: 'E', position: { x: 850, y: 500 } },
+            { name: 'Gen', direction: 'NE', position: { x: 850, y: 850 } },
+            { name: 'Kan', direction: 'N', position: { x: 500, y: 850 } },
+            { name: 'Qian', direction: 'NW', position: { x: 150, y: 850 } },
+            { name: 'Dui', direction: 'W', position: { x: 150, y: 500 } },
+            { name: 'Kun', direction: 'SW', position: { x: 150, y: 150 } }
+        ];
+        const trigrams = (typeof FENG_SHUI_DGL_SPEC !== 'undefined' && FENG_SHUI_DGL_SPEC.trigrams?.houtian) 
+            ? FENG_SHUI_DGL_SPEC.trigrams.houtian 
+            : defaultTrigrams;
         const trigram = trigrams.find(t => t.name === trigramOrDirection || t.direction === trigramOrDirection);
         if (!trigram) return { x: 500, y: 500 };
 
@@ -1764,7 +1840,7 @@ class SigilTools {
             }
 
             // Draw direction labels
-            ctx.fillStyle = isActive ? highlightColor : '#888';
+            ctx.fillStyle = isActive ? highlightColor : stroke;
             ctx.font = `${size * 0.04}px sans-serif`;
             const dirX = cx + Math.cos(t.angle) * (r * 1.1);
             const dirY = cy + Math.sin(t.angle) * (r * 1.1);
@@ -2016,3 +2092,5 @@ class SigilTools {
         ctx.restore();
     }
 }
+
+

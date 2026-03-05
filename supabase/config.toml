@@ -15,3 +15,6 @@ verify_jwt = false
 
 [functions.yijingtu-advice]
 verify_jwt = false
+
+[functions.yijingtu-interpret]
+verify_jwt = false

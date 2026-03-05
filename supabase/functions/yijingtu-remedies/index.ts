@@ -493,9 +493,15 @@ async function translateRemedyContent(
 ): Promise<any> {
   log(3, `[TRANSLATE] Translating remedy to ${targetLangName}...`);
 
-  const systemPrompt = `You are a professional translator and Daoist scholar.
-Translate the provided remedy from English to ${targetLangName}.
-All string values must be plain text - no markdown formatting.
+  const systemPrompt = `ROLE: Professional translator and Daoist scholar
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I translate EVERY detail without summarizing?
+✓ Did I preserve all Chinese characters (符咒, 八卦 terms)?
+✓ Did I keep all pinyin pronunciation guides?
+✓ Did I preserve all ritual steps in instructions?
+✓ Did I maintain technical alchemical terminology?
+✓ Is output valid JSON with same structure as input?
 
 STRICT RULES:
 1. FAITHFUL TRANSLATION: Do NOT summarize. Every detail must be translated.
@@ -594,8 +600,15 @@ async function selectRemedies(body: any): Promise<any> {
   }));
 
   // AI selection
-  const systemPrompt = `You are a Daoist Remedy Selector. Choose 2-4 appropriate remedies from the catalog based on the hexagram and question.
-All string values must be plain text - no markdown formatting.
+  const systemPrompt = `ROLE: Daoist Remedy Selector
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I select 2-4 remedies total?
+✓ Is at least one remedy a Fulu (talisman) type?
+✓ Is at least one remedy environmental (Feng Shui/Medicine)?
+✓ Do selected IDs match exactly with provided catalog?
+✓ Does each relevance explain hexagram connection specifically?
+✓ Are instructions customized to the reading, not generic?
 
 SELECTION CRITERIA:
 1. Match remedy purpose to the hexagram's core meaning
@@ -614,15 +627,14 @@ OUTPUT FORMAT:
   ]
 }`;
 
-  const userPrompt = `HEXAGRAM: ${hexagram.number} - ${hexagram.name_en}
-QUESTION: ${question}
+  const userPrompt = `HEX: #${hexagram.number} ${hexagram.name_en}
+Q: "${question}"
 EQUILIBRIUM: ${equilibrium?.balanceState || 'unknown'}
-${equilibrium?.elements ? `ELEMENTS: Wood:${equilibrium.elements.wood} Fire:${equilibrium.elements.fire} Earth:${equilibrium.elements.earth} Metal:${equilibrium.elements.metal} Water:${equilibrium.elements.water}` : ''}
+${equilibrium?.elements ? `WUXING: W:${Math.round(equilibrium.elements.wood)} F:${Math.round(equilibrium.elements.fire)} E:${Math.round(equilibrium.elements.earth)} M:${Math.round(equilibrium.elements.metal)} Wa:${Math.round(equilibrium.elements.water)}` : ''}
 
-AVAILABLE REMEDIES:
-${JSON.stringify(slimCatalog, null, 2)}
+CATALOG: ${slimCatalog.map((r: any) => `${r.id}:${r.name}[${r.type}]`).join('; ')}
 
-Select the most appropriate remedies and provide scholarly relevance explanations.`;
+Select 2-4 appropriate remedies with scholarly relevance explanations.`;
 
   const selection = await getStructuredInterpretation(userPrompt, 2000, {
     systemPrompt,
@@ -753,8 +765,13 @@ async function verifyRemedies(body: any): Promise<any> {
     return remedies;
   }
 
-  const systemPrompt = `You are a Daoist Remedy Verifier. Fix only "Unknown" or broken placeholders.
-All string values must be plain text - no markdown formatting.
+  const systemPrompt = `ROLE: Daoist Remedy Verifier
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I ONLY fix fields containing "Unknown" or broken placeholders?
+✓ Did I preserve detailed instructions (drawing steps, cinnabar usage)?
+✓ Did I NOT replace authentic descriptions with generic text?
+✓ Is output valid JSON with same structure?
 
 STRICT RULES:
 1. DO NOT replace authentic descriptions with generic usage.
@@ -896,9 +913,16 @@ async function generateBaguaMedicine(body: any): Promise<any> {
   const { interpretation, question, hexagram, lang = 'en' } = body;
   const targetLang = lang;
 
-  const systemPrompt = `You are a Master of Bagua Medicine (Ba Gua Zhen Liao) and Classical Feng Shui.
-Provide therapeutic and environmental adjustments based on I Ching readings.
-All string values must be plain text - no markdown formatting.
+  const systemPrompt = `ROLE: Master of Bagua Medicine (Ba Gua Zhen Liao) and Classical Feng Shui
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I provide specific favorable directions (N, S, E, W, etc.)?
+✓ Did I provide specific unfavorable directions?
+✓ Did I include Bagua Medicine (herbs, acupoints, or alchemical practices)?
+✓ Did I reference Houtian (Later Heaven) Bagua arrangement?
+✓ Did I include Alchemical/Neidan context?
+✓ Did I avoid referencing user's specific question text?
+✓ Is output valid JSON with correct structure?
 
 HOUTIAN (LATER HEAVEN) BAGUA REFERENCE:
 Position:     Trigram   Direction   Element   Life Area
@@ -940,8 +964,8 @@ FORMAT:
   }
 }`;
 
-  const userPrompt = `HEXAGRAM: ${hexagram?.number} - ${hexagram?.name_en}
-INTERPRETATION CONTEXT: ${JSON.stringify(interpretation?.en || {})}
+  const userPrompt = `HEX: #${hexagram?.number} ${hexagram?.name_en}
+CONTEXT: ${typeof interpretation?.en === 'string' ? interpretation.en.substring(0, 400) : JSON.stringify(interpretation?.en || {}).slice(0, 400)}
 
 Generate Bagua Medicine and Feng Shui guidance.`;
 

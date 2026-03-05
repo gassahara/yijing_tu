@@ -146,7 +146,15 @@ async function generateAdvice(request: AdviceRequest): Promise<{ advice: string;
       ? `LINE ${ln}: "${hexData.lines_en[ln - 1]}"` : "")
   ].filter(Boolean).join('\n');
 
-  const systemPrompt = `You are a Yi Jing textual scholar extracting practical orientations from classical sources.
+  const systemPrompt = `ROLE: Yi Jing textual scholar extracting practical orientations
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I cite classical source for EACH of the 4-6 orientations?
+✓ Are all orientations grounded in Judgment, Image, or Line texts?
+✓ Did I begin each orientation with quoted classical passage?
+✓ NO motivational clichés ("trust yourself", "be bold", "take action")?
+✓ NO invented guidance beyond provided classical texts?
+✓ Tone is scholarly/interpretive, not life-coaching?
 
 RULES:
 1. ALL guidance must be derived explicitly from the classical texts provided (Judgment, Image, moving Line texts).
@@ -157,20 +165,18 @@ RULES:
 6. Plain text only — no markdown, no bullet symbols. Separate orientations with a blank line.
 7. The tone is scholarly and interpretive, not pastoral or prescriptive.`;
 
-  const userPrompt = `### QUESTION
-"${question}"
+  const userPrompt = `Q: "${question}"
 
-### HEXAGRAM
-${hexagram.number} — ${hexagram.name_zh || ''} / ${hexagram.name_en || ''}
-Moving Lines: ${changingLines.length > 0 ? changingLines.join(', ') : 'None'}
+HEX: #${hexagram.number} ${hexagram.name_zh||''}/${hexagram.name_en||''}
+MOVING: [${changingLines.join(',')||'none'}]
 
-### CLASSICAL TEXTS
-${classicalContext || "(Classical texts not available — base analysis on the complete reading context below.)"}
+CLASSICAL:
+${classicalContext || "(Texts unavailable)"}
 
-### COMPLETE READING CONTEXT
-${previousContext || "None."}
+CONTEXT:
+${previousContext || "None"}
 
-Provide 4-6 classically-grounded orientations. Quote the relevant passage first, then explain its application to the question.`;
+Provide 4-6 classically-grounded orientations. Quote passage first, then explain.`;
 
   try {
     const response = await callAI(userPrompt, 2000, {

@@ -315,19 +315,63 @@ function fillMissingFields(data: any, schema: any): any {
 }
 
 // ============================================================================
+// COMPACT MARKDOWN FORMAT HELPERS
+// ============================================================================
+
+function toCompactMarkdown(data: any): string {
+  if (!data) return 'N/A';
+  const parts: string[] = [];
+  
+  for (const [key, value] of Object.entries(data)) {
+    if (value === undefined || value === null) continue;
+    const shortKey = key.slice(0, 3).toUpperCase();
+    if (typeof value === 'object') {
+      parts.push(`${shortKey}:{${toCompactMarkdown(value)}}`);
+    } else {
+      parts.push(`${shortKey}:${String(value).slice(0, 50)}`);
+    }
+  }
+  return parts.join('|');
+}
+
+function formatBaziMD(bazi: any): string {
+  if (!bazi) return 'N/A';
+  const dm = bazi.dayMaster;
+  const str = bazi.strength;
+  return `DM:${dm?.stem||'?'}-${dm?.element||'?'}|STR:${str?.result||'?'}|FAV:${(str?.favorable||[]).join(',')}|UNFAV:${(str?.unfavorable||[]).join(',')}`;
+}
+
+function formatElementsMD(eq: any): string {
+  if (!eq?.elements) return 'N/A';
+  const e = eq.elements;
+  return `W:${Math.round(e.wood||0)}|F:${Math.round(e.fire||0)}|E:${Math.round(e.earth||0)}|M:${Math.round(e.metal||0)}|Wa:${Math.round(e.water||0)}|MISS:${(eq.missing||[]).join(',')}|STR:${eq.strongest||'?'}|WK:${eq.weakest||'?'}`;
+}
+
+// ============================================================================
 // PROMPT GENERATORS
 // ============================================================================
 
 const PROMPTS = {
   technical(hex: any, hexData: any, question: string): { system: string; user: string; schema: any } {
-    const compressed = { h: compressHexagram(hex), c: compressClassical(hexData) };
-
+    const judgment = truncate(hexData?.judgment_en, 300);
+    const image = truncate(hexData?.image?.image_en, 300);
+    
     const system = `ROLE: Yi Jing textual scholar specializing in structural analysis
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I cite Judgment text explicitly? 
+✓ Did I cite Image Commentary text?
+✓ Did I name both trigrams and their elements?
+✓ Did I explain the trigram relationship (above/below)?
+✓ Did I connect to the hexagram name meaning?
+✓ NO life-coaching or motivational language used?
+✓ NO invented interpretations beyond classical texts?
 
 RULES:
 - Ground ALL analysis in classical texts (Judgment, Image, Line texts)
-- Quote or paraphrase classical texts explicitly
+- Quote or paraphrase classical texts explicitly with citations
 - Analyze trigram dynamics using Wuxing correspondences
+- Explain upper trigram ABOVE lower trigram cosmologically
 - NO life-coaching language - textual/cosmological analysis only
 - NO invented interpretations
 - Plain text, no markdown
@@ -339,8 +383,10 @@ OUTPUT FORMAT (JSON):
   "quotedReferences": ["Classical citation (source)"]
 }`;
 
-    const user = `DATA: ${JSON.stringify(compressed)}
-
+    const user = `HEX: #${hex.number} ${hex.name_zh||''}/${hex.name_en}
+TRIGRAMS: ↑${hex.trigramUpper?.name||'?'}-${hex.trigramUpper?.element||'?'} | ↓${hex.trigramLower?.name||'?'}-${hex.trigramLower?.element||'?'}
+JUDGMENT: "${judgment}"
+IMAGE: "${image}"
 Q: "${truncate(question, 200)}"
 
 Provide technical analysis grounded in classical texts.`;
@@ -356,6 +402,15 @@ Provide technical analysis grounded in classical texts.`;
 
   colloquial(hex: any, question: string, context: string): { system: string; user: string; schema: any } {
     const system = `ROLE: Yi Jing scholar providing accessible hermeneutic narrative
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I reference Judgment meaning in my narrative?
+✓ Did I incorporate Image Commentary imagery?
+✓ Did I weave in Five Elements dynamics?
+✓ Did I address the specific question asked?
+✓ Is the tone scholarly, not motivational?
+✓ NO clichés like "trust yourself" or "be bold"?
+✓ NO invented advice beyond classical meaning?
 
 RULES:
 - Narrative MUST derive from classical Judgment and Image
@@ -373,10 +428,10 @@ OUTPUT FORMAT (JSON):
   "quotedReferences": ["Classical citation"]
 }`;
 
-    const user = `HEXAGRAM: ${hex.number} - ${hex.name_zh || ''} / ${hex.name_en}
+    const user = `HEX: #${hex.number} ${hex.name_zh||''}/${hex.name_en}
 
 TECHNICAL CONTEXT:
-${truncate(context, 800)}
+${truncate(context, 600)}
 
 Q: "${truncate(question, 200)}"
 
@@ -395,10 +450,19 @@ Write hermeneutic narrative connecting classical meaning to the question.`;
     const moving = lines.map((l, i) => l.isChanging ? i + 1 : null).filter(Boolean);
     const lineTexts = moving.map(p => ({
       p,
-      e: truncate(hexData?.lines_en?.[p - 1], 150)
+      text: truncate(hexData?.lines_en?.[p - 1], 150)
     }));
 
     const system = `ROLE: Yi Jing textual scholar extracting practical orientations
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I cite classical source for EACH orientation?
+✓ Are all 4-6 orientations grounded in specific texts?
+✓ Did I reference Judgment and Image Commentary?
+✓ Did I include moving line texts if present?
+✓ NO motivational clichés used ("trust yourself", "be bold")?
+✓ NO invented guidance beyond classical texts?
+✓ Scholarly tone maintained throughout?
 
 RULES:
 - ALL guidance must derive explicitly from classical texts
@@ -415,15 +479,11 @@ OUTPUT FORMAT (JSON):
   "quotedReferences": ["Cited passage"]
 }`;
 
-    const user = `HEXAGRAM: ${hex.number} - ${hex.name_zh || ''} / ${hex.name_en}
-MOVING LINES: ${moving.join(', ') || 'None'}
-
-LINE TEXTS:
-${JSON.stringify(lineTexts)}
-
-JUDGMENT: "${truncate(hexData?.judgment_en, 300)}"
-
-IMAGE: "${truncate(hexData?.image?.image_en, 300)}"
+    const user = `HEX: #${hex.number} ${hex.name_zh||''}/${hex.name_en}
+MOVING: [${moving.join(',')||'none'}]
+JUDGMENT: "${truncate(hexData?.judgment_en, 250)}"
+IMAGE: "${truncate(hexData?.image?.image_en, 250)}"
+${lineTexts.map(l => `L${l.p}: "${l.text}"`).join('\n')}
 
 Q: "${truncate(question, 200)}"
 
@@ -444,11 +504,20 @@ Provide 4-6 classically-grounded orientations with citations.`;
     const lineData = moving.map(p => ({
       p,
       name: ["Bottom", "Second", "Third", "Fourth", "Fifth", "Top"][p - 1],
-      z: truncate(hexData?.lines_zh?.[p - 1], 150),
-      e: truncate(hexData?.lines_en?.[p - 1], 200)
+      zh: truncate(hexData?.lines_zh?.[p - 1], 100),
+      en: truncate(hexData?.lines_en?.[p - 1], 150)
     }));
 
     const system = `ROLE: Yi Jing scholar specializing in Yao Ci (Line Text) exegesis
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I quote Yao Ci text for EACH moving line?
+✓ Did I provide exactly 6 lineTexts entries?
+✓ Did I exegete symbolic imagery within hexagram context?
+✓ Did I explain the combined dynamic of moving lines?
+✓ Are non-moving lines marked as "(stable)"?
+✓ NO life-coaching language used?
+✓ NO invented symbolism beyond classical texts?
 
 RULES:
 - Quote Yao Ci text before interpreting each line
@@ -465,10 +534,11 @@ OUTPUT FORMAT (JSON):
   "quotedReferences": ["Yao Ci citation"]
 }`;
 
-    const user = `HEXAGRAM: ${hex.number} - ${hex.name_zh || ''} / ${hex.name_en}
+    const user = `HEX: #${hex.number} ${hex.name_zh||''}/${hex.name_en}
+MOVING: [${moving.join(',')}]
 
-MOVING LINE TEXTS (Yao Ci):
-${JSON.stringify(lineData)}
+YAO CI (Line Texts):
+${lineData.map(l => `L${l.p} (${l.name}): "${l.zh}" / "${l.en}"`).join('\n')}
 
 Q: "${truncate(question, 200)}"
 
@@ -486,6 +556,15 @@ Provide Yao Ci commentary for moving lines.`;
   elements(hex: any, equilibrium: any, question: string): { system: string; user: string; schema: any } {
     const system = `ROLE: Yi Jing scholar specializing in Wuxing (Five Elements) cosmology
 
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I reference sheng (generating) cycle relationships?
+✓ Did I reference ke (controlling) cycle relationships?
+✓ Did I connect elements to hexagram's Judgment/Image?
+✓ Did I identify strongest and weakest elements?
+✓ Did I explain missing elements' significance?
+✓ NO generic life advice unrelated to classical meaning?
+✓ Analysis grounded in provided elemental data?
+
 RULES:
 - Ground analysis in hexagram's Judgment and Image Commentary
 - Reference sheng (generating) and ke (controlling) cycles
@@ -501,10 +580,9 @@ OUTPUT FORMAT (JSON):
   "recommendations": "Element-based classical orientations"
 }`;
 
-    const user = `HEXAGRAM: ${hex.number} - ${hex.name_en}
-ELEMENTS: ${JSON.stringify(compressElements(equilibrium))}
-UPPER TRIGRAM: ${hex.trigramUpper?.element}
-LOWER TRIGRAM: ${hex.trigramLower?.element}
+    const user = `HEX: #${hex.number} ${hex.name_en}
+TRIGRAMS: ↑${hex.trigramUpper?.element||'?'} | ↓${hex.trigramLower?.element||'?'}
+WUXING: ${formatElementsMD(equilibrium)}
 
 Q: "${truncate(question, 200)}"
 
@@ -523,6 +601,15 @@ Analyze Wuxing cycles and elemental dynamics.`;
   bazi(birthBazi: any, currentBazi: any, hex: any, question: string): { system: string; user: string; schema: any } {
     const system = `ROLE: Daoist Master compounding BaZi and Five Elements analysis
 
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I analyze ACTUAL day master from provided data?
+✓ Did I note strength result (strong/weak/balanced)?
+✓ Did I list favorable and unfavorable elements?
+✓ Did I explain birth BaZi impact on this reading?
+✓ Did I explain current BaZi (Prasna) moment influence?
+✓ Did I keep hexagram as PRIMARY and astrology as CONTEXT?
+✓ NO invented astrology - used only provided data?
+
 RULES:
 - USE PROVIDED TECHNICAL DATA: Analyze actual master of day, stems, branches
 - BIRTH BAZI: master of day, strength, favorable elements from data
@@ -535,14 +622,14 @@ RULES:
 OUTPUT FORMAT (JSON):
 {
   "technicalAnalysis": "Compounded BaZi and Five Elements analysis",
-  "birthBazi": { "description": "", "readingImpact": "" },
-  "currentBazi": { "description": "", "readingImpact": "" },
+  "birthBazi": { "description": "Birth chart technical summary", "readingImpact": "How birth chart affects this reading" },
+  "currentBazi": { "description": "Current moment technical summary", "readingImpact": "How current sky affects this reading" },
   "celestial": "Combined narrative of sky's influence"
 }`;
 
-    const user = `HEXAGRAM: ${hex.number} - ${hex.name_en}
-BIRTH BAZI: ${JSON.stringify(compressBazi(birthBazi))}
-CURRENT BAZI: ${JSON.stringify(compressBazi(currentBazi))}
+    const user = `HEX: #${hex.number} ${hex.name_en}
+BIRTH: ${formatBaziMD(birthBazi)}
+CURRENT: ${formatBaziMD(currentBazi)}
 
 Q: "${truncate(question, 200)}"
 

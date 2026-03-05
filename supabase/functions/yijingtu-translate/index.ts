@@ -189,7 +189,32 @@ RULES:
 2. Translate both descriptive and prescriptive text faithfully and completely.
 3. Keep Chinese proper terms (Bagua, Gua, Zang-Fu, etc.) in their established form.
 4. Do NOT add markdown formatting.
-5. Return ONLY a valid JSON object with exactly the same keys as the input. No commentary outside the JSON.`
+5. Return ONLY a valid JSON object with exactly the same keys as the input. No commentary outside the JSON.`,
+
+  // ── MD-LDL Layout Language ────────────────────────────────────────────────
+  mdldl: `You are a translator of Yi Jing interpretation content formatted in MD-LDL (Markdown Layout Definition Language).
+Your task is to translate the CONTENT while preserving the MD-LDL structure exactly.
+
+MD-LDL STRUCTURE (DO NOT MODIFY):
+- @page {lang:XX layout:tabbed} - Page directive
+- ## {id:NAME type:TYPE icon:EMOJI order:N} - Section headers
+- ### {type:TYPE priority:N} - Layer headers  
+- @text {class:CLASS} - Component directive
+- @badges - Badge component
+- @quote {source:NAME} - Quote component
+- @card {style:STYLE} - Card component
+- header:[text] - Card header
+- footer:[text] - Card footer
+- --- - Card body separator
+
+RULES:
+1. PRESERVE ALL MD-LDL syntax: @directives, ## section headers, ### layer headers, {properties}, [content placeholders]
+2. Translate ONLY the text inside [brackets] and after headers/labels
+3. Keep all property names, IDs, types, class names in English
+4. Keep emoji icons as-is
+5. Keep the @page {lang:XX...} line but change XX to target language code
+6. Preserve all line breaks and structure exactly
+7. Return the complete MD-LDL document with translated content`
 };
 
 // ============================================================================
@@ -440,6 +465,60 @@ function cleanAndParseJSON(text: string, fallbackField?: string): any {
 }
 
 // ============================================================================
+// MD-LDL TRANSLATION
+// ============================================================================
+
+async function translateMDLDL(
+  mdlLayout: string,
+  targetLang: string,
+  hexagramName: string,
+  attempt: number = 1
+): Promise<string> {
+  const target = langName(targetLang);
+  const systemPrompt = SYSTEM_PROMPTS['mdldl'];
+  
+  const userPrompt = `Translate the following MD-LDL content to ${target}.
+
+Hexagram: ${hexagramName || "Unknown"}
+
+MD-LDL Content:
+${mdlLayout}
+
+Return ONLY the complete MD-LDL with translated content. Preserve all @directives, ## headers, ### layers, and {properties} exactly. Only translate text inside [brackets] and after headers.`;
+
+  log(`translateMDLDL: lang='${targetLang}' attempt=${attempt}`);
+
+  try {
+    const raw = await callDeepSeek(systemPrompt, userPrompt, 2500, 0.15);
+    
+    // Basic validation - check if it looks like MD-LDL
+    const trimmed = raw.trim();
+    const hasPage = trimmed.includes('@page');
+    const hasSections = (trimmed.match(/##\s*\{/g) || []).length >= 2;
+    
+    if (!hasPage || !hasSections) {
+      log(`MD-LDL validation failed on attempt ${attempt}, retrying...`);
+      if (attempt < 2) {
+        await new Promise(r => setTimeout(r, 800));
+        return translateMDLDL(mdlLayout, targetLang, hexagramName, attempt + 1);
+      }
+      log('MD-LDL validation failed after retries, returning original');
+      return mdlLayout;
+    }
+    
+    // Update the lang attribute in @page
+    return trimmed.replace(/@page\s*\{lang:[a-z]{2}/, `@page {lang:${targetLang}`);
+  } catch (error) {
+    log(`MD-LDL translation failed: ${error.message}`);
+    if (attempt < 2) {
+      await new Promise(r => setTimeout(r, 800));
+      return translateMDLDL(mdlLayout, targetLang, hexagramName, attempt + 1);
+    }
+    return mdlLayout;
+  }
+}
+
+// ============================================================================
 // CORE TRANSLATION LOGIC
 // ============================================================================
 
@@ -450,12 +529,34 @@ async function translateContent(
   hexagramName: string,
   attempt: number = 1
 ): Promise<Record<string, any>> {
+  // SPECIAL HANDLING: If content has mdlLayout, translate it specially
+  if (content.mdlLayout && typeof content.mdlLayout === 'string' && content.mdlLayout.length > 100) {
+    log(`translateContent: Detected MD-LDL content, using specialized translator`);
+    const translatedLayout = await translateMDLDL(content.mdlLayout, targetLang, hexagramName);
+    return {
+      ...content,
+      mdlLayout: translatedLayout,
+      mdlParsed: undefined // Clear parsed cache since content changed
+    };
+  }
+
   const category = getPromptCategory(section);
   const systemPrompt = SYSTEM_PROMPTS[category];
-  const target = langName(targetLang);
+  const isEnglish = targetLang === 'en';
+  const target = isEnglish ? 'English (formatting only)' : langName(targetLang);
   const budget = getTokenBudget(section);
 
-  const userPrompt = `Translate the following I Ching content to ${target}.
+  const userPrompt = isEnglish 
+    ? `Format and beautify the following I Ching content. Keep all text in English, but improve readability with proper paragraph structure, consistent styling, and clear formatting.
+
+Hexagram: ${hexagramName || "Unknown"}
+Section: ${section}
+
+Content (JSON):
+${JSON.stringify(content, null, 2)}
+
+Return ONLY a valid JSON object with exactly the same keys, with all text values formatted in English. Apply proper paragraph breaks and consistent styling.`
+    : `Translate the following I Ching content to ${target}.
 
 Hexagram: ${hexagramName || "Unknown"}
 Section: ${section}
@@ -523,13 +624,14 @@ async function handleTranslate(body: any, requestId: string): Promise<Response> 
   if (!content || typeof content !== "object") {
     return errorResponse(400, "Missing or invalid 'content' field", requestId);
   }
-  if (!targetLang || !["es", "it", "zh"].includes(targetLang)) {
-    return errorResponse(400, `Invalid 'targetLang': must be es, it, or zh`, requestId);
+  if (!targetLang || !["en", "es", "it", "zh"].includes(targetLang)) {
+    return errorResponse(400, `Invalid 'targetLang': must be en, es, it, or zh`, requestId);
   }
   if (!section || typeof section !== "string") {
     return errorResponse(400, "Missing 'section' field", requestId);
   }
 
+  // ALL languages including English go through the API for formatting/styling
   const translated = await translateContent(content, targetLang, section, hexagramName || "");
 
   return new Response(
@@ -548,12 +650,20 @@ async function handleTranslateAll(body: any, requestId: string): Promise<Respons
   if (!sections || typeof sections !== "object") {
     return errorResponse(400, "Missing or invalid 'sections' field", requestId);
   }
-  if (!targetLang || !["es", "it", "zh"].includes(targetLang)) {
-    return errorResponse(400, `Invalid 'targetLang': must be es, it, or zh`, requestId);
+  if (!targetLang || !["en", "es", "it", "zh"].includes(targetLang)) {
+    return errorResponse(400, `Invalid 'targetLang': must be en, es, it, or zh`, requestId);
   }
 
   const sectionEntries = Object.entries(sections) as [string, Record<string, any>][];
   log(`translate-all: ${sectionEntries.length} sections to ${targetLang}`);
+
+  // For English, just return as-is (formatting only)
+  if (targetLang === 'en') {
+    return new Response(
+      JSON.stringify({ success: true, requestId, translated: sections }),
+      { headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
 
   // Translate all sections in parallel (DeepSeek can handle concurrent calls)
   const results = await Promise.allSettled(
@@ -592,12 +702,20 @@ async function handleTranslateText(body: any, requestId: string): Promise<Respon
   if (!Array.isArray(texts) || texts.length === 0) {
     return errorResponse(400, "Missing or empty 'texts' array", requestId);
   }
-  if (!targetLang || !["es", "it", "zh"].includes(targetLang)) {
-    return errorResponse(400, `Invalid 'targetLang': must be es, it, or zh`, requestId);
+  if (!targetLang || !["en", "es", "it", "zh"].includes(targetLang)) {
+    return errorResponse(400, `Invalid 'targetLang': must be en, es, it, or zh`, requestId);
   }
 
   const target = langName(targetLang);
   log(`translate-text: ${texts.length} items to ${targetLang}`);
+
+  // For English, return texts as-is (formatting only)
+  if (targetLang === 'en') {
+    return new Response(
+      JSON.stringify({ success: true, requestId, translatedTexts: texts }),
+      { headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
 
   const systemPrompt = `You are a translator for a Chinese metaphysical application UI.
 Translate short labels, headers, and technical terms from English into ${target}.
@@ -643,11 +761,19 @@ async function handleRemediesTranslate(body: any, requestId: string): Promise<Re
   if (!Array.isArray(remedies)) {
     return errorResponse(400, "Missing or invalid 'remedies' array", requestId);
   }
-  if (!targetLang || !["es", "it", "zh"].includes(targetLang)) {
-    return errorResponse(400, `Invalid 'targetLang': must be es, it, or zh`, requestId);
+  if (!targetLang || !["en", "es", "it", "zh"].includes(targetLang)) {
+    return errorResponse(400, `Invalid 'targetLang': must be en, es, it, or zh`, requestId);
   }
 
   log(`remedies-translate: ${remedies.length} remedies to ${targetLang}`);
+
+  // For English, return as-is (formatting only)
+  if (targetLang === 'en') {
+    return new Response(
+      JSON.stringify({ success: true, requestId, translated: remedies }),
+      { headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
 
   // Translate the remedies array as a single batch to preserve relational context
   const contentWrapper = { remedies };
@@ -664,6 +790,90 @@ async function handleRemediesTranslate(body: any, requestId: string): Promise<Re
     JSON.stringify({ success: true, requestId, translated: translatedRemedies }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } }
   );
+}
+
+// ============================================================================
+// FORMAT ENDPOINT (Layout formatting without translation)
+// ============================================================================
+
+// POST /format
+// Body: { content: {...}, section: string, lang?: string }
+// Response: { formatted: {...} }
+async function handleFormat(body: any, requestId: string): Promise<Response> {
+  const { content, section, lang = 'en' } = body;
+
+  if (!content || typeof content !== "object") {
+    return errorResponse(400, "Missing or invalid 'content' field", requestId);
+  }
+  if (!section || typeof section !== "string") {
+    return errorResponse(400, "Missing 'section' field", requestId);
+  }
+
+  log(`format: section='${section}' lang='${lang}'`);
+
+  // Call AI to format/beautify the content
+  const formatted = await formatContent(content, section, lang);
+
+  return new Response(
+    JSON.stringify({ success: true, requestId, formatted }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+}
+
+async function formatContent(
+  content: Record<string, any>,
+  section: string,
+  lang: string,
+  attempt: number = 1
+): Promise<Record<string, any>> {
+  const budget = getTokenBudget(section);
+
+  const systemPrompt = `ROLE: Professional text formatter for I Ching content.
+
+Your task is to format and beautify the provided text while keeping it in the SAME language.
+Do NOT translate - only improve layout, paragraph structure, and readability.
+
+FORMATTING RULES:
+1. Keep ALL text in the original language (${lang})
+2. Apply proper paragraph breaks (2-4 sentences per paragraph)
+3. Remove excessive whitespace and normalize spacing
+4. Maintain section prefixes like "CELESTIAL:", "ELEMENTS:", "ANALYSIS:", "ADVICE:"
+5. Preserve all technical terms, names, and special vocabulary
+6. Ensure consistent styling throughout
+
+Return ONLY valid JSON with the same keys as input.`;
+
+  const userPrompt = `Format the following I Ching content for better readability.
+Keep the text in ${lang} language - do NOT translate.
+
+Section: ${section}
+
+Content (JSON):
+${JSON.stringify(content, null, 2)}
+
+Return ONLY the formatted JSON object with the same field names and structure.`;
+
+  try {
+    const raw = await callDeepSeek(systemPrompt, userPrompt, budget, 0.1);
+    
+    // Use the shared repair pipeline
+    const parseResult = cleanAndParseJSON(raw);
+    if (parseResult.error) {
+      log(`Format JSON parse failed on attempt ${attempt}: ${parseResult.message}`);
+      if (attempt < 2) {
+        log("Retrying format...");
+        await new Promise(r => setTimeout(r, 500));
+        return formatContent(content, section, lang, attempt + 1);
+      }
+      log("Giving up, returning original content");
+      return content;
+    }
+    
+    return parseResult as Record<string, any>;
+  } catch (err) {
+    log(`Format error: ${err.message}`);
+    return content;
+  }
 }
 
 // ============================================================================
@@ -722,13 +932,16 @@ serve(async (req: Request) => {
       case "remedies-translate":
         return await handleRemediesTranslate(body, requestId);
 
+      case "format":
+        return await handleFormat(body, requestId);
+
       default:
         // Default to single-section translate (backward compat with existing callers
         // that POST directly to the function URL without an action path segment)
         if (body.content && body.targetLang && body.section) {
           return await handleTranslate(body, requestId);
         }
-        return errorResponse(404, `Unknown action: '${action}'. Use: translate, translate-all, remedies-translate`, requestId);
+        return errorResponse(404, `Unknown action: '${action}'. Use: translate, translate-all, remedies-translate, format`, requestId);
     }
   } catch (err: any) {
     log(`Unhandled error: ${err.message}`);

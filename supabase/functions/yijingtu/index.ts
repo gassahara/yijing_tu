@@ -189,6 +189,162 @@ const DEFAULT_MODEL = "deepseek-chat";
 const MAX_OUTPUT_TOKENS = 2048;
 
 // ============================================================================
+// RNG SOURCE CONFIGURATION
+// ============================================================================
+
+interface RNGSource {
+  name: string;
+  weight: number;  // Probability weight (higher = more likely to be selected)
+  enabled: boolean;
+  fetcher: () => Promise<Uint8Array>;
+}
+
+// NIST Beacon fetcher (Schema: pulse.outputValue = hex string)
+async function fetchNISTEntropy(): Promise<Uint8Array> {
+  const NIST_BEACON_URL = "https://beacon.nist.gov/beacon/2.0/pulse/last";
+  const response = await fetchWithTimeout(NIST_BEACON_URL, {}, 10000);
+  if (!response.ok) throw new Error(`NIST beacon returned ${response.status}`);
+  const data = await response.json();
+  // NIST returns hex string in pulse.outputValue
+  const hexString = data.pulse?.outputValue;
+  if (!hexString) throw new Error('NIST beacon returned no outputValue');
+  // Convert hex to bytes
+  const bytes = new Uint8Array(hexString.length / 2);
+  for (let i = 0; i < hexString.length; i += 2) {
+    bytes[i / 2] = parseInt(hexString.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+// CURBY (University of Colorado Boulder Quantum RNG) fetcher
+// Schema: data.content.payload.randomness.bytes = base64 string
+async function fetchCURBYEntropy(): Promise<Uint8Array> {
+  const CURBY_URL = "https://random.colorado.edu/api/curbyq/round/latest/result";
+  const response = await fetchWithTimeout(CURBY_URL, {}, 15000);
+  if (!response.ok) throw new Error(`CURBY returned ${response.status}`);
+  const data = await response.json();
+  // CURBY returns base64 in data.content.payload.randomness.bytes
+  const base64String = data.data?.content?.payload?.randomness?.bytes;
+  if (!base64String) throw new Error('CURBY returned no randomness bytes');
+  // Convert base64 to bytes
+  const binaryString = atob(base64String);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+// Local crypto fallback
+async function fetchLocalEntropy(): Promise<Uint8Array> {
+  const bytes = new Uint8Array(64);
+  crypto.getRandomValues(bytes);
+  return bytes;
+}
+
+// AnuQ RNG (quantum) fetcher
+async function fetchAnuQEntropy(): Promise<Uint8Array> {
+  const ANUQ_URL = "https://qrng.anu.edu.au/API/jsonI.php?length=64&type=uint8";
+  const response = await fetchWithTimeout(ANUQ_URL, {}, 10000);
+  if (!response.ok) throw new Error(`AnuQ returned ${response.status}`);
+  const data = await response.json();
+  if (!data.success || !Array.isArray(data.data)) {
+    throw new Error('AnuQ returned invalid data');
+  }
+  return new Uint8Array(data.data);
+}
+
+// Registered RNG sources with their weights
+// First: NIST (Schema: pulse.outputValue = hex)
+// Second: CURBY (Schema: data.content.payload.randomness.bytes = base64)
+const RNG_SOURCES: Record<string, RNGSource> = {
+  nist: {
+    name: 'NIST',
+    weight: 35,
+    enabled: true,
+    fetcher: fetchNISTEntropy
+  },
+  curby: {
+    name: 'CURBY',
+    weight: 35,
+    enabled: true,
+    fetcher: fetchCURBYEntropy
+  },
+  local: {
+    name: 'local_crypto',
+    weight: 30,
+    enabled: true,
+    fetcher: fetchLocalEntropy
+  }
+};
+
+// Select RNG sources based on mode and weights
+function selectRNGSources(mode: 'single' | 'multiple' | 'all', count?: number): RNGSource[] {
+  const enabledSources = Object.values(RNG_SOURCES).filter(s => s.enabled);
+  
+  if (mode === 'all') {
+    return enabledSources;
+  }
+  
+  if (mode === 'single' || (mode === 'multiple' && (!count || count === 1))) {
+    // Weighted random selection
+    const totalWeight = enabledSources.reduce((sum, s) => sum + s.weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    for (const source of enabledSources) {
+      random -= source.weight;
+      if (random <= 0) {
+        return [source];
+      }
+    }
+    return [enabledSources[enabledSources.length - 1]];
+  }
+  
+  // mode === 'multiple' with count > 1
+  const numToSelect = Math.min(count || 2, enabledSources.length);
+  const selected: RNGSource[] = [];
+  const available = [...enabledSources];
+  
+  // Weighted selection without replacement
+  for (let i = 0; i < numToSelect && available.length > 0; i++) {
+    const totalWeight = available.reduce((sum, s) => sum + s.weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    for (let j = 0; j < available.length; j++) {
+      random -= available[j].weight;
+      if (random <= 0) {
+        selected.push(available[j]);
+        available.splice(j, 1);
+        break;
+      }
+    }
+  }
+  
+  return selected;
+}
+
+// Mix multiple entropy sources using XOR
+function mixEntropy(buffers: Uint8Array[]): Uint8Array {
+  if (buffers.length === 0) {
+    throw new Error('No entropy buffers to mix');
+  }
+  if (buffers.length === 1) {
+    return buffers[0];
+  }
+  
+  // Find minimum length
+  const minLength = Math.min(...buffers.map(b => b.length));
+  const result = new Uint8Array(minLength);
+  
+  // XOR all buffers together
+  for (let i = 0; i < minLength; i++) {
+    result[i] = buffers.reduce((acc, buf) => acc ^ buf[i], 0);
+  }
+  
+  return result;
+}
+
+// ============================================================================
 // AUTHENTIC DAOIST FULU/FUZHOU DATABASE
 // ============================================================================
 
@@ -1962,9 +2118,16 @@ async function translateInterpretationContent(
 ): Promise<any> {
   log(4, `[TRANSLATE] Translating to ${targetLangName}...`);
 
-  const systemPrompt = `You are a professional translator and Yi Jing scholar. 
-Translate the provided I Ching interpretation from English to ${targetLangName}.
-All string values must be plain text - no markdown formatting (no **bold**, no *italic*, no # headings).
+  const systemPrompt = `ROLE: Professional translator and Yi Jing scholar
+
+VERIFICATION CHECKLIST - Verify before output:
+✓ Did I translate EVERY detail without summarizing?
+✓ Did I preserve all technical terminology (BaZi, trigrams, Five Elements)?
+✓ Did I keep all Chinese characters and pinyin?
+✓ Did I preserve ritual steps and drawing instructions exactly?
+✓ Is the translation length comparable to source (not abbreviated)?
+✓ Did I remove all markdown formatting (**bold**, *italic*, # headings)?
+✓ Is output valid JSON with same structure?
 
 STRICT RULES:
 1. FAITHFUL TRANSLATION: Do NOT summarize. Every detail, nuance, and paragraph must be translated.
@@ -3548,85 +3711,166 @@ function generateFengShuiDiagram(favorable: string[], unfavorable: string[], ins
 // MAIN ENDPOINT HANDLERS
 // ============================================================================
 
-async function handleRandomBeacon(requestId: string, startTime: number): Promise<Response> {
-  log(4, `[RANDOM] Calling shared-rng service`);
+async function handleRandomBeacon(
+  requestId: string, 
+  startTime: number,
+  mode: 'single' | 'multiple' | 'all' = 'single',
+  sourceCount?: number,
+  requestedSources?: string[]
+): Promise<Response> {
+  log(4, `[RANDOM] Generating entropy - mode: ${mode}, sources: ${requestedSources?.join(',') || 'weighted'}`);
 
   try {
-    // Call the shared RNG service for superior entropy mixing
-    const sharedRngResponse = await fetch(`${SHARED_RNG_URL}?bits=512&format=binary`, {
-      method: 'GET',
-      headers: { 
-        'Accept': 'application/json',
-        'X-Request-ID': requestId
-      }
-    });
+    // Get enabled sources count for validation
+    const enabledSources = Object.values(RNG_SOURCES).filter(s => s.enabled);
+    const maxAvailable = enabledSources.length;
 
-    if (!sharedRngResponse.ok) {
-      throw new Error(`shared-rng returned ${sharedRngResponse.status}`);
-    }
-
-    const rngData = await sharedRngResponse.json();
+    // Validate requested count against available sources
+    let effectiveCount = sourceCount;
+    let countWarning: string | undefined;
     
-    if (!rngData.success || !rngData.data?.entropy) {
-      throw new Error('Invalid response from shared-rng');
+    if (mode === 'multiple' && sourceCount) {
+      if (sourceCount > maxAvailable) {
+        countWarning = `Requested ${sourceCount} sources but only ${maxAvailable} are available. Using all ${maxAvailable} sources.`;
+        log(3, `[RANDOM] ${countWarning}`);
+        effectiveCount = maxAvailable;
+      }
     }
 
-    const binaryString = rngData.data.entropy;
-    const sources = rngData.data.sources || ['unknown'];
-    const qualityScore = rngData.data.quality_score || 0;
+    // Determine which sources to use
+    let selectedSources: RNGSource[];
+    
+    if (requestedSources && requestedSources.length > 0) {
+      // Use specifically requested sources
+      selectedSources = requestedSources
+        .map(name => RNG_SOURCES[name.toLowerCase()])
+        .filter(s => s && s.enabled);
+      if (selectedSources.length === 0) {
+        throw new Error('None of the requested sources are available');
+      }
+      // Warn if fewer sources than requested
+      if (selectedSources.length < requestedSources.length) {
+        countWarning = `Requested ${requestedSources.length} sources but only ${selectedSources.length} are available/enabled.`;
+      }
+    } else {
+      // Use weighted selection based on mode
+      selectedSources = selectRNGSources(mode, effectiveCount);
+    }
 
-    log(4, `[RANDOM] Received entropy from shared-rng`, { 
-      sources: sources.join(', '),
-      quality: qualityScore 
+    log(4, `[RANDOM] Selected sources: ${selectedSources.map(s => s.name).join(', ')}`);
+
+    // Fetch entropy from all selected sources in parallel
+    const entropyResults = await Promise.allSettled(
+      selectedSources.map(async (source) => {
+        const start = Date.now();
+        try {
+          const entropy = await source.fetcher();
+          // Ensure minimum 512 bits (64 bytes)
+          if (entropy.length < 64) {
+            throw new Error(`Insufficient entropy: ${entropy.length * 8} bits (minimum 512 required)`);
+          }
+          log(4, `[RANDOM] ${source.name} returned ${entropy.length * 8} bits in ${Date.now() - start}ms`);
+          return { source: source.name, entropy, success: true };
+        } catch (err: any) {
+          log(3, `[RANDOM] ${source.name} failed: ${err.message}`);
+          return { source: source.name, error: err.message, success: false };
+        }
+      })
+    );
+
+    // Collect successful entropy
+    const successfulEntropies: Uint8Array[] = [];
+    const usedSources: string[] = [];
+    const failedSources: string[] = [];
+
+    for (const result of entropyResults) {
+      if (result.status === 'fulfilled' && result.value.success) {
+        successfulEntropies.push(result.value.entropy);
+        usedSources.push(result.value.source);
+      } else {
+        failedSources.push(result.status === 'fulfilled' ? result.value.source : 'unknown');
+      }
+    }
+
+    // If no sources succeeded, fall back to local crypto
+    if (successfulEntropies.length === 0) {
+      log(3, `[RANDOM] All external sources failed, falling back to local crypto`);
+      const localEntropy = await fetchLocalEntropy();
+      successfulEntropies.push(localEntropy);
+      usedSources.push('local_crypto_fallback');
+    }
+
+    // Mix all entropy sources together
+    const mixedEntropy = mixEntropy(successfulEntropies);
+    
+    // Convert to binary string - preserve ALL entropy
+    const binaryString = Array.from(mixedEntropy)
+      .map(byte => byte.toString(2).padStart(8, '0'))
+      .join('');
+
+    // Calculate quality score based on number of sources
+    const qualityScore = Math.min(100, usedSources.length * 25 + (usedSources.includes('local') ? 0 : 10));
+
+    log(4, `[RANDOM] Generated ${binaryString.length} bits from ${usedSources.length} source(s)`, {
+      sources: usedSources,
+      failed: failedSources,
+      quality: qualityScore
     });
 
-    // Map to legacy response format for backward compatibility
-    const response = {
+    const response: any = {
       binaryString,
-      timestamp: rngData.data.timestamp || new Date().toISOString(),
-      source: sources.includes('NIST') ? 'NIST_beacon' : 
-              sources.includes('drand') ? 'drand_beacon' : 
-              'shared_crypto',
-      sources,  // New field for enhanced clients
-      qualityScore,  // New field for enhanced clients
-      pulseIndex: rngData.meta?.requestId || requestId
+      timestamp: new Date().toISOString(),
+      source: usedSources.length === 1 ? usedSources[0] : 'mixed',
+      sources: usedSources,
+      failedSources: failedSources.length > 0 ? failedSources : undefined,
+      totalBits: binaryString.length,
+      qualityScore,
+      mode,
+      availableSources: maxAvailable,
+      pulseIndex: requestId
     };
+
+    // Add warning if applicable
+    if (countWarning) {
+      response.warning = countWarning;
+    }
 
     return new Response(
       JSON.stringify(createSuccessResponse(response, requestId, startTime)),
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
 
   } catch (error: any) {
-    log(3, `[RANDOM] shared-rng error: ${error.message}, falling back to local crypto`);
+    log(3, `[RANDOM] Multi-source generation failed: ${error.message}, falling back to local crypto`);
 
-    // Fallback to local crypto (original Yijing behavior)
+    // Final fallback to local crypto
     try {
-      const randomBytes = new Uint8Array(64);
-      crypto.getRandomValues(randomBytes);
-
-      const binaryString = Array.from(randomBytes)
+      const localEntropy = await fetchLocalEntropy();
+      const binaryString = Array.from(localEntropy)
         .map(byte => byte.toString(2).padStart(8, '0'))
         .join('');
 
       const response = {
         binaryString,
         timestamp: new Date().toISOString(),
-        source: "crypto_fallback",
-        note: "shared-rng unavailable, using local cryptographically secure random"
+        source: "local_crypto",
+        sources: ["local_crypto"],
+        qualityScore: 50,
+        mode,
+        note: "External sources unavailable, using local cryptographically secure random"
       };
 
       return new Response(
         JSON.stringify(createSuccessResponse(response, requestId, startTime)),
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     } catch (cryptoError: any) {
-      log(0, `[RANDOM] Local crypto fallback failed: ${cryptoError.message}`);
+      log(0, `[RANDOM] Critical failure: ${cryptoError.message}`);
       throw new AppError(
         "Failed to generate randomness",
         500,
         "RANDOM_GENERATION_FAILED",
-        { originalError: cryptoError.message, sharedRngError: error.message }
+        { originalError: cryptoError.message }
       );
     }
   }
@@ -4436,38 +4680,98 @@ async function handleInterpretationTab(body: any, requestId: string, startTime: 
     zh: { ce: '天体', el: '五行', an: '分析', ad: '建议', wr: '用中文写' }
   }[lang] || t.en;
 
-  const prompt = `${t.wr}. Yi Jing reading for Hexagram #${ctx.h.n} ${ctx.h.zh} ${ctx.h.name}.
+  // Compact token-optimized prompt with verification
+  const prompt = `ROLE: Yi Jing scholar. Write interpretation in ${lang}.
 
-Judgment: ${ctx.j}
-Image: ${ctx.i}
-Trigrams: ${ctx.tu}(${ctx.tue})/${ctx.tl}(${ctx.tle})
-${mLines.length ? `Lines: ${mLines.map((l: any) => `#${l.p}:${l.t}...`).join(', ')}` : 'Stable'}
+INPUT:
+H#${ctx.h.n} ${ctx.h.name}|${ctx.h.zh}
+Trigrams:${ctx.tu}(${ctx.tue})/${ctx.tl}(${ctx.tle})
+Judgment:"${ctx.j?.slice(0, 150)}"
+Image:"${ctx.i?.slice(0, 150)}"
+Mansion:${ctx.lm}|LifeGua:${ctx.lg}|DayMaster:${ctx.dm}(${ctx.dme})|Strength:${ctx.str}
+Elements:W${ctx.w}%F${ctx.f}%E${ctx.e}%M${ctx.m}%Wa${ctx.wa}%|Dom:${ctx.dom}|Def:${ctx.def}
+Moving:${mLines.map((l: any) => l.p).join(',') || 'none'}
+Q:"${question?.slice(0, 80)}"
 
-Cosmic: Mansion ${ctx.lm}(${ctx.lmn}), LifeGua ${ctx.lg}, DayMaster ${ctx.dm}(${ctx.dme}), Strength ${ctx.str}
-Elements: ${ctx.w}%${elName('wood')} ${ctx.f}%${elName('fire')} ${ctx.e}%${elName('earth')} ${ctx.m}%${elName('metal')} ${ctx.wa}%${elName('water')} | Dom:${ctx.dom} Def:${ctx.def}
+OUTPUT FORMAT (MD-LDL - strict):
+@page {lang:${lang} layout:tabbed}
 
-Question: "${question?.slice(0, 100)}"
+## {id:celestial type:celestial icon:🌟 order:1}
+${t.ce}
+### {type:analysis priority:1}
+@text {class:technical}
+[2-3 paragraphs: BaZi, mansion, LifeGua analysis. Quote Judgment/Image.]
 
-Return JSON in ${lang} language (no newlines in values):
-{"c":"${t.ce}: ...","e":"${t.el}: ...","a":"${t.an}: ...","d":"${t.ad}: ...","r":["..."]}`;
+## {id:elements type:elements icon:🔄 order:2}
+${t.el}
+### {type:analysis priority:1}
+@badges
+Wood:M|Fire:F|Earth:E|Metal:Mt|Water:Wa
+@text {class:technical}
+[Wuxing cycles, dominant/deficient analysis]
+
+## {id:analysis type:analysis icon:🔍 order:3}
+${t.an}
+### {type:analysis priority:1}
+@badges
+Upper:${ctx.tu}:${ctx.tue}|Lower:${ctx.tl}:${ctx.tle}
+@text {class:classical}
+[Hexagram structure, trigram dynamics, moving lines meaning]
+@quote {source:Yijing ${ctx.h.n}}
+[Key Judgment quote]
+### {type:colloquial priority:2}
+@card {style:colloquial}
+header:[Title for querent]
+---
+[Practical application to question. 2 paragraphs.]
+---
+footer:[Core wisdom]
+
+## {id:advice type:advice icon:💡 order:4}
+${t.ad}
+### {type:list priority:1}
+@list {numbered:true}
+[4-6 numbered orientations grounded in classical texts]
+### {type:references collapsed:true priority:2}
+@quote {source:Image}
+[Relevant Image Commentary]
+
+RULES:
+- Ground ALL in classical texts (Judgment, Image, Line texts)
+- NO life-coaching clichés
+- Cite sources explicitly
+- Paragraphs: 2-3 sentences max per paragraph
+- Output ONLY MD-LDL, no explanations`; 
 
   try {
-    const result = await getStructuredInterpretation(
-      prompt,
-      2000, // Reduced token limit
-      { response_mime_type: "application/json" },
-      ['a', 'd'], // Check analysis and advice exist
-      1 // Single retry
-    );
+    // Reduced token limit for faster response
+    const raw = await getInterpretation(prompt, 1500, { temperature: 0.2 });
+    
+    // Verification: ensure we got valid MD-LDL structure
+    const trimmed = raw.trim();
+    const hasPage = trimmed.startsWith('@page');
+    const hasSections = (trimmed.match(/##\s*\{/g) || []).length >= 3;
+    
+    if (!hasPage || !hasSections) {
+      log(4, `[TAB:interpretation] MD-LDL verification failed, attempting repair`);
+      // Retry with stronger instruction
+      const retryPrompt = prompt + '\n\nCRITICAL: Previous output was malformed. Ensure @page header and ## sections with {id:...} properties.';
+      const retryRaw = await getInterpretation(retryPrompt, 1500, { temperature: 0.1 });
+      return new Response(
+        JSON.stringify(createSuccessResponse({
+          layout: retryRaw.trim(),
+          format: 'md-ldl',
+          lang
+        }, requestId, startTime)),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-    // Return compact format
     return new Response(
       JSON.stringify(createSuccessResponse({
-        c: result.c || result.celestial || '',
-        e: result.e || result.elements || '',
-        a: result.a || result.analysis || '',
-        d: result.d || result.advice || '',
-        r: result.r || result.quotedReferences || []
+        layout: trimmed,
+        format: 'md-ldl',
+        lang
       }, requestId, startTime)),
       { headers: { "Content-Type": "application/json" } }
     );
@@ -4859,7 +5163,7 @@ async function handlePostRequest(
             translateText: "POST /translate-text - Optimized translation using text format (40% less tokens)",
 
             // GET endpoints
-            random: "GET /random - NIST beacon randomness",
+            random: "GET /random?mode=single|multiple|all&count=N&sources=nist,curby,local - Multi-source RNG (NIST + CURBY). Yi Jing uses 2 sources (45-68s wait), Ashtamangala uses 4 beacons (2 waves) with meditation periods",
             health: "GET /health - System health check"
           }
         }, requestId, startTime)),
@@ -4899,10 +5203,17 @@ async function handleGetRequest(
     );
   }
 
-  // GET /random - NIST beacon for randomness
+  // GET /random - Multi-source RNG with configurable selection
   if (lastSegment === 'random' || lastSegment === '' || lastSegment === 'yijingtu') {
     console.log(`[GET_HANDLER] Routing to handleRandomBeacon`);
-    return await handleRandomBeacon(requestId, startTime);
+    
+    // Parse query parameters for RNG configuration
+    const url = new URL(req.url);
+    const mode = (url.searchParams.get('mode') as 'single' | 'multiple' | 'all') || 'single';
+    const count = parseInt(url.searchParams.get('count') || '1', 10);
+    const sources = url.searchParams.get('sources')?.split(',').filter(Boolean);
+    
+    return await handleRandomBeacon(requestId, startTime, mode, count, sources);
   }
 
   // GET /health
@@ -5150,26 +5461,33 @@ async function handleTranslate(body: any, requestId: string, startTime?: number)
     throw new ValidationError("Request must include 'content', 'targetLang', and 'section'");
   }
 
-  if (!['es', 'it', 'zh'].includes(targetLang)) {
+  if (!['en', 'es', 'it', 'zh'].includes(targetLang)) {
     throw new ValidationError(`Unsupported target language: ${targetLang}`);
   }
 
-  log(4, `[translate] Translating section '${section}' to ${targetLang}`);
+  // ALL languages including English go through the API for proper formatting/styling
+  log(4, `[translate] Processing section '${section}' for language '${targetLang}'`);
 
   // Build translation prompt
   const contentJson = JSON.stringify(content, null, 2);
 
-  const systemPrompt = `You are a professional translator specializing in I Ching (Yi Jing) terminology and Chinese metaphysics.
-Translate the following interpretation content from English to ${targetLang === 'es' ? 'Spanish' : targetLang === 'it' ? 'Italian' : 'Chinese'}.
+  const isEnglish = targetLang === 'en';
+  const targetLangName = targetLang === 'es' ? 'Spanish' : targetLang === 'it' ? 'Italian' : targetLang === 'zh' ? 'Chinese' : 'English';
+  
+  const systemPrompt = `You are a professional ${isEnglish ? 'formatter' : 'translator'} specializing in I Ching (Yi Jing) terminology and Chinese metaphysics.
+${isEnglish 
+  ? 'Format and beautify the following interpretation content. Keep all text in English, apply proper styling, ensure good paragraph structure, and maintain consistent formatting.' 
+  : `Translate the following interpretation content from English to ${targetLangName}.`}
 
 CRITICAL REQUIREMENTS:
-1. Maintain all technical terminology accuracy (BaZi, Five Elements, trigrams, etc.)
+1. ${isEnglish ? 'Maintain all original meaning while improving formatting' : 'Maintain all technical terminology accuracy (BaZi, Five Elements, trigrams, etc.)'}
 2. Preserve the structure - return ONLY a JSON object with the same keys as input
 3. Use classical/divinatory language style appropriate for spiritual texts
 4. Do NOT add markdown formatting to text values
 5. Keep lineTexts as an array of 6 strings (one per line)
+${isEnglish ? '6. Apply proper paragraph breaks for readability' : ''}
 
-Return ONLY valid JSON with the translated content.`;
+Return ONLY valid JSON with the ${isEnglish ? 'formatted' : 'translated'} content.`;
 
   const userPrompt = `Translate this I Ching interpretation section to ${targetLang === 'es' ? 'Spanish' : targetLang === 'it' ? 'Italian' : 'Chinese'}:
 
@@ -5217,11 +5535,12 @@ async function handleTranslateText(body: any, requestId: string, startTime?: num
     throw new ValidationError("Request must include 'content', 'targetLang', and 'section'");
   }
 
-  if (!['es', 'it', 'zh'].includes(targetLang)) {
+  if (!['en', 'es', 'it', 'zh'].includes(targetLang)) {
     throw new ValidationError(`Unsupported target language: ${targetLang}`);
   }
 
-  log(4, `[translate-text] Translating section '${section}' to ${targetLang}`);
+  // ALL languages including English go through the API for proper formatting/styling
+  log(4, `[translate-text] Processing section '${section}' for language '${targetLang}'`);
 
   // Convert JSON to compact text format
   const contentText = jsonToTextFormat(content);
@@ -5233,16 +5552,29 @@ async function handleTranslateText(body: any, requestId: string, startTime?: num
   const savings = jsonSize - textSize;
   log(4, `[translate-text] Format savings: ${savings} chars (${Math.round(savings / jsonSize * 100)}%)`);
 
-  const langName = targetLang === 'es' ? 'Spanish' : targetLang === 'it' ? 'Italian' : 'Chinese';
+  const isEnglish = targetLang === 'en';
+  const langName = targetLang === 'es' ? 'Spanish' : targetLang === 'it' ? 'Italian' : targetLang === 'zh' ? 'Chinese' : 'English';
 
-  // CRITICAL: Stronger prompt to ensure actual translation happens
-  const systemPrompt = `You are a professional translator. Translate the following I Ching content from English to ${langName}.
-IMPORTANT: You MUST translate all text content. Do NOT return English.
+  // CRITICAL: Stronger prompt to ensure actual translation/formatting happens
+  const systemPrompt = `ROLE: Professional ${isEnglish ? 'formatter' : 'translator'} for I Ching content
+
+VERIFICATION CHECKLIST - Verify before output:
+${isEnglish 
+  ? `✓ Did I preserve ALL original text content (not changing any words)?
+✓ Did I apply proper paragraph breaks and formatting?
+✓ Did I improve readability while maintaining meaning?`
+  : `✓ Did I translate ALL text content (not leaving any English)?
+✓ Did I keep technical terms in original form (BaZi, trigrams, Five Elements)?
+✓ Did I use classical/spiritual language style?`}
+✓ Did I preserve all [KEY] and [/KEY] tags exactly?
+✓ Did I preserve ---ITEM--- separators for arrays?
+✓ Did I maintain the compact Markdown format?
+
 Rules:
-- Translate all descriptive text to ${langName}
-- Keep technical terms like "BaZi", "trigrams", "Five Elements", "Yin", "Yang" in original form
-- Use classical, spiritual language appropriate for I Ching
-- Maintain the exact same [KEY] and [/KEY] tags around your translated text.
+${isEnglish 
+  ? '- Keep all text in English, only improve formatting and structure\n- Apply proper paragraph breaks for readability\n- Maintain consistent styling throughout' 
+  : `- Translate all descriptive text to ${langName}\n- Keep technical terms like "BaZi", "trigrams", "Five Elements", "Yin", "Yang" in original form\n- Use classical, spiritual language appropriate for I Ching`}
+- Maintain the exact same [KEY] and [/KEY] tags around your ${isEnglish ? 'formatted' : 'translated'} text.
 - If the original uses ---ITEM--- to separate array items, preserve the ---ITEM--- separators exactly.
 
 Example input:

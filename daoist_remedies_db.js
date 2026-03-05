@@ -71,16 +71,16 @@ const DAOIST_REMEDIES_DB = {
               "name": "cloud_script_body",
               "commands": [
                 // The "V" and loops header
-                { "type": "path", "points": [[450, 250], [550, 250], [500, 300], [450, 250]], "style": { "width": 6, "color": "#000000" } },
+                { "type": "path", "points": [[450, 250], [550, 250], [500, 300], [450, 250]], "style": { "width": 6, "color": "#CC0000" } },
                 { "type": "circle", "cx": 500, "cy": 350, "r": 30, "style": { "width": 6, "color": "#000", "fill": "none" } },
                 { "type": "circle", "cx": 500, "cy": 420, "r": 30, "style": { "width": 6, "color": "#000", "fill": "none" } },
                 { "type": "circle", "cx": 500, "cy": 490, "r": 30, "style": { "width": 6, "color": "#000", "fill": "none" } },
                 // The 5 Thunder Squiggles
-                { "type": "text", "x": 300, "y": 600, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#000000" } },
-                { "type": "text", "x": 700, "y": 600, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#000000" } },
-                { "type": "text", "x": 500, "y": 700, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#000000" } },
-                { "type": "text", "x": 350, "y": 850, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#000000" } },
-                { "type": "text", "x": 650, "y": 850, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#000000" } }
+                { "type": "text", "x": 300, "y": 600, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 700, "y": 600, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 500, "y": 700, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 350, "y": 850, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 650, "y": 850, "content": "雷", "size": 100, "font": "worm", "style": { "color": "#CC0000" } }
               ]
             }
           ]
@@ -371,11 +371,75 @@ const DAOIST_REMEDIES_DB = {
     {
       "id": "fulu_018",
       "name": { "zh": "九鳳破穢符", "en": "Nine-Phoenix Destroyer of Filth", "es": "Destructor de Inmundicia de las Nueve Fénix", "it": "Distruttore di Immondizia delle Nove Fenici", "pinyin": "Jiufeng Pohui Fu" },
-      "description": "Purification talisman. Nine stylized crests at top.",
-      "structure": { "type": "purification", "elements": ["9 Phoenix crests", "Fire/Red ink"] },
+      "description": "A powerful purification talisman invoking the Nine Phoenixes (九鳳) to destroy filth and cleanse space. The nine stylized phoenix crests at the top represent celestial fire spirits that descend to burn away impure qi. Used in purification rituals to cleanse homes, temples, and ritual spaces of accumulated negative energies.",
+      "source": { "primary": "Zhengyi Purification Rites", "scholarCitation": "Traditional thunder-magic purification talisman using fire/phoenix symbolism." },
+      "structure": { 
+        "type": "purification", 
+        "elements": ["9 Phoenix crests", "Fire/Red ink", "Thunder V header", "Celestial fire symbols"],
+        "instructions": "Draw with red cinnabar ink on yellow paper. The nine crests at top represent the nine phoenixes. The central body contains the command characters. Visualize nine celestial phoenixes descending with fire to burn away all impurity."
+      },
       "generatorParams": { "style": "THUNDER", "chars": ["九", "鳳", "破", "穢"] },
-      "usage": ["purification", "space_cleansing"],
+      "visualData": {
+        "fdl": {
+          "version": "1.0",
+          "background": "#F5E6CA",
+          "source": "database",
+          "layers": [
+            {
+              "name": "phoenix_crests",
+              "commands": [
+                { "type": "path", "points": [[150, 100], [170, 40], [190, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 170, "cy": 70, "r": 6, "style": { "fill": "#CC0000" } },
+                { "type": "path", "points": [[250, 100], [270, 30], [290, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 270, "cy": 60, "r": 6, "style": { "fill": "#CC0000" } },
+                { "type": "path", "points": [[350, 100], [370, 20], [390, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 370, "cy": 50, "r": 6, "style": { "fill": "#CC0000" } },
+                { "type": "path", "points": [[450, 100], [470, 15], [490, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 470, "cy": 45, "r": 6, "style": { "fill": "#CC0000" } },
+                { "type": "path", "points": [[550, 100], [570, 15], [590, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 570, "cy": 45, "r": 6, "style": { "fill": "#CC0000" } },
+                { "type": "path", "points": [[650, 100], [670, 20], [690, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 670, "cy": 50, "r": 6, "style": { "fill": "#CC0000" } },
+                { "type": "path", "points": [[750, 100], [770, 30], [790, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 770, "cy": 60, "r": 6, "style": { "fill": "#CC0000" } },
+                { "type": "path", "points": [[850, 100], [870, 40], [890, 100]], "style": { "width": 4, "color": "#CC0000" } },
+                { "type": "circle", "cx": 870, "cy": 70, "r": 6, "style": { "fill": "#CC0000" } }
+              ]
+            },
+            {
+              "name": "thunder_header",
+              "commands": [
+                { "type": "path", "points": [[450, 160], [550, 160], [500, 220]], "style": { "width": 5, "color": "#CC0000" } },
+                { "type": "path", "points": [[420, 200], [480, 200]], "style": { "width": 3, "color": "#CC0000" } },
+                { "type": "path", "points": [[520, 200], [580, 200]], "style": { "width": 3, "color": "#CC0000" } }
+              ]
+            },
+            {
+              "name": "main_body",
+              "commands": [
+                { "type": "circle", "cx": 500, "cy": 380, "r": 80, "style": { "width": 5, "color": "#CC0000", "fill": "none" } },
+                { "type": "circle", "cx": 500, "cy": 380, "r": 20, "style": { "fill": "#CC0000" } },
+                { "type": "circle", "cx": 500, "cy": 540, "r": 80, "style": { "width": 5, "color": "#CC0000", "fill": "none" } },
+                { "type": "circle", "cx": 500, "cy": 540, "r": 12, "style": { "width": 3, "color": "#CC0000", "fill": "none" } },
+                { "type": "text", "x": 500, "y": 750, "content": "九鳳破穢", "size": 80, "font": "seal", "style": { "color": "#CC0000" } }
+              ]
+            },
+            {
+              "name": "fire_marks",
+              "commands": [
+                { "type": "path", "points": [[250, 350], [230, 300], [270, 330]], "style": { "width": 3, "color": "#A52A2A" } },
+                { "type": "path", "points": [[750, 350], [770, 300], [730, 330]], "style": { "width": 3, "color": "#A52A2A" } },
+                { "type": "path", "points": [[300, 580], [280, 530], [320, 560]], "style": { "width": 3, "color": "#A52A2A" } },
+                { "type": "path", "points": [[700, 580], [720, 530], [680, 560]], "style": { "width": 3, "color": "#A52A2A" } }
+              ]
+            }
+          ]
+        }
+      },
+      "usage": ["purification", "space_cleansing", "exorcism", "fire_purification"],
       "verified": true,
+      "hexagrams": [30, 51, 40, 49],
+      "elements": ["Fire", "Thunder", "Heaven"],
       "sealChars": ["九", "鳳", "破", "穢"]
     },
     {
@@ -490,28 +554,28 @@ const DAOIST_REMEDIES_DB = {
               "name": "imperial_header",
               "opacity": 1,
               "commands": [
-                { "type": "text", "x": 500, "y": 80, "content": "敕", "size": 140, "font": "seal", "style": { "color": "#000000" } },
-                { "type": "path", "points": [[500, 150], [180, 380]], "style": { "width": 10, "color": "#000000", "curve": "smooth" } },
-                { "type": "path", "points": [[500, 150], [820, 380]], "style": { "width": 10, "color": "#000000", "curve": "smooth" } },
-                { "type": "path", "points": [[450, 250], [550, 250], [500, 320], [450, 250]], "style": { "width": 8, "color": "#000000" } }
+                { "type": "text", "x": 500, "y": 80, "content": "敕", "size": 140, "font": "seal", "style": { "color": "#CC0000" } },
+                { "type": "path", "points": [[500, 150], [180, 380]], "style": { "width": 10, "color": "#CC0000", "curve": "smooth" } },
+                { "type": "path", "points": [[500, 150], [820, 380]], "style": { "width": 10, "color": "#CC0000", "curve": "smooth" } },
+                { "type": "path", "points": [[450, 250], [550, 250], [500, 320], [450, 250]], "style": { "width": 8, "color": "#CC0000" } }
               ]
             },
             {
               "name": "main_body_text",
               "opacity": 1,
               "commands": [
-                { "type": "path", "points": [[350, 320], [380, 850]], "style": { "width": 8, "color": "#000000", "curve": "heavy" } },
-                { "type": "path", "points": [[650, 320], [620, 850]], "style": { "width": 8, "color": "#000000", "curve": "heavy" } },
-                { "type": "text", "x": 500, "y": 420, "content": "鎮宅", "size": 110, "font": "vertical", "style": { "color": "#000000", "glow": 5 } },
-                { "type": "text", "x": 500, "y": 560, "content": "化煞", "size": 110, "font": "vertical", "style": { "color": "#000000", "glow": 5 } },
-                { "type": "text", "x": 500, "y": 700, "content": "重于命", "size": 70, "font": "vertical", "style": { "color": "#000000" } }
+                { "type": "path", "points": [[350, 320], [380, 850]], "style": { "width": 8, "color": "#CC0000", "curve": "heavy" } },
+                { "type": "path", "points": [[650, 320], [620, 850]], "style": { "width": 8, "color": "#CC0000", "curve": "heavy" } },
+                { "type": "text", "x": 500, "y": 420, "content": "鎮宅", "size": 110, "font": "vertical", "style": { "color": "#CC0000", "glow": 5 } },
+                { "type": "text", "x": 500, "y": 560, "content": "化煞", "size": 110, "font": "vertical", "style": { "color": "#CC0000", "glow": 5 } },
+                { "type": "text", "x": 500, "y": 700, "content": "重于命", "size": 70, "font": "vertical", "style": { "color": "#CC0000" } }
               ]
             },
             {
               "name": "footer_bagua",
               "opacity": 1,
               "commands": [
-                { "type": "bagua", "x": 500, "y": 880, "size": 110, "style": { "color": "#000000", "fill": "#FFD700" } },
+                { "type": "bagua", "x": 500, "y": 880, "size": 110, "style": { "color": "#CC0000", "fill": "#FFD700" } },
                 { "type": "circle", "cx": 500, "cy": 880, "r": 35, "style": { "fill": "none", "width": 2, "color": "#000" } },
                 { "type": "path", "points": [[500, 845], [500, 915]], "style": { "width": 1, "curve": "s-curve", "color": "#000" } },
                 { "type": "circle", "cx": 490, "cy": 865, "r": 6, "style": { "fill": "#000" } },
@@ -548,6 +612,7 @@ const DAOIST_REMEDIES_DB = {
         "fdl": {
           "version": "1.0",
           "background": "#F5E6CA",
+          "source": "database",
           "layers": [
             {
               "name": "red_ink",
@@ -558,8 +623,8 @@ const DAOIST_REMEDIES_DB = {
                 { "type": "text", "x": 500, "y": 150, "content": "奉茅山祖師", "size": 45, "font": "vertical", "style": { "color": "#CC0000" } },
                 { "type": "text", "x": 500, "y": 280, "content": "敕", "size": 100, "font": "seal", "style": { "color": "#CC0000" } },
                 { "type": "path", "points": [[350, 350], [650, 350]], "style": { "width": 5, "color": "#CC0000" } },
-                { "type": "path", "points": [[350, 350], [250, 900]], "style": { "width": 5, "color": "#CC0000", "curve": "slight-bow-out" } },
-                { "type": "path", "points": [[650, 350], [750, 900]], "style": { "width": 5, "color": "#CC0000", "curve": "slight-bow-out" } },
+                { "type": "path", "points": [[350, 350], [250, 900]], "style": { "width": 5, "color": "#CC0000" } },
+                { "type": "path", "points": [[650, 350], [750, 900]], "style": { "width": 5, "color": "#CC0000" } },
                 { "type": "text", "x": 300, "y": 450, "content": "女", "size": 40, "style": { "color": "#CC0000" } },
                 { "type": "text", "x": 300, "y": 600, "content": "生辰", "size": 30, "font": "vertical", "style": { "color": "#CC0000" } },
                 { "type": "text", "x": 700, "y": 450, "content": "男", "size": 40, "style": { "color": "#CC0000" } },
@@ -821,7 +886,7 @@ const DAOIST_REMEDIES_DB = {
             },
             {
               "name": "cloud_script", "commands": [
-                { "type": "text", "x": 500, "y": 550, "content": "五雷令", "size": 300, "font": "worm", "style": { "color": "#000000" } }
+                { "type": "text", "x": 500, "y": 550, "content": "五雷令", "size": 300, "font": "worm", "style": { "color": "#CC0000" } }
               ]
             }
           ]
@@ -884,11 +949,11 @@ const DAOIST_REMEDIES_DB = {
           "version": "1.0", "background": "#F5F5DC", "layers": [
             {
               "name": "black_ink", "commands": [
-                { "type": "text", "x": 800, "y": 300, "content": "王靈官", "size": 70, "font": "vertical", "style": { "color": "#000000" } },
-                { "type": "text", "x": 200, "y": 300, "content": "馬元帥", "size": 70, "font": "vertical", "style": { "color": "#000000" } },
-                { "type": "text", "x": 500, "y": 450, "content": "斬妖", "size": 150, "font": "seal", "style": { "color": "#000000" } },
-                { "type": "text", "x": 650, "y": 700, "content": "地兵水兵", "size": 50, "font": "vertical", "style": { "color": "#000000" } },
-                { "type": "text", "x": 350, "y": 700, "content": "火車律令", "size": 50, "font": "vertical", "style": { "color": "#000000" } }
+                { "type": "text", "x": 800, "y": 300, "content": "王靈官", "size": 70, "font": "vertical", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 200, "y": 300, "content": "馬元帥", "size": 70, "font": "vertical", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 500, "y": 450, "content": "斬妖", "size": 150, "font": "seal", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 650, "y": 700, "content": "地兵水兵", "size": 50, "font": "vertical", "style": { "color": "#CC0000" } },
+                { "type": "text", "x": 350, "y": 700, "content": "火車律令", "size": 50, "font": "vertical", "style": { "color": "#CC0000" } }
               ]
             },
             {
@@ -924,14 +989,14 @@ const DAOIST_REMEDIES_DB = {
           "version": "1.0", "background": "#FFFFFF", "layers": [
             {
               "name": "ink_drawing", "commands": [
-                { "type": "text", "x": 500, "y": 200, "content": "北帝勅命", "size": 80, "font": "vertical", "style": { "color": "#000000" } },
+                { "type": "text", "x": 500, "y": 200, "content": "北帝勅命", "size": 80, "font": "vertical", "style": { "color": "#CC0000" } },
 
-                { "type": "path", "points": [[400, 400], [200, 900], [800, 900], [600, 400]], "style": { "width": 10, "color": "#000000", "fill": "none" } },
-                { "type": "text", "x": 500, "y": 600, "content": "把隘", "size": 150, "font": "seal", "style": { "color": "#000000" } },
+                { "type": "path", "points": [[400, 400], [200, 900], [800, 900], [600, 400]], "style": { "width": 10, "color": "#CC0000", "fill": "none" } },
+                { "type": "text", "x": 500, "y": 600, "content": "把隘", "size": 150, "font": "seal", "style": { "color": "#CC0000" } },
 
-                { "type": "circle", "cx": 450, "cy": 950, "r": 20, "style": { "fill": "#000000" } },
-                { "type": "circle", "cx": 500, "cy": 950, "r": 20, "style": { "fill": "#000000" } },
-                { "type": "circle", "cx": 550, "cy": 950, "r": 20, "style": { "fill": "#000000" } }
+                { "type": "circle", "cx": 450, "cy": 950, "r": 20, "style": { "fill": "#CC0000" } },
+                { "type": "circle", "cx": 500, "cy": 950, "r": 20, "style": { "fill": "#CC0000" } },
+                { "type": "circle", "cx": 550, "cy": 950, "r": 20, "style": { "fill": "#CC0000" } }
               ]
             }
           ]
@@ -965,7 +1030,7 @@ const DAOIST_REMEDIES_DB = {
               "name": "ink_drawing", "commands": [
                 { "type": "circle", "cx": 500, "cy": 100, "r": 30, "style": { "fill": "none", "width": 2, "color": "#000" } },
                 { "type": "circle", "cx": 500, "cy": 100, "r": 5, "style": { "fill": "#000" } },
-                { "type": "text", "x": 500, "y": 250, "content": "上帝敕令", "size": 60, "font": "vertical", "style": { "color": "#000000" } },
+                { "type": "text", "x": 500, "y": 250, "content": "上帝敕令", "size": 60, "font": "vertical", "style": { "color": "#CC0000" } },
 
                 { "type": "path", "points": [[400, 400], [600, 400], [500, 450], [400, 400]], "style": { "width": 3, "color": "#000", "curve": "wavy" } },
                 { "type": "path", "points": [[400, 500], [600, 500], [500, 550], [400, 500]], "style": { "width": 3, "color": "#000", "curve": "wavy" } },
@@ -1124,9 +1189,9 @@ const DAOIST_REMEDIES_DB = {
           "version": "1.0", "background": "#FFD700", "layers": [
             {
               "name": "red_ink", "commands": [
-                { "type": "rect", "x": 150, "y": 100, "w": 700, "h": 850, "style": { "width": 8, "color": "#FF0000", "fill": "none" } },
+                { "type": "rect", "x": 150, "y": 100, "w": 700, "h": 850, "style": { "width": 8, "color": "#CC0000", "fill": "none" } },
 
-                { "type": "text", "x": 500, "y": 500, "content": "北斗解厄", "size": 180, "font": "vertical-seal", "style": { "color": "#FF0000" } }
+                { "type": "text", "x": 500, "y": 500, "content": "北斗解厄", "size": 180, "font": "vertical-seal", "style": { "color": "#CC0000" } }
               ]
             }
           ]
@@ -1596,7 +1661,64 @@ const DAOIST_REMEDIES_DB = {
       "description": "Core Neidan (Internal Alchemy) practice for harmonizing the Heart-Fire and Kidney-Water, preventing alchemical imbalance and promoting longevity.",
       "source": { "primary": "Zhengtong Daozang", "textTitle": "Zhouyi Cantong Qi", "references": ["DZ 999"] },
       "usage": ["internal_alchemy", "longevity", "vitality", "heart_kidney_harmony"],
-      "verified": true
+      "verified": true,
+      "instructions": [
+        "Place red candle or lamp in the SOUTH (Li/Fire palace) to strengthen Heart Qi",
+        "Place bowl of pure water in the NORTH (Kan/Water palace) to nourish Kidney essence",
+        "Sit facing EAST (Zhen/Wood palace) for morning practice to activate Wood generation",
+        "Keep the CENTER (Taiji) clear - place a yellow crystal or jade stone for Earth stability"
+      ],
+      "fengShui": {
+        "favorable": ["S", "N", "E", "Center"],
+        "unfavorable": ["SE", "NW"],
+        "elements": ["Fire", "Water", "Wood", "Earth"],
+        "artifacts": [
+          { "direction": "S", "item": "Red Candle", "purpose": "Activate Heart-Fire" },
+          { "direction": "N", "item": "Water Bowl", "purpose": "Nourish Kidney-Water" },
+          { "direction": "E", "item": "Green Plant", "purpose": "Generate Wood Qi" },
+          { "direction": "Center", "item": "Yellow Crystal", "purpose": "Earth Stability" }
+        ]
+      },
+      "visualData": {
+        "fdl": {
+          "version": "1.0",
+          "background": "#1a1a2e",
+          "type": "medicine_diagram",
+          "layers": [
+            {
+              "name": "base_bagua",
+              "commands": [
+                { "type": "bagua", "x": 500, "y": 500, "size": 700, "style": { "arrangement": "houtian" } }
+              ]
+            },
+            {
+              "name": "sector_highlights",
+              "opacity": 0.4,
+              "commands": [
+                { "type": "highlight_sector", "trigram": "Li", "direction": "S", "style": { "fill": "#F4433640", "stroke": "#F44336", "glow": true, "glowColor": "#FF5252" }, "label": { "text": "Fire\nHeart", "color": "#F44336" } },
+                { "type": "highlight_sector", "trigram": "Kan", "direction": "N", "style": { "fill": "#2196F340", "stroke": "#2196F3", "glow": true, "glowColor": "#2196F3" }, "label": { "text": "Water\nKidney", "color": "#2196F3" } },
+                { "type": "highlight_sector", "trigram": "Zhen", "direction": "E", "style": { "fill": "#4CAF5040", "stroke": "#4CAF50", "glow": true, "glowColor": "#4CAF50" }, "label": { "text": "Wood\nLiver", "color": "#4CAF50" } },
+                { "type": "highlight_sector", "trigram": "Taiji", "direction": "Center", "style": { "fill": "#FFB74D40", "stroke": "#FFB74D", "glow": true, "glowColor": "#FFB74D" }, "label": { "text": "Earth\nSpleen", "color": "#FFB74D" } }
+              ]
+            },
+            {
+              "name": "instruction_markers",
+              "commands": [
+                { "type": "instruction_marker", "trigram": "Li", "direction": "S", "style": { "markerType": "star", "size": 30, "color": "#F44336" }, "instruction": { "item": "Red Candle", "action": "Place", "purpose": "Activate Heart-Fire" } },
+                { "type": "instruction_marker", "trigram": "Kan", "direction": "N", "style": { "markerType": "circle", "size": 30, "color": "#2196F3" }, "instruction": { "item": "Water Bowl", "action": "Place", "purpose": "Nourish Kidney-Water" } },
+                { "type": "instruction_marker", "trigram": "Zhen", "direction": "E", "style": { "markerType": "triangle", "size": 30, "color": "#4CAF50" }, "instruction": { "item": "Green Plant", "action": "Place", "purpose": "Generate Wood Qi" } },
+                { "type": "instruction_marker", "trigram": "Taiji", "direction": "Center", "style": { "markerType": "diamond", "size": 30, "color": "#FFB74D" }, "instruction": { "item": "Yellow Crystal", "action": "Place", "purpose": "Earth Stability" } }
+              ]
+            },
+            {
+              "name": "center_taijitu",
+              "commands": [
+                { "type": "taijitu", "x": 500, "y": 500, "size": 120, "style": { "color": "#d4af37", "width": 3 } }
+              ]
+            }
+          ]
+        }
+      }
     },
     {
       "id": "med_002",
@@ -1604,7 +1726,68 @@ const DAOIST_REMEDIES_DB = {
       "description": "Daoist medical discipline for regulating the internal organ systems through Bagua and Five Element correspondences.",
       "source": { "primary": "Common Daoist Medical Canon", "textTitle": "Huangdi Neijing" },
       "usage": ["organ_health", "five_elements_medicine", "healing", "preventive_care"],
-      "verified": true
+      "verified": true,
+      "instructions": [
+        "EAST (Zhen/Wood): Place fresh plants or wooden objects to support Liver health",
+        "SOUTHEAST (Xun/Wood): Position herbs or medicinal plants for respiratory wellness",
+        "SOUTH (Li/Fire): Keep lighting moderate - bright but not harsh for Heart balance",
+        "SOUTHWEST (Kun/Earth): Place yellow stones or ceramics for digestive health",
+        "WEST (Dui/Metal): Use metal wind chimes or white stones for Lung vitality",
+        "NORTHWEST (Qian/Metal): Position breathing exercise space for respiratory Qi",
+        "NORTH (Kan/Water): Maintain calm water features for Kidney essence preservation",
+        "NORTHEAST (Gen/Earth): Place meditation cushion or stable seating for grounding"
+      ],
+      "fengShui": {
+        "favorable": ["E", "SE", "S", "SW", "W", "NW", "N", "NE"],
+        "unfavorable": [],
+        "elements": ["Wood", "Fire", "Earth", "Metal", "Water"],
+        "artifacts": [
+          { "direction": "E", "item": "Fresh Plants", "purpose": "Liver Health" },
+          { "direction": "S", "item": "Moderate Lighting", "purpose": "Heart Balance" },
+          { "direction": "SW", "item": "Yellow Stones", "purpose": "Digestive Health" },
+          { "direction": "W", "item": "Metal Chimes", "purpose": "Lung Vitality" },
+          { "direction": "N", "item": "Water Feature", "purpose": "Kidney Essence" },
+          { "direction": "NE", "item": "Meditation Space", "purpose": "Grounding" }
+        ]
+      },
+      "visualData": {
+        "fdl": {
+          "version": "1.0",
+          "background": "#1a1a2e",
+          "type": "medicine_diagram",
+          "layers": [
+            {
+              "name": "base_bagua",
+              "commands": [
+                { "type": "bagua", "x": 500, "y": 500, "size": 700, "style": { "arrangement": "houtian" } }
+              ]
+            },
+            {
+              "name": "all_sectors_highlight",
+              "opacity": 0.25,
+              "commands": [
+                { "type": "highlight_sector", "trigram": "Li", "direction": "S", "style": { "fill": "#F4433630", "stroke": "#F44336" }, "label": { "text": "Heart", "color": "#F44336" } },
+                { "type": "highlight_sector", "trigram": "Kan", "direction": "N", "style": { "fill": "#2196F330", "stroke": "#2196F3" }, "label": { "text": "Kidney", "color": "#2196F3" } },
+                { "type": "highlight_sector", "trigram": "Zhen", "direction": "E", "style": { "fill": "#4CAF5030", "stroke": "#4CAF50" }, "label": { "text": "Liver", "color": "#4CAF50" } },
+                { "type": "highlight_sector", "trigram": "Xun", "direction": "SE", "style": { "fill": "#8BC34A30", "stroke": "#8BC34A" }, "label": { "text": "Respiratory", "color": "#8BC34A" } },
+                { "type": "highlight_sector", "trigram": "Dui", "direction": "W", "style": { "fill": "#FFC10730", "stroke": "#FFC107" }, "label": { "text": "Lungs", "color": "#FFC107" } },
+                { "type": "highlight_sector", "trigram": "Gen", "direction": "NE", "style": { "fill": "#00BCD430", "stroke": "#00BCD4" }, "label": { "text": "Grounding", "color": "#00BCD4" } },
+                { "type": "highlight_sector", "trigram": "Kun", "direction": "SW", "style": { "fill": "#E91E6330", "stroke": "#E91E63" }, "label": { "text": "Digestion", "color": "#E91E63" } },
+                { "type": "highlight_sector", "trigram": "Qian", "direction": "NW", "style": { "fill": "#FF980030", "stroke": "#FF9800" }, "label": { "text": "Breath", "color": "#FF9800" } }
+              ]
+            },
+            {
+              "name": "organ_markers",
+              "commands": [
+                { "type": "instruction_marker", "trigram": "Li", "direction": "S", "style": { "markerType": "star", "size": 25, "color": "#F44336" }, "instruction": { "item": "Moderate Light", "purpose": "Heart Balance" } },
+                { "type": "instruction_marker", "trigram": "Kan", "direction": "N", "style": { "markerType": "circle", "size": 25, "color": "#2196F3" }, "instruction": { "item": "Water Feature", "purpose": "Kidney Essence" } },
+                { "type": "instruction_marker", "trigram": "Zhen", "direction": "E", "style": { "markerType": "triangle", "size": 25, "color": "#4CAF50" }, "instruction": { "item": "Fresh Plants", "purpose": "Liver Health" } },
+                { "type": "instruction_marker", "trigram": "Dui", "direction": "W", "style": { "markerType": "diamond", "size": 25, "color": "#FFC107" }, "instruction": { "item": "Metal Chimes", "purpose": "Lung Vitality" } }
+              ]
+            }
+          ]
+        }
+      }
     }
   ],
 

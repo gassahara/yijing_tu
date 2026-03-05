@@ -193,8 +193,16 @@ class UI {
             }
         }
 
-        // Split into paragraphs
-        const paragraphs = cleanText.split(/\n+/).filter(p => p.trim());
+        // Clean up the text - normalize whitespace
+        cleanText = cleanText.replace(/\s+/g, ' ').trim();
+
+        // Split into paragraphs by newlines first
+        let paragraphs = cleanText.split(/\n+/).filter(p => p.trim());
+
+        // If no newlines found or only one paragraph, intelligently split long text
+        if (paragraphs.length <= 1 && cleanText.length > 300) {
+            paragraphs = this._intelligentParagraphSplit(cleanText);
+        }
 
         if (paragraphs.length === 0) return cleanText;
 
@@ -216,6 +224,75 @@ class UI {
             const highlighted = this.highlightProperNames(p.trim(), lang);
             return `<p>${highlighted}</p>`;
         }).join('');
+    }
+
+    /**
+     * Intelligently split long text into paragraphs based on sentence boundaries
+     * and topic shifts. Groups 2-4 sentences per paragraph.
+     * @param {string} text - Long text without paragraph breaks
+     * @returns {string[]} - Array of paragraph strings
+     */
+    static _intelligentParagraphSplit(text) {
+        // Split into sentences (handles common sentence endings)
+        const sentenceRegex = /[^.!?]+[.!?]+["']?\s*/g;
+        const sentences = text.match(sentenceRegex) || [text];
+        
+        if (sentences.length <= 2) {
+            return [text.trim()];
+        }
+
+        const paragraphs = [];
+        let currentParagraph = '';
+        let sentenceCount = 0;
+        const targetSentencesPerParagraph = 2;
+
+        // Topic shift words in multiple languages
+        const topicShiftWords = ['however', 'meanwhile', 'furthermore', 'consequently', 'therefore', 
+            'additionally', 'moreover', 'nevertheless', 'conversely', 'specifically',
+            'sin embargo', 'mientras tanto', 'además', 'por consiguiente', 'específicamente',
+            'tuttavia', 'nel frattempo', 'inoltre', 'di conseguenza', 'specificamente'];
+
+        for (let i = 0; i < sentences.length; i++) {
+            const sentence = sentences[i].trim();
+            if (!sentence) continue;
+
+            const lowerSentence = sentence.toLowerCase();
+            const hasTopicShift = topicShiftWords.some(word => 
+                lowerSentence.startsWith(word) || lowerSentence.includes('. ' + word)
+            );
+
+            // Start new paragraph on topic shift or after target sentence count
+            if ((hasTopicShift && sentenceCount >= 2) || sentenceCount >= targetSentencesPerParagraph + 1) {
+                if (currentParagraph.trim()) {
+                    paragraphs.push(currentParagraph.trim());
+                }
+                currentParagraph = sentence + ' ';
+                sentenceCount = 1;
+            } else {
+                currentParagraph += sentence + ' ';
+                sentenceCount++;
+            }
+        }
+
+        // Don't forget the last paragraph
+        if (currentParagraph.trim()) {
+            paragraphs.push(currentParagraph.trim());
+        }
+
+        // If we ended up with too many small paragraphs, merge them
+        if (paragraphs.length > 5) {
+            const merged = [];
+            for (let i = 0; i < paragraphs.length; i += 2) {
+                if (i + 1 < paragraphs.length) {
+                    merged.push(paragraphs[i] + ' ' + paragraphs[i + 1]);
+                } else {
+                    merged.push(paragraphs[i]);
+                }
+            }
+            return merged;
+        }
+
+        return paragraphs.length > 0 ? paragraphs : [text.trim()];
     }
 
     /**
@@ -941,8 +1018,23 @@ class UI {
         }
 
         const r = result[lang] || result.en;
+        console.log('[UI] renderAIInterpretation - result keys:', Object.keys(result));
+        console.log('[UI] renderAIInterpretation - r keys:', r ? Object.keys(r) : 'null');
+        console.log('[UI] renderAIInterpretation - has mdlLayout:', !!(r && r.mdlLayout));
         if (!r) {
             container.innerHTML = `<div style="color: var(--text-dim); padding: 20px;">${I18N[lang]?.unavailable ? I18N[lang].unavailable : 'Interpretation unavailable'}</div>`;
+            return;
+        }
+
+        // MD-LDL rendering (preferred)
+        if (r.mdlLayout && typeof LayoutLanguage !== 'undefined') {
+            console.log('[UI] Rendering AI interpretation with MD-LDL layout');
+            if (r.mdlParsed) {
+                LayoutLanguage.render(r.mdlParsed, 'interpretation-content-area', lang);
+            } else {
+                const parsed = LayoutLanguage.parse(r.mdlLayout);
+                LayoutLanguage.render(parsed, 'interpretation-content-area', lang);
+            }
             return;
         }
 
@@ -991,15 +1083,22 @@ class UI {
                 // Layer 2: Technical Analysis (classical) - main content
                 if (technicalAnalysis) {
                     const techString = typeof technicalAnalysis === 'string' ? technicalAnalysis : JSON.stringify(technicalAnalysis);
-                    html += `<div class="interp-text interp-technical" style="margin-bottom: 8px;">${this.formatParagraphs ? this.formatParagraphs(techString) : techString}</div>`;
+                    // Use formatCompactInterp for 3-tab compact format, formatParagraphs for legacy
+                    const formatted = techString.includes('CELESTIAL:') || techString.includes('ELEMENTS:') || techString.includes('ANALYSIS:')
+                        ? this.formatCompactInterp(techString, key, lang)
+                        : (this.formatParagraphs ? this.formatParagraphs(techString) : techString);
+                    html += `<div class="interp-text interp-technical" style="margin-bottom: 8px;">${formatted}</div>`;
                 }
 
                 // Layer 3: Colloquial/Modern Interpretation - collapsible
                 if (colloquialData) {
                     const collString = typeof colloquialData === 'string' ? colloquialData : JSON.stringify(colloquialData);
+                    const formatted = collString.includes('CELESTIAL:') || collString.includes('ELEMENTS:') || collString.includes('ANALYSIS:')
+                        ? this.formatCompactInterp(collString, key, lang)
+                        : (this.formatParagraphs ? this.formatParagraphs(collString) : collString);
                     html += `<details class="interp-coll-details" style="margin-top: 8px;">
                         <summary class="interp-coll-summary">${t.colloquialInterpretation || '💬 Modern Interpretation'}</summary>
-                        <div class="interp-coll-box interp-colloquial">${this.formatParagraphs ? this.formatParagraphs(collString) : collString}</div>
+                        <div class="interp-coll-box interp-colloquial">${formatted}</div>
                     </details>`;
                 }
 
@@ -1031,7 +1130,7 @@ class UI {
             }
             html += `<div class="interp-lines-box">
                 <div class="interp-header">⚡ ${t.movingLines || 'Moving Lines'}</div>
-                <div class="interp-text">${movingLinesText}</div>
+                <div class="interp-text">${this.formatParagraphs ? this.formatParagraphs(movingLinesText) : movingLinesText}</div>
             </div>`;
         }
 
@@ -1213,7 +1312,14 @@ class UI {
         }
 
         // Standard paragraph formatting
-        return text.split(/\n\n+/).map(p => {
+        let paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+        
+        // If no paragraph breaks found and text is long, apply intelligent splitting
+        if (paragraphs.length <= 1 && text.length > 400) {
+            paragraphs = this._intelligentParagraphSplit(text);
+        }
+        
+        return paragraphs.map(p => {
             if (!p.trim()) return '';
             const trimmed = p.trim();
             // Detect subtitle-like short lines
@@ -1765,7 +1871,7 @@ class UI {
 
         // Helper to translate remedy content asynchronously (for legacy renderer)
         const translateRemedyContentLegacy = async (remedy, lang) => {
-            if (lang === 'en' || !window.translationService) return remedy;
+            if (!window.translationService) return remedy;
 
             const fieldsToTranslate = ['relevance', 'description', 'instructions'];
             for (const field of fieldsToTranslate) {
@@ -1805,8 +1911,8 @@ class UI {
             const remedyName = this._resolveRemedyName(remedy, displayLang);
             const remedyNameZh = typeof remedy.name === 'object' ? (remedy.name.zh || '') : (remedy.nameZh || '');
 
-            // Kick off async translation for remedy content if not English
-            if (displayLang !== 'en' && window.translationService) {
+            // Kick off async formatting/translation for remedy content (always, for beautifying)
+            if (window.translationService) {
                 translateRemedyContentLegacy(remedy, displayLang).then(updatedRemedy => {
                     // Update DOM with translated content
                     const items = document.querySelectorAll('.remedy-item-wrapper');
@@ -2091,20 +2197,127 @@ class UI {
         console.log(`[UI.generateFengShuiFDL] Favorable directions:`, favorable);
 
         // Build highlight commands for favorable directions
-        const highlightCommands = favorable.map(dir => {
+        const highlightCommands = [];
+        const markerCommands = [];
+        
+        // Get artifacts/remedies from content or DB
+        let artifacts = content.artifacts || [];
+        let remedies = content.remedies || [];
+        
+        // Try to get from DB if not in content
+        if ((artifacts.length === 0 || remedies.length === 0) && content.remedy?.id && typeof DAOIST_REMEDIES_DB !== 'undefined' && DAOIST_REMEDIES_DB.fengshui) {
+            const dbEntry = DAOIST_REMEDIES_DB.fengshui.find(f => f.id === content.remedy.id);
+            if (dbEntry?.artifacts) {
+                artifacts = dbEntry.artifacts;
+            }
+            if (dbEntry?.remedies) {
+                remedies = dbEntry.remedies;
+            }
+        }
+
+        favorable.forEach(dir => {
             const trigram = this._directionToTrigram(dir);
-            if (!trigram) return null;
-            return {
+            if (!trigram) return;
+            
+            // Get color for trigram (including Taiji for Center)
+            const colors = {
+                'Li': '#F44336', 'Kan': '#2196F3', 'Zhen': '#4CAF50', 'Xun': '#8BC34A',
+                'Dui': '#FFC107', 'Qian': '#FF9800', 'Gen': '#00BCD4', 'Kun': '#E91E63',
+                'Taiji': '#FFB74D'
+            };
+            const color = colors[trigram] || '#4CAF50';
+            
+            // Add highlight
+            highlightCommands.push({
                 type: "highlight_sector",
                 trigram: trigram,
-                style: { fill: "#00FF0040", stroke: "#00FF00", strokeWidth: 3, glow: true, glowColor: "#00FF00" }
-            };
-        }).filter(Boolean);
+                direction: dir,
+                style: { 
+                    fill: color + '40', 
+                    stroke: color, 
+                    strokeWidth: 3, 
+                    glow: true, 
+                    glowColor: color 
+                },
+                label: {
+                    text: trigram,
+                    color: color
+                }
+            });
+            
+            // Find artifact for this direction (check both artifacts and remedies arrays)
+            let artifact = artifacts.find(a => a.direction === dir);
+            if (!artifact) {
+                // Try to find a remedy that matches the direction (heuristic)
+                const remedy = remedies.find(r => {
+                    const item = (r.item || '').toLowerCase();
+                    const zh = (r.zh || '').toLowerCase();
+                    // Match center-related items for Center direction
+                    if (dir === 'Center') {
+                        return item.includes('center') || item.includes('taiji') || 
+                               zh.includes('中央') || zh.includes('太極') || zh.includes('中');
+                    }
+                    return false;
+                });
+                if (remedy) {
+                    artifact = {
+                        item: remedy.item,
+                        purpose: remedy.reason
+                    };
+                }
+            }
+            
+            if (artifact) {
+                markerCommands.push({
+                    type: "instruction_marker",
+                    trigram: trigram,
+                    direction: dir,
+                    style: {
+                        markerType: "star",
+                        size: 28,
+                        color: color
+                    },
+                    instruction: {
+                        item: artifact.item,
+                        action: "Place",
+                        purpose: artifact.purpose || artifact.power || artifact.reason || "Activate"
+                    }
+                });
+            }
+        });
+
+        // Add unfavorable highlights
+        const unfavorable = content.unfavorable || [];
+        unfavorable.forEach(dir => {
+            const trigram = this._directionToTrigram(dir);
+            if (!trigram) return;
+            
+            // Only add if not already highlighted
+            const alreadyAdded = highlightCommands.some(cmd => cmd.trigram === trigram);
+            if (alreadyAdded) return;
+            
+            highlightCommands.push({
+                type: "highlight_sector",
+                trigram: trigram,
+                direction: dir,
+                style: { 
+                    fill: '#F4433630', 
+                    stroke: '#F44336', 
+                    strokeWidth: 2, 
+                    glow: true, 
+                    glowColor: '#F44336' 
+                },
+                label: {
+                    text: "Avoid",
+                    color: '#F44336'
+                }
+            });
+        });
 
         return {
             version: "2.0",
             background: "#f4f4f9",
-            source: "fengshui_fallback",
+            source: "fengshui_enhanced",
             type: "fengshui_diagram",
             layers: [
                 {
@@ -2115,16 +2328,33 @@ class UI {
                     ]
                 },
                 {
-                    name: "directions",
+                    name: "sector_highlights",
                     type: "highlight_layer",
+                    opacity: 0.5,
                     commands: highlightCommands
+                },
+                {
+                    name: "instruction_markers",
+                    type: "overlay_layer",
+                    commands: markerCommands
+                },
+                {
+                    name: "center_taijitu",
+                    type: "symbol_layer",
+                    commands: [
+                        { type: "taijitu", x: 500, y: 500, size: 100, style: { color: "#d4af37", width: 3 } }
+                    ]
                 }
             ]
         };
     }
 
     static _directionToTrigram(dir) {
-        const map = { 'S': 'Li', 'SE': 'Xun', 'E': 'Zhen', 'NE': 'Gen', 'N': 'Kan', 'NW': 'Qian', 'W': 'Dui', 'SW': 'Kun' };
+        const map = { 
+            'S': 'Li', 'SE': 'Xun', 'E': 'Zhen', 'NE': 'Gen', 
+            'N': 'Kan', 'NW': 'Qian', 'W': 'Dui', 'SW': 'Kun',
+            'Center': 'Taiji', 'Centre': 'Taiji', 'C': 'Taiji'
+        };
         return map[dir] || null;
     }
 
@@ -2608,6 +2838,17 @@ class UI {
             }
         }
 
+        // Generate FDL with instruction layers for medicine
+        const fdl = this._generateMedicineFDL(fengShuiData, lang);
+        if (fdl && SigilTools.drawFDL) {
+            try {
+                SigilTools.drawFDL(ctx, w, h, fdl, '#d4af37');
+                return;
+            } catch (e) {
+                console.warn('[UI] Generated FDL rendering failed, falling back to basic:', e);
+            }
+        }
+
         // Fallback: Build highlight style based on favorable/unfavorable directions
         const cx = w / 2;
         const cy = h / 2;
@@ -2708,6 +2949,188 @@ class UI {
                 ctx.fillText(isFavorable ? '✓' : '✗', x, y + markerR * 0.45);
             }
         });
+    }
+
+    /**
+     * Generate FDL for Medicine diagrams with instruction layers
+     * including favorable directions, artifact signaling, and organ correspondences
+     */
+    static _generateMedicineFDL(fengShuiData, lang) {
+        const t = I18N[lang] || I18N['en'];
+        
+        // Direction to trigram mapping
+        const dirToTrigram = {
+            'S': 'Li', 'South': 'Li',
+            'SW': 'Kun', 'Southwest': 'Kun',
+            'W': 'Dui', 'West': 'Dui',
+            'NW': 'Qian', 'Northwest': 'Qian',
+            'N': 'Kan', 'North': 'Kan',
+            'NE': 'Gen', 'Northeast': 'Gen',
+            'E': 'Zhen', 'East': 'Zhen',
+            'SE': 'Xun', 'Southeast': 'Xun',
+            'Center': 'Taiji', 'Center': 'Taiji'
+        };
+
+        // Element colors for trigrams
+        const trigramColors = {
+            'Li': '#F44336',    // Fire - Red
+            'Kan': '#2196F3',   // Water - Blue
+            'Zhen': '#4CAF50',  // Wood - Green
+            'Xun': '#8BC34A',   // Wood - Light Green
+            'Dui': '#FFC107',   // Metal - Gold
+            'Qian': '#FF9800',  // Metal - Orange
+            'Gen': '#00BCD4',   // Earth - Cyan
+            'Kun': '#E91E63',   // Earth - Pink
+            'Taiji': '#FFB74D'  // Center - Yellow
+        };
+
+        // Organ correspondences
+        const organMap = {
+            'Li': 'Heart', 'Kan': 'Kidney', 'Zhen': 'Liver', 'Xun': 'Respiratory',
+            'Dui': 'Lungs', 'Qian': 'Breath', 'Gen': 'Grounding', 'Kun': 'Digestion'
+        };
+
+        const layers = [
+            {
+                name: "base_bagua",
+                commands: [
+                    { type: "bagua", x: 500, y: 500, size: 700, style: { arrangement: "houtian" } }
+                ]
+            }
+        ];
+
+        // Build sector highlights from favorable directions
+        const highlightCommands = [];
+        const markerCommands = [];
+        
+        // Process favorable directions with artifacts
+        if (fengShuiData.favorable && Array.isArray(fengShuiData.favorable)) {
+            fengShuiData.favorable.forEach(dir => {
+                const trigram = dirToTrigram[dir.trim()];
+                if (!trigram) return;
+                
+                const color = trigramColors[trigram] || '#4CAF50';
+                const organ = organMap[trigram] || '';
+                
+                // Find artifact for this direction
+                let artifact = null;
+                if (fengShuiData.artifacts && Array.isArray(fengShuiData.artifacts)) {
+                    artifact = fengShuiData.artifacts.find(a => a.direction === dir.trim());
+                }
+                
+                // Add sector highlight
+                highlightCommands.push({
+                    type: "highlight_sector",
+                    trigram: trigram,
+                    direction: dir.trim(),
+                    style: { 
+                        fill: color + '40', 
+                        stroke: color, 
+                        glow: true, 
+                        glowColor: color 
+                    },
+                    label: { 
+                        text: organ, 
+                        color: color 
+                    }
+                });
+                
+                // Add instruction marker with artifact
+                if (artifact) {
+                    markerCommands.push({
+                        type: "instruction_marker",
+                        trigram: trigram,
+                        direction: dir.trim(),
+                        style: { 
+                            markerType: "star", 
+                            size: 28, 
+                            color: color 
+                        },
+                        instruction: { 
+                            item: artifact.item, 
+                            action: "Place", 
+                            purpose: artifact.purpose || organ
+                        }
+                    });
+                } else {
+                    markerCommands.push({
+                        type: "instruction_marker",
+                        trigram: trigram,
+                        direction: dir.trim(),
+                        style: { 
+                            markerType: "circle", 
+                            size: 24, 
+                            color: color 
+                        },
+                        instruction: { 
+                            item: organ, 
+                            action: "Activate", 
+                            purpose: "Balance"
+                        }
+                    });
+                }
+            });
+        }
+
+        // Process unfavorable directions
+        if (fengShuiData.unfavorable && Array.isArray(fengShuiData.unfavorable)) {
+            fengShuiData.unfavorable.forEach(dir => {
+                const trigram = dirToTrigram[dir.trim()];
+                if (!trigram) return;
+                
+                // Only add if not already in favorable
+                const alreadyHighlighted = highlightCommands.some(cmd => cmd.trigram === trigram);
+                if (alreadyHighlighted) return;
+                
+                highlightCommands.push({
+                    type: "highlight_sector",
+                    trigram: trigram,
+                    direction: dir.trim(),
+                    style: { 
+                        fill: '#F4433630', 
+                        stroke: '#F44336', 
+                        glow: true, 
+                        glowColor: '#F44336' 
+                    },
+                    label: { 
+                        text: "Avoid", 
+                        color: '#F44336' 
+                    }
+                });
+            });
+        }
+
+        // Add highlight layer if we have highlights
+        if (highlightCommands.length > 0) {
+            layers.push({
+                name: "sector_highlights",
+                opacity: 0.5,
+                commands: highlightCommands
+            });
+        }
+
+        // Add instruction markers layer if we have markers
+        if (markerCommands.length > 0) {
+            layers.push({
+                name: "instruction_markers",
+                commands: markerCommands
+            });
+        }
+
+        // Add center taijitu
+        layers.push({
+            name: "center_taijitu",
+            commands: [
+                { type: "taijitu", x: 500, y: 500, size: 100, style: { color: "#d4af37", width: 3 } }
+            ]
+        });
+
+        return {
+            version: "2.0",
+            background: "#1a1a2e",
+            type: "medicine_diagram",
+            layers: layers
+        };
     }
 
     /**
@@ -3484,9 +3907,28 @@ class UI {
         if (!container || !result) return;
 
         const r = result[lang] || result.en;
+        console.log('[UI] renderInterpretationTabbed - result keys:', Object.keys(result));
+        console.log('[UI] renderInterpretationTabbed - r keys:', r ? Object.keys(r) : 'null');
+        console.log('[UI] renderInterpretationTabbed - has mdlLayout:', !!(r && r.mdlLayout));
         if (!r) {
             container.innerHTML = '<div style="color: var(--text-dim); padding: 20px;">Interpretation unavailable</div>';
             return;
+        }
+
+        // MD-LDL rendering (preferred)
+        if (r.mdlLayout && typeof LayoutLanguage !== 'undefined') {
+            console.log('[UI] Rendering with MD-LDL layout');
+            try {
+                if (r.mdlParsed) {
+                    LayoutLanguage.render(r.mdlParsed, 'interpretation-content-area', lang);
+                } else {
+                    const parsed = LayoutLanguage.parse(r.mdlLayout);
+                    LayoutLanguage.render(parsed, 'interpretation-content-area', lang);
+                }
+                return;
+            } catch (e) {
+                console.warn('[UI] MD-LDL render failed, falling back:', e.message);
+            }
         }
 
         const t = I18N[lang] || I18N['en'];
@@ -3822,7 +4264,7 @@ class UI {
 
         // Helper to translate remedy content asynchronously
         const translateRemedyContent = async (remedy, lang) => {
-            if (lang === 'en' || !window.translationService) return remedy;
+            if (!window.translationService) return remedy;
 
             const fieldsToTranslate = ['relevance', 'description', 'instructions'];
             for (const field of fieldsToTranslate) {
@@ -3858,8 +4300,8 @@ class UI {
             if (remedy.image) fuluContent.image = remedy.image;
             if (remedy.visualData?.fdl) fuluContent.fdl = remedy.visualData.fdl;
 
-            // Kick off async translation for remedy content if not English
-            if (displayLang !== 'en' && window.translationService) {
+            // Kick off async formatting/translation for remedy content (always, for beautifying)
+            if (window.translationService) {
                 translateRemedyContent(remedy, displayLang).then(updatedRemedy => {
                     // Update DOM with translated content
                     const tabItems = document.querySelectorAll('.remedy-tab-item');
@@ -3899,8 +4341,8 @@ class UI {
                     }
                     if (localRecord && localRecord.instructions) {
                         remedy.instructions = localRecord.instructions;
-                        // Kick off async translation for DB-sourced text if not EN
-                        if (displayLang !== 'en' && window.translationService) {
+                        // Kick off async formatting/translation for DB-sourced text (always)
+                        if (window.translationService) {
                             window.translationService.translateText(remedy.instructions, displayLang, 'ui_content')
                                 .then(translated => {
                                     if (translated && translated !== remedy.instructions) {
